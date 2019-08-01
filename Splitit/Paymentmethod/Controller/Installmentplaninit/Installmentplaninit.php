@@ -10,55 +10,59 @@ class Installmentplaninit extends \Magento\Framework\App\Action\Action {
 
 	private $helper;
 
-	public function execute(){
+	public function execute() {
 
 		$this->helper = $this->_objectManager->create('Splitit\Paymentmethod\Helper\Data');
 		$request = $this->_objectManager->get('\Magento\Framework\App\Request\Http')->getParams();
 		$resultJson = $this->resultFactory->create(ResultFactory::TYPE_JSON);
 		$response = [
-                        "status" => false,
-                        "errorMsg" => "",
-                        "successMsg"=>"",
-                        "data" => "",
-                        
-        ];
-        $logger = $this->_objectManager->get('\Psr\Log\LoggerInterface');
+			"status" => false,
+			"errorMsg" => "",
+			"successMsg" => "",
+			"data" => "",
+
+		];
+		$logger = $this->_objectManager->get('\Psr\Log\LoggerInterface');
 
 		$selectedInstallment = "";
-		if(isset($request["selectedInstallment"]) && $request["selectedInstallment"] != ""){
-			$selectedInstallment = $request["selectedInstallment"];	
-		}else{
+		if (isset($request["selectedInstallment"]) && $request["selectedInstallment"] != "") {
+			$selectedInstallment = $request["selectedInstallment"];
+		} else {
 			$response["errorMsg"] = "Please select Number of Installments";
 			return $resultJson->setData($response);
-			
+
 		}
 		$guestEmail = "";
-		if(isset($request["guestEmail"])){
-			$guestEmail = $request["guestEmail"];	
+		if (isset($request["guestEmail"])) {
+			$guestEmail = $request["guestEmail"];
 		}
 
 		$apiModelObj = $this->_objectManager->get('Splitit\Paymentmethod\Model\Api');
 		$loginResponse = $apiModelObj->apiLogin();
 		// check if login successfully or not
-		if(!$loginResponse["status"]){
-			 $logger->addError($loginResponse["errorMsg"]);
+		if (!$loginResponse["status"]) {
+			$logger->addError($loginResponse["errorMsg"]);
 			$response["errorMsg"] = 'Error in processing your order. Please try again later.';
 			return $resultJson->setData($response);
-			
+
 		}
 		// call Installment Plan
 		$installmentPlanInitResponse = $apiModelObj->installmentPlanInit($selectedInstallment, $guestEmail);
 
-		if($installmentPlanInitResponse["status"]){
-            $response["status"] = true;
-            $response["successMsg"] = $installmentPlanInitResponse["successMsg"];
-        }else{
-        	 $logger->addError($installmentPlanInitResponse["errorMsg"]);
-            $response["errorMsg"] = 'Error in processing your order. Please try again later.';
-        }
-        
-        	$resultJson->setData($response);
-	        return $resultJson;
+		if ($installmentPlanInitResponse["status"]) {
+			$response["status"] = true;
+			$response["successMsg"] = $installmentPlanInitResponse["successMsg"];
+		} else {
+			$response["errorMsg"] = 'Error in processing your order. Please try again later.';
+			$logger->addError($installmentPlanInitResponse["errorMsg"]);
+			if ($installmentPlanInitResponse["errorMsg"]) {
+				$response["errorMsg"] = $installmentPlanInitResponse["errorMsg"];
+			}
+
+		}
+
+		$resultJson->setData($response);
+		return $resultJson;
 
 	}
 

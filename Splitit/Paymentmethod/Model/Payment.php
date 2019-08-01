@@ -190,10 +190,10 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 			$params = array('InstallmentPlanNumber' => $authNumber);
 			if ($paymentAction == "authorize_capture") {
 				$api = $this->_apiModel->getApiUrl();
-				$sessionId = $this->customerSession->getSplititSessionid();
+				$sessionId = $this->_apiModel->getorCreateSplititSessionid();
 			} else {
 				$api = $this->_apiModel->apiLogin();
-				$sessionId = $this->customerSession->getSplititSessionid();
+				$sessionId = $this->_apiModel->getorCreateSplititSessionid();
 			}
 			$params = array_merge($params, array("RequestHeader" => array('SessionId' => $sessionId)));
 			$api = $this->_apiModel->getApiUrl();
@@ -258,7 +258,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 			}
 			$params = array(
 				"RequestHeader" => array(
-					"SessionId" => $this->customerSession->getSplititSessionid(),
+					"SessionId" => $this->_apiModel->getorCreateSplititSessionid(),
 				),
 				"InstallmentPlanNumber" => $installmentPlanNumber,
 				"RefundUnderCancelation" => "OnlyIfAFullRefundIsPossible",
@@ -318,7 +318,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 			}
 			$params = array(
 				"RequestHeader" => array(
-					"SessionId" => $this->customerSession->getSplititSessionid(),
+					"SessionId" => $this->_apiModel->getorCreateSplititSessionid(),
 				),
 				"InstallmentPlanNumber" => $installmentPlanNumber,
 				"Amount" => array("Value" => $amount),
@@ -484,7 +484,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 			$this->_logger->error(__('normal installment-----'));
 			$params = [
 				"RequestHeader" => [
-					"SessionId" => $this->customerSession->getSplititSessionid(),
+					"SessionId" => $this->_apiModel->getorCreateSplititSessionid(),
 					"ApiKey" => $this->helper->getConfig("payment/splitit_payment/api_terminal_key"),
 					"CultureName" => $cultureName,
 				],
@@ -509,7 +509,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 	public function updateRefOrderNumber($api, $order) {
 		$params = [
 			"RequestHeader" => [
-				"SessionId" => $this->customerSession->getSplititSessionid(),
+				"SessionId" => $this->_apiModel->getorCreateSplititSessionid(),
 			],
 			"InstallmentPlanNumber" => $this->customerSession->getInstallmentPlanNumber(),
 			"PlanData" => [

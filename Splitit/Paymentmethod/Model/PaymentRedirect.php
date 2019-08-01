@@ -132,10 +132,10 @@ class PaymentRedirect extends \Magento\Payment\Model\Method\AbstractMethod {
 			$params = array('InstallmentPlanNumber' => $authNumber);
 			if ($paymentAction == "authorize_capture") {
 				$api = $this->api->getApiUrl();
-				$sessionId = $this->customerSession->getSplititSessionid();
+				$sessionId = $this->api->getorCreateSplititSessionid();
 			} else {
 				$api = $this->api->apiLogin();
-				$sessionId = $this->customerSession->getSplititSessionid();
+				$sessionId = $this->api->getorCreateSplititSessionid();
 			}
 			$params = array_merge($params, array("RequestHeader" => array('SessionId' => $sessionId)));
 			$this->_logger->error(print_r($params, true));
@@ -201,7 +201,7 @@ class PaymentRedirect extends \Magento\Payment\Model\Method\AbstractMethod {
 			}
 			$params = array(
 				"RequestHeader" => array(
-					"SessionId" => $this->customerSession->getSplititSessionid(),
+					"SessionId" => $this->api->getorCreateSplititSessionid(),
 				),
 				"InstallmentPlanNumber" => $installmentPlanNumber,
 				"RefundUnderCancelation" => "OnlyIfAFullRefundIsPossible",
@@ -261,7 +261,7 @@ class PaymentRedirect extends \Magento\Payment\Model\Method\AbstractMethod {
 			}
 			$params = array(
 				"RequestHeader" => array(
-					"SessionId" => $this->customerSession->getSplititSessionid(),
+					"SessionId" => $this->api->getorCreateSplititSessionid(),
 				),
 				"InstallmentPlanNumber" => $installmentPlanNumber,
 				"Amount" => array("Value" => $amount),

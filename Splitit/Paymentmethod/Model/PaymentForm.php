@@ -87,6 +87,25 @@ class PaymentForm {
 			"installmentNum" => "1",
 		);
 
+		//check for address
+		$quote = $this->quote;
+		$billAddress = $quote->getBillingAddress();
+		$customerInfo = $this->customerSession->getCustomer()->getData();
+		if (!isset($customerInfo["firstname"])) {
+			$customerInfo["firstname"] = $billAddress->getFirstname();
+			$customerInfo["lastname"] = $billAddress->getLastname();
+			$customerInfo["email"] = $billAddress->getEmail();
+		}
+		$bags = $billAddress->getStreet();
+
+		$validateAddress = $this->checkForBillingFieldsEmpty($billAddress, $customerInfo);
+		if (!$validateAddress['status']) {
+			$response["status"] = false;
+			$response["error"] = true;
+			$response["errorMsg"] = $validateAddress['errorMsg'];
+
+			return $response;
+		}
 		$initResponse = $this->installmentplaninitForHostedSolution();
 //        print_r($initResponse);
 		//        echo 5/0;
@@ -110,24 +129,7 @@ class PaymentForm {
 				$customerInfo["email"] = $billAddress->getEmail();
 			}
 			$bags = $billAddress->getStreet();
-//            echo "<br/>\n";
-			//            var_dump($bags);
-			//            echo "<br/>\n";
-			//            var_dump(($bags[0]));
-			//            echo "<br/>\n";
-			//            var_dump(($billAddress->getCity()));
-			//            echo "<br/>\n";
-			//            var_dump(($billAddress->getPostcode()));
-			//            echo "<br/>\n";
-			//            var_dump(($customerInfo["firstname"]));
-			//            echo "<br/>\n";
-			//            var_dump($customerInfo["lastname"]);
-			//            echo "<br/>\n";
-			//            var_dump($customerInfo["email"]);
-			//            echo "<br/>\n";
-			//            var_dump($billAddress->getTelephone());
-			//            echo "<br/>\n";
-			//            var_dump(($bags[0] == "" || $billAddress->getCity() == "" || $billAddress->getPostcode() == "" || $customerInfo["firstname"] == "" || $customerInfo["lastname"] == "" || $customerInfo["email"] == "" || $billAddress->getTelephone() == ""));exit;
+
 			if (!($bags[0] == "" || $billAddress->getCity() == "" || $billAddress->getPostcode() == "" || $customerInfo["firstname"] == "" || $customerInfo["lastname"] == "" || $customerInfo["email"] == "" || $billAddress->getTelephone() == "")) {
 				if ($this->quoteValidator->validateBeforeSubmit($quote)) {
 //                    echo "validated quote";exit;
@@ -146,6 +148,32 @@ class PaymentForm {
 			return $response;
 //            throw new \Magento\Framework\Validator\Exception(__($response['data']));
 		}
+	}
+
+	public function checkForBillingFieldsEmpty($billingAddress, $customerInfo) {
+
+		$response = ["errorMsg" => "", "successMsg" => "", "status" => false];
+		if ($billingAddress->getStreet()[0] == "" || $billingAddress->getCity() == "" || $billingAddress->getPostcode() == "" || $customerInfo["firstname"] == "" || $customerInfo["lastname"] == "" || $customerInfo["email"] == "" || $billingAddress->getTelephone() == "") {
+			$response["errorMsg"] = "Please fill required fields.";
+		} else if (strlen($billingAddress->getTelephone()) < 5 || strlen($billingAddress->getTelephone()) > 10) {
+
+			$response["errorMsg"] = __("Splitit does not accept phone number less than 5 digits or greater than 10 digits.");
+		} elseif (!$billingAddress->getCity()) {
+			$response["errorMsg"] = __("Splitit does not accept empty city field.");
+		} elseif (!$billingAddress->getCountry()) {
+			$response["errorMsg"] = ("Splitit does not accept empty country field.");
+		} elseif (!$billingAddress->getPostcode()) {
+			$response["errorMsg"] = ("Splitit does not accept empty postcode field.");
+		} elseif (!$customerInfo["firstname"]) {
+			$response["errorMsg"] = ("Splitit does not accept empty customer name field.");
+		} elseif (strlen($customerInfo["firstname"] . ' ' . $customerInfo['lastname']) < 3) {
+			$response["errorMsg"] = ("Splitit does not accept less than 3 characters customer name field.");
+		} elseif (!filter_var($customerInfo['email'], FILTER_VALIDATE_EMAIL)) {
+			$response["errorMsg"] = ("Splitit does not accept invalid customer email field.");
+		} else {
+			$response["status"] = true;
+		}
+		return $response;
 	}
 
 	public function getCheckoutRedirectUrl() {
@@ -203,7 +231,7 @@ class PaymentForm {
 		$cultureName = $this->helper->getCultureName(true);
 		$params = array(
 			"RequestHeader" => array(
-				"SessionId" => $this->customerSession->getSplititSessionid(),
+				"SessionId" => $this->api->getorCreateSplititSessionid(),
 				"ApiKey" => $this->getConfigData('api_terminal_key', $storeId),
 				"CultureName" => $cultureName,
 			),
@@ -253,7 +281,7 @@ class PaymentForm {
 
 		$params = array(
 			"RequestHeader" => array(
-				"SessionId" => $this->customerSession->getSplititSessionid(),
+				"SessionId" => $this->api->getorCreateSplititSessionid(),
 			),
 			"InstallmentPlanNumber" => $this->_checkoutSession->getSplititInstallmentPlanNumber(),
 			"PlanData" => array(
@@ -300,9 +328,10 @@ class PaymentForm {
 			$customerInfo["email"] = $billAddress->getEmail();
 		}
 		$cultureName = $this->helper->getCultureName(true);
-		$params = $this->installmentplaninitParams($firstInstallmentAmount, $billAddress, $customerInfo, $cultureName, null, $selectedInstallment);
 
 		try {
+			$params = $this->installmentplaninitParams($firstInstallmentAmount, $billAddress, $customerInfo, $cultureName, null, $selectedInstallment);
+
 			$response = array("status" => false, "data" => "");
 			// check if cunsumer dont filled data
 			$bags = $billAddress->getStreet();
@@ -456,9 +485,10 @@ class PaymentForm {
 			$autoCapture = true;
 		}
 		$getStreet = $billAddress->getStreet();
+
 		$params = array(
 			"RequestHeader" => array(
-				"SessionId" => $this->customerSession->getSplititSessionid(),
+				"SessionId" => $this->api->getorCreateSplititSessionid(),
 				"ApiKey" => $this->helper->getConfig("payment/splitit_paymentredirect/api_terminal_key"),
 			),
 			"PlanData" => array(
@@ -601,7 +631,7 @@ class PaymentForm {
 	public function getInstallmentPlanDetails($api) {
 		$params = array(
 			"RequestHeader" => array(
-				"SessionId" => $this->customerSession->getSplititSessionid(),
+				"SessionId" => $this->api->getorCreateSplititSessionid(),
 			),
 			"QueryCriteria" => array(
 				"InstallmentPlanNumber" => $this->_checkoutSession->getSplititInstallmentPlanNumber(),
@@ -640,7 +670,7 @@ class PaymentForm {
 	public function cancelInstallmentPlan($api, $installmentPlanNumber) {
 		$params = array(
 			"RequestHeader" => array(
-				"SessionId" => $this->customerSession->getSplititSessionid(),
+				"SessionId" => $this->api->getorCreateSplititSessionid(),
 			),
 			"InstallmentPlanNumber" => $installmentPlanNumber,
 			"RefundUnderCancelation" => "OnlyIfAFullRefundIsPossible",

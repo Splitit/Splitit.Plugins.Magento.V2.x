@@ -38,7 +38,7 @@ class AddFeeToOrderObserver implements ObserverInterface
         $quote = $observer->getEvent()->getQuote();
         $feeAmount = $quote->getFeeAmount();
         
-        $logger->debug(print_r($quote->getId(),TRUE));
+        $logger->debug($quote->getId());
         $logger->debug('feeAmount='.$feeAmount);
         
         

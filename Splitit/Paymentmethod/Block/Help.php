@@ -6,9 +6,4 @@ class Help extends \Magento\Framework\View\Element\Template
 	{
 		parent::__construct($context);
 	}
-
-	public function sayHello()
-	{
-		return __('Hello World');
-	}
 }
