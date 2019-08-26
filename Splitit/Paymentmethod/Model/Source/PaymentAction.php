@@ -15,7 +15,7 @@ class PaymentAction implements ArrayInterface
         return array(
             array(
                 'value' => AbstractMethod::ACTION_AUTHORIZE_CAPTURE,
-                'label' => __('Charge my consumer at the time of the purchase')
+                'label' => __('Charge my consumer at the time of purchase')
             ),
             array(
                 'value' => AbstractMethod::ACTION_AUTHORIZE,

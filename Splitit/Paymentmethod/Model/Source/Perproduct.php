@@ -9,8 +9,8 @@ class Perproduct
     {
         return array(
             array('value' => '0', 'label' => __('Disabled')),
-            array('value' => '1', 'label' => __('Enable Splitit just if the selected products from the list and only they are on the cart')),
-            array('value' => '2', 'label' => __('Enable Splitit if 1 or more of the selected products from the list is on cart, and the cart includes also other products'))
+            array('value' => '1', 'label' => __('Enable Splitit only if the products in the list below are present in the cart')),
+            array('value' => '2', 'label' => __('Enable Splitit if one or more of the below products are present in the cart'))
         );
 
     }

@@ -121,7 +121,6 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 						$errorMsg .= $value["ErrorCode"] . " : " . $value["Message"];
 					}
 					$this->_logger->error(__($errorMsg));
-					throw new \Exception('your error message');
 					throw new \Magento\Framework\Validator\Exception(__($errorMsg));
 				}
 

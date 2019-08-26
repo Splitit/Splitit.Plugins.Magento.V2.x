@@ -37,14 +37,6 @@ class Getinstallmentprice extends \Magento\Framework\App\Action\Action {
 		if ($isEnable == "") {
 			$isEnable = 0;
 		}
-		if ($this->helper->getConfig("payment/splitit_paymentmethod/faq_link_enabled")) {
-			$response['help']['splitit_paymentmethod']["title"] = $this->helper->getConfig("payment/splitit_paymentmethod/faq_link_title");
-			$response['help']['splitit_paymentmethod']["link"] = $this->helper->getConfig("payment/splitit_paymentmethod/faq_link_title_url");
-		}
-		if ($this->helper->getConfig("payment/splitit_paymentredirect/faq_link_enabled")) {
-			$response['help']['splitit_paymentredirect']["title"] = $this->helper->getConfig("payment/splitit_paymentredirect/faq_link_title");
-			$response['help']['splitit_paymentredirect']["link"] = $this->helper->getConfig("payment/splitit_paymentredirect/faq_link_title_url");
-		}
 
 		$displayInstallmentPriceOnPage = '';
 		$numOfInstallmentForDisplay = '';
@@ -53,21 +45,25 @@ class Getinstallmentprice extends \Magento\Framework\App\Action\Action {
 		$installmetPriceText = "";
 		$SplititLogoSrc = "";
 		$SplititLogoBackgroundSrc = "";
+		$helpLink = "";
 		if ($splititLogoArray) {
 			$installmetPriceText = $splititLogoArray['price_text'];
 			$SplititLogoSrc = $splititLogoArray['logo_src'];
 			$SplititLogoBackgroundSrc = $splititLogoArray['bakcground_href'];
 			$displayInstallmentPriceOnPage = $splititLogoArray['installment_price_on_pages'];
 			$numOfInstallmentForDisplay = $splititLogoArray['installments_count'];
+			$helpLink = $splititLogoArray['help_link'];
+			$helpTitle = $splititLogoArray['help_title'];
 		}
 
 		if (is_null($installmetPriceText)) {
 			$installmetPriceText = "";
 		} else {
+			$installmetPriceText = str_replace('{NOI}', $numOfInstallmentForDisplay, $installmetPriceText);
 			$textArr = explode(' ', $installmetPriceText);
 			$changeindex = array_search('SPLITIT', $textArr);
 			if ($changeindex > -1) {
-				$replace = "<a href='" . $SplititLogoBackgroundSrc . "' target='_blank'><img class='logoWidthSrc' src='" . $SplititLogoSrc . "' alt='SPLITIT'/></a>";
+				$replace = "<a id='tell-me-more' href='" . $SplititLogoBackgroundSrc . "' target='_blank'><img class='logoWidthSrc' src='" . $SplititLogoSrc . "' alt='SPLITIT'/></a>";
 				$textToChange = str_replace('SPLITIT', $replace, $textArr[$changeindex]);
 				unset($textArr[$changeindex]);
 				$newText = __(implode(' ', $textArr));
@@ -75,6 +71,9 @@ class Getinstallmentprice extends \Magento\Framework\App\Action\Action {
 				$newVal = array($changeindex => $textToChange);
 				$newList = array_merge(array_slice($newTextArr, 0, $changeindex), $newVal, array_slice($newTextArr, $changeindex));
 				$installmetPriceText = implode(' ', $newList);
+			}
+			if ($helpLink) {
+				$installmetPriceText = $installmetPriceText . " <a class='tellLink' id='tell-me-more' href='" . $helpLink . "' target='_blank'>" . $helpTitle . "</a>";
 			}
 		}
 

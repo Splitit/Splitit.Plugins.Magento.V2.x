@@ -9,6 +9,7 @@ use Magento\Checkout\Model\ConfigProviderInterface;
 use Magento\Framework\Locale\ResolverInterface;
 use Magento\Customer\Helper\Session\CurrentCustomer;
 use Magento\Framework\UrlInterface;
+use Magento\Framework\App\Config\ScopeConfigInterface;
 use Magento\Payment\Helper\Data as PaymentHelper;
 
 /**
@@ -57,6 +58,13 @@ class ExpressConfigProvider implements ConfigProviderInterface
     protected $urlBuilder;
 
     /**
+     * @var ScopeConfigInterface
+     */
+    protected $scopeConfig;
+    
+    protected $helpBlock;
+
+    /**
      * Constructor
      *
      * @param ConfigFactory $configFactory
@@ -69,12 +77,16 @@ class ExpressConfigProvider implements ConfigProviderInterface
         ResolverInterface $localeResolver,
         CurrentCustomer $currentCustomer,
         PaymentHelper $paymentHelper,
+        ScopeConfigInterface $scopeConfig,
+        \Splitit\Paymentmethod\Block\Help $helpBlock,
         UrlInterface $urlBuilder
     ) {
         $this->localeResolver = $localeResolver;
         $this->currentCustomer = $currentCustomer;
         $this->paymentHelper = $paymentHelper;
         $this->urlBuilder = $urlBuilder;
+        $this->scopeConfig = $scopeConfig;
+        $this->helpBlock = $helpBlock;
 
         foreach ($this->methodCodes as $code) {
             $this->methods[$code] = $this->paymentHelper->getMethodInstance($code);
@@ -89,8 +101,9 @@ class ExpressConfigProvider implements ConfigProviderInterface
         $config = [
             'payment' => [
                 'splititExpress' => [
-                    'paymentAcceptanceMarkHref' => "ashwani",
-                    'paymentAcceptanceMarkSrc' => "ashwani",
+                    'paymentAcceptanceMarkHref' => $this->scopeConfig->getValue('payment/splitit_paymentmethod/faq_link_title_url', \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
+                    'paymentAcceptanceMarkSrc' => $this->scopeConfig->getValue('payment/splitit_paymentmethod/splitit_logo_src', \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
+                    'questionMark' => $this->helpBlock->getViewFileUrl('Splitit_Paymentmethod::images/learn_more.svg'),
                     'isContextCheckout' => false,
                     'inContextConfig' => []
                 ]
@@ -119,6 +132,10 @@ class ExpressConfigProvider implements ConfigProviderInterface
 //        $response=$api->apiLogin();
         foreach ($this->methodCodes as $code) {
             if ($this->methods[$code]->isAvailable()) {
+                if($code==PaymentRedirect::CODE){
+                    $config['payment']['splititExpress']['paymentAcceptanceMarkHref'] = $this->scopeConfig->getValue('payment/splitit_paymentredirect/faq_link_title_url', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+                    $config['payment']['splititExpress']['paymentAcceptanceMarkSrc'] = $this->scopeConfig->getValue('payment/splitit_paymentredirect/splitit_logo_src', \Magento\Store\Model\ScopeInterface::SCOPE_STORE);
+                }
 //                $config['payment']['splititExpress']['redirectUrl'][$code] = $this->getMethodRedirectUrl($code);
                 $config['payment']['splititExpress']['redirectUrl'][$code] = $this->urlBuilder->getUrl("splititpaymentmethod/payment/redirect");
                 $config['payment']['splititExpress']['billingAgreementCode'][$code] = "";

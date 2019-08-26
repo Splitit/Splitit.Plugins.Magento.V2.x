@@ -4,17 +4,41 @@
  * created by Zoran Salamun(zoran.salamun@Splitit.net)
  */
 namespace Splitit\Paymentmethod\Controller\Installmentplaninit;
-use Magento\Framework\Controller\ResultFactory;
 
 class Installmentplaninit extends \Magento\Framework\App\Action\Action {
 
-	private $helper;
+	protected $request;
+	protected $apiModel;
+	protected $logger;
+	protected $resultPage;
+	protected $resultJsonFactory;
 
+	public function __construct(
+		\Magento\Framework\App\Action\Context $context,
+		\Magento\Framework\App\Request\Http $request,
+		\Psr\Log\LoggerInterface $logger,
+		\Splitit\Paymentmethod\Model\Api $apiModel,
+		\Magento\Framework\View\Result\PageFactory $resultPage,
+		\Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
+	) {
+		$this->request = $request;
+		$this->apiModel = $apiModel;
+		$this->logger = $logger;
+		$this->resultPage = $resultPage;
+		$this->resultJsonFactory = $resultJsonFactory;
+		parent::__construct($context);
+	}
+
+	/**
+	Installment init call for the Splitit
+	selectedInstallment int
+	guestEmail string
+	@return Json
+	 **/
 	public function execute() {
 
-		$this->helper = $this->_objectManager->create('Splitit\Paymentmethod\Helper\Data');
-		$request = $this->_objectManager->get('\Magento\Framework\App\Request\Http')->getParams();
-		$resultJson = $this->resultFactory->create(ResultFactory::TYPE_JSON);
+		$request = $this->request->getParams();
+		$resultJson = $this->resultJsonFactory->create();
 		$response = [
 			"status" => false,
 			"errorMsg" => "",
@@ -22,8 +46,6 @@ class Installmentplaninit extends \Magento\Framework\App\Action\Action {
 			"data" => "",
 
 		];
-		$logger = $this->_objectManager->get('\Psr\Log\LoggerInterface');
-
 		$selectedInstallment = "";
 		if (isset($request["selectedInstallment"]) && $request["selectedInstallment"] != "") {
 			$selectedInstallment = $request["selectedInstallment"];
@@ -37,24 +59,30 @@ class Installmentplaninit extends \Magento\Framework\App\Action\Action {
 			$guestEmail = $request["guestEmail"];
 		}
 
-		$apiModelObj = $this->_objectManager->get('Splitit\Paymentmethod\Model\Api');
-		$loginResponse = $apiModelObj->apiLogin();
+		$loginResponse = $this->apiModel->apiLogin();
 		// check if login successfully or not
 		if (!$loginResponse["status"]) {
-			$logger->addError($loginResponse["errorMsg"]);
+			$this->logger->addError($loginResponse["errorMsg"]);
 			$response["errorMsg"] = 'Error in processing your order. Please try again later.';
 			return $resultJson->setData($response);
 
 		}
 		// call Installment Plan
-		$installmentPlanInitResponse = $apiModelObj->installmentPlanInit($selectedInstallment, $guestEmail);
+		$installmentPlanInitResponse = $this->apiModel->installmentPlanInit($selectedInstallment, $guestEmail);
 
 		if ($installmentPlanInitResponse["status"]) {
 			$response["status"] = true;
-			$response["successMsg"] = $installmentPlanInitResponse["successMsg"];
+			//$response["successMsg"] = $installmentPlanInitResponse["successMsg"];
+			$block = $this->resultPage->create()->getLayout()
+				->createBlock('Splitit\Paymentmethod\Block\Popup')
+				->setTemplate('Splitit_Paymentmethod::popup.phtml')
+				->setData('data', $installmentPlanInitResponse["successMsg"])
+				->toHtml();
+
+			$response["successMsg"] = $block;
 		} else {
 			$response["errorMsg"] = 'Error in processing your order. Please try again later.';
-			$logger->addError($installmentPlanInitResponse["errorMsg"]);
+			$this->logger->addError($installmentPlanInitResponse["errorMsg"]);
 			if ($installmentPlanInitResponse["errorMsg"]) {
 				$response["errorMsg"] = $installmentPlanInitResponse["errorMsg"];
 			}

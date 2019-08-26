@@ -99,6 +99,12 @@ table.tablePage2 td{ width:50%; vertical-align: middle; }
 .num-of-installments>label{font-weight: 600;}
 .num-of-installments>em{color: #e02b27;     font-size: 1.2rem; margin: 0 0 0 5px;}
 #select-num-of-installments{margin-top: 10px;}
+
+.payment-icon-splitit{
+    height: 18px !important;
+    display: inline-block !important;
+    margin-bottom: -5px !important;
+}
 @media only screen and (max-width: 1024px) {}
 @media only screen and (max-width: 900px) {
     .form-block{width:100%;}

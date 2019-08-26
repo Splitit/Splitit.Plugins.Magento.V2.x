@@ -1,2 +1,5 @@
 .cart-installment-onepage{ display: block; text-align: left; clear: both;}
 .logoWidthSrc{ height: 20px; display: inline-block; margin-bottom: -5px;}
+.tellLink{  color: #000 !important;
+    text-decoration: underline;
+    font-size: 11px; }

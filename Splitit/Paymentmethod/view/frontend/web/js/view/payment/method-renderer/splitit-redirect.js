@@ -36,7 +36,13 @@ define(
 
             /** Open window with  */
             showAcceptanceWindow: function (data, event) {
-                window.open(
+                var left = (screen.width - 433)/2;
+                var top = (screen.height/2)-(window.innerHeight/2);
+                var win= window.open(event.currentTarget.href,"Tell me more","width=433,height=607,left="+left+",top="+top+",location=no,status=no,scrollbars=no,resizable=no");
+                win.document.writeln("<body style='margin:0px'><img width=100% src='"+event.currentTarget.href+"' />");
+                win.document.writeln("</body>");
+                win.document.write('<title>Splitit Learn More</title>');
+                /*window.open(
                     $(event.target).attr('href'),
                     'olcwhatissplitit',
                     'toolbar=no, location=no,' +
@@ -44,19 +50,24 @@ define(
                     ' menubar=no, scrollbars=yes,' +
                     ' resizable=yes, ,left=0,' +
                     ' top=0, width=400, height=350'
-                );
+                );*/
 
                 return false;
             },
 
-            /** Returns payment acceptance mark link path */
+            /** Returns Splitit tell me more link path */
             getPaymentAcceptanceMarkHref: function () {
                 return window.checkoutConfig.payment.splititExpress.paymentAcceptanceMarkHref;
             },
 
-            /** Returns payment acceptance mark image path */
+            /** Returns Splitit logo image path */
             getPaymentAcceptanceMarkSrc: function () {
                 return window.checkoutConfig.payment.splititExpress.paymentAcceptanceMarkSrc;
+            },
+
+            /** Returns Splitit tell me more image path */
+            questionMark: function () {
+                return window.checkoutConfig.payment.splititExpress.questionMark;
             },
 
             /** Returns billing agreement data */

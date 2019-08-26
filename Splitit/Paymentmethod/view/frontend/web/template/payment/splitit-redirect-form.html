@@ -4,7 +4,17 @@
                name="payment[method]"
                class="radio"
                data-bind="attr: {'id': getCode()}, value: getCode(), checked: isChecked, click: selectPaymentMethod, visible: isRadioButtonVisible()"/>
-        <label data-bind="attr: {'for': getCode()}" class="label"><span data-bind="text: getTitle()"></span></label>
+        <label data-bind="attr: {'for': getCode()}" class="label">
+            <!-- Splitit Logo -->
+            <img data-bind="attr: {src: getPaymentAcceptanceMarkSrc(), alt: $t('Splitit')}"
+                 class="payment-icon-splitit"/>
+            <!-- Splitit Logo -->
+            <span data-bind="i18n: getTitle()"></span>
+            <a data-bind="attr: {href: getPaymentAcceptanceMarkHref()}, click: showAcceptanceWindow" class="action action-help">
+                <img data-bind="attr: {src: questionMark(), alt: $t('Splitit')}"
+                 class="payment-icon-splitit"/>
+            </a>
+        </label>
     </div>
     <div class="payment-method-content">
         <!-- ko foreach: getRegion('messages') -->

@@ -9,7 +9,20 @@ var jqueryInterval = setInterval(function(){
     
     if(window.jQuery){
       clearInterval(jqueryInterval);      
-      console.log('jQuery found!!');   
+      console.log('jQuery found!!');  
+      //tell me more button
+	    jQuery(document).on('click', '#tell-me-more', function(e){
+	    	
+	        e.preventDefault();
+	        var left = (screen.width - 433)/2;
+	 		 var top = (screen.height/2)-(window.innerHeight/2);
+	        var win= window.open(jQuery(this).attr('href'),"Tell me more","width=433,height=607,left="+left+",top="+top+",location=no,status=no,scrollbars=no,resizable=no");
+	        win.document.writeln("<body style='margin:0px'><img width=100% src='"+jQuery(this).attr('href')+"' />");
+	        win.document.writeln("</body>");
+	        win.document.write('<title>Splitit Learn More</title>');
+	        
+	        return;
+	    }); 
       runMyScripts(); 
      }else{
       console.log('jQuery not found!!');
@@ -69,7 +82,8 @@ function runMyScripts(){
 					productprice = Number(productprice.replace(/[^0-9\.]+/g,""));
 					productprice = jQuery(".product-info-price").find('[data-price-type="finalPrice"]').attr('data-price-amount');
 					installments = (productprice/result.numOfInstallmentForDisplay).toFixed(2);
-					installmentNewSpan = '<br><span class="cart-installment">'+currencySymbol+installments+' x '+result.numOfInstallmentForDisplay+' '+result.installmetPriceText+'</span>';
+					installmentNewSpan = result.installmetPriceText.replace('{AMOUNT}',currencySymbol+installments);
+					installmentNewSpan = '<br><span class="cart-installment">'+installmentNewSpan+'</span>';
 					jQuery('.product-info-price').after(installmentNewSpan);
 
 				}
@@ -83,7 +97,8 @@ function runMyScripts(){
 						currencySymbol = result.currencySymbol;
 						productprice = Number(productprice.replace(/[^0-9\.]+/g,""));
 						installments = (productprice/result.numOfInstallmentForDisplay).toFixed(2);
-						installmentNewSpan = '<br><span class="cart-installment">'+currencySymbol+installments+' x '+result.numOfInstallmentForDisplay+' '+result.installmetPriceText+'</span>';
+						installmentNewSpan = result.installmetPriceText.replace('{AMOUNT}',currencySymbol+installments);
+					installmentNewSpan = '<br><span class="cart-installment">'+installmentNewSpan+'</span>';
 						jQuery('table.totals tr:last').after('<tr><td>'+installmentNewSpan+'</td></tr>');    
 		    		}else{
 		    			console.log('In cart page totals not found!!');   
@@ -104,7 +119,9 @@ function runMyScripts(){
 							currencySymbol = result.currencySymbol;
 							productprice = Number(productprice.replace(/[^0-9\.]+/g,""));
 							installments = (productprice/result.numOfInstallmentForDisplay).toFixed(2);
-							installmentNewSpan = '<br><span class="cart-installment-onepage">'+currencySymbol+installments+' x '+result.numOfInstallmentForDisplay+' '+result.installmetPriceText+'</span>';
+							installmentNewSpan = result.installmetPriceText.replace('{AMOUNT}',currencySymbol+installments);
+							installmentNewSpan = '<br><span class="cart-installment">'+installmentNewSpan+'</span>';
+							//installmentNewSpan = '<br><span class="cart-installment-onepage">'+currencySymbol+installments+' x '+result.numOfInstallmentForDisplay+' '+result.installmetPriceText+'</span>';
 							jQuery('div.iwd-grand-total-item').after(installmentNewSpan);
 						}
 					}, 3000);	
@@ -175,7 +192,9 @@ function runMyScriptForCheckout(){
 					currencySymbol = result.currencySymbol;
 					productprice = Number(productprice.replace(/[^0-9\.]+/g,""));
 					installments = (productprice/result.numOfInstallmentForDisplay).toFixed(2);
-					installmentNewSpan = '<br><span class="cart-installment-onepage">'+currencySymbol+installments+' x '+result.numOfInstallmentForDisplay+' '+result.installmetPriceText+'</span>';
+					installmentNewSpan = result.installmetPriceText.replace('{AMOUNT}',currencySymbol+installments);
+					installmentNewSpan = '<br><span class="cart-installment">'+installmentNewSpan+'</span>';
+					//installmentNewSpan = '<br><span class="cart-installment-onepage">'+currencySymbol+installments+' x '+result.numOfInstallmentForDisplay+' '+result.installmetPriceText+'</span>';
 					jQuery('table.table-totals').find('.cart-installment-onepage').closest('tr').remove();
 					jQuery('table.table-totals tr:last').after('<tr><td>'+installmentNewSpan+'</td></tr>');
 					

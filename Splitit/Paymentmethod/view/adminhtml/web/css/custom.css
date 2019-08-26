@@ -1,3 +1,27 @@
+tr[id$="_splitit_paymentmethod_title"]{
+    display: none;
+}
+tr[id$="_splitit_paymentmethod_faq_link_enabled"]{
+    display: none;
+}
+tr[id$="_splitit_paymentmethod_faq_link_title"]{
+    display: none;
+}
+tr[id$="_splitit_paymentmethod_splitit_fee_on_total"]{
+    display: none;
+}
+tr[id$="_splitit_paymentredirect_splitit_fee_on_total"]{
+    display: none;
+}
+tr[id$="_splitit_paymentredirect_title"]{
+    display: none;
+}
+tr[id$="_splitit_paymentredirect_faq_link_enabled"]{
+    display: none;
+}
+tr[id$="_splitit_paymentredirect_faq_link_title"]{
+    display: none;
+}
 button.delete-product-option{
     border: none;
     background: none;

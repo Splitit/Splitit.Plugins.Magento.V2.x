@@ -1,0 +1,169 @@
+<?php
+$approvalUrlResponse = $block->getData();
+$approvalUrlResponseArr = json_decode($approvalUrlResponse['data'], true);
+		$html = '';
+		if (!empty($approvalUrlResponseArr) && isset($approvalUrlResponseArr["Global"]["ResponseResult"]) && isset($approvalUrlResponseArr["Global"]["ResponseResult"]["Succeeded"]) && $approvalUrlResponseArr["Global"]["ResponseResult"]["Succeeded"] == 1) {
+
+			$currencySymbol = $approvalUrlResponseArr["Global"]["Currency"]["Symbol"];
+			$totalAmount = $approvalUrlResponseArr["HeaderSection"]["InstallmentPlanTotalAmount"]["Amount"];
+			$totalText = $approvalUrlResponseArr["HeaderSection"]["InstallmentPlanTotalAmount"]["Text"];
+
+			$scheduleChargedDateText = $approvalUrlResponseArr["ScheduledPaymentSection"]["ChargedDateText"];
+			$scheduleChargedAmountText = $approvalUrlResponseArr["ScheduledPaymentSection"]["ChargedAmountText"];
+			$scheduleRequiredAvailableCreditText = $approvalUrlResponseArr["ScheduledPaymentSection"]["RequiredAvailableCreditText"];
+
+			$termsConditionsText = $approvalUrlResponseArr["ImportantNotesSection"]["AcknowledgeLink"]["Text"];
+			$termsConditionsLink = $approvalUrlResponseArr["ImportantNotesSection"]["AcknowledgeLink"]["Link"];
+			$servicesText = $approvalUrlResponseArr["LinksSection"]["PrivacyPolicy"]["Text"];
+			$servicesLink = $approvalUrlResponseArr["LinksSection"]["PrivacyPolicy"]["Link"];
+			?>
+
+
+			<div class="approval-popup_ovelay" style=""></div>
+
+			<div id="approval-popup" style="">
+
+			<div id="main">
+			<div class="_popup_overlay"></div>
+			<!-- Start small inner popup -->
+
+			<!--  // Start Term and Condition Popup -->
+			<div id="termAndConditionpopup" style=" ">
+                    <div class="popup-block">
+
+			<div class="popup-content" style="">
+			// start close button on terms-condition popup
+			<div class="popup-footer" style="">
+			<div id="payment-schedule-close-btn" class="popup-btn"  style="">
+			<div class="popup-btn-area-terms" style=""><span id="termAndConditionpopupCloseBtn" class="popup-btn-icon-terms" style="">x</span></div>
+			</div>
+			</div>
+			<!-- // end close button on terms-condition popup -->
+			<?php echo  $block->getTermnConditionText()  ?>
+
+                    </div>
+
+			</div>
+			</div>
+			<!--  // Close Term and Condition Popup -->
+			<div id="payment-schedule" style=" ">
+			<div class="popup-block">
+			<div class="popup-content" style="">
+			<table class="popupContentTable" style="">
+			<thead>
+			<tr>
+			<th style="width: 1em;"></th>
+			<th style="text-align:center;"> <?php echo $scheduleChargedDateText ?> </th>
+			<th style="text-align:center;"> <?php echo $scheduleChargedAmountText ?> </th>
+			<th style="text-align:center;"> <?php echo$scheduleRequiredAvailableCreditText ?></th>
+			</tr>
+			</thead>
+			<tbody>
+			<?php
+			$schedulePayment = ""; //echo $value["DateOfCharge"];//substr($value["DateOfCharge"], 0, strpos($value["DateOfCharge"], "To"));
+			if (isset($approvalUrlResponseArr["ScheduledPaymentSection"]["ScheduleItems"])) {
+
+				foreach ($approvalUrlResponseArr["ScheduledPaymentSection"]["ScheduleItems"] as $key => $value) {
+					$dateOfChargeTemp = (string) $value["DateOfCharge"];
+					$dataOfCharge = substr($dateOfChargeTemp, 0, strpos($dateOfChargeTemp, "T"));
+					$date = date_create($dataOfCharge);
+
+					$schedulePayment .= '<tr>';
+					$schedulePayment .= '<td style="text-align: left;"> '. $value["InstallmentNumber"] . '.</td>';
+					$schedulePayment .= '<td>' . date_format($date, "m/d/Y") . '</td>';
+					$schedulePayment .= '<td> '. $currencySymbol . $value["ChargeAmount"] . '</td>';
+					$schedulePayment .= '<td> '. $currencySymbol . $value["RequiredAvailableCredit"] . '</td>';
+					$schedulePayment .= '</tr>';
+				}
+			}
+			echo $schedulePayment;
+			?>
+			
+			</tbody>
+			</table>
+			</div>
+			<div class="popup-footer" style="">
+			<div id="payment-schedule-close-btn" class="popup-btn"  style="">
+			<div class="popup-btn-area" style=""><span id="complete-payment-schedule-close" class="popup-btn-icon" style="">Close</span></div>
+			</div>
+			</div>
+			</div>
+			</div>
+			<!-- End small inner popup -->
+
+			<div class="mainHeader">
+			<span class="closeapprovalpopup_btn" style="" onclick="closeApprovalPopup();">x</span>
+			<table id="wiz-header" width="100%;">
+			<tbody>
+			<tr>
+			<td class="wiz-header-side wiz-header-left" style=""></td>
+			<td class="wiz-header-center" style="">
+			<div>TOTAL PURCHASE:</div>
+			<div class="currencySymbolIcon" style=""> <?php echo $currencySymbol . $totalAmount  ?></div></td><td class="wiz-header-side wiz-header-right" style="">
+			</td>
+			</tr>
+			</tbody>
+			</table>
+			</div>
+			<div style="margin-top: auto;">
+
+			<div class="form-block" style="">
+			<div class="form-block-area" style="">
+			<div class="spacer15" style=""></div>
+			<div class="tableResponsive"><table class="tablePage2" style="" cellspacing="0" cellpadding="0">
+			<tbody>
+				<?php 
+			$planDataSection = '';
+			$planDataSectionHtml = '';
+			$planDataSection = $approvalUrlResponseArr["PlanDataSection"];
+			if (isset($approvalUrlResponseArr["PlanDataSection"])) {
+				$planDataSectionHtml .= '<tr class="tablePage2TD"  style="">';
+				$planDataSectionHtml .= '<td>' . $planDataSection["NumberOfInstallments"]["Text"] . '</td>';
+				$planDataSectionHtml .= '<td class="text-right" style="">';
+				$planDataSectionHtml .= '<span>' . $planDataSection["NumberOfInstallments"]["NumOfInstallments"] . '</span>';
+				$planDataSectionHtml .= '</td></tr>';
+
+				$planDataSectionHtml .= '<tr class="tablePage2TD" style="">';
+				$planDataSectionHtml .= '<td>' . $planDataSection["FirstInstallmentAmount"]["Text"] . '</td>';
+				$planDataSectionHtml .= '<td class="text-right" style="">';
+				$planDataSectionHtml .= '<span>' . $currencySymbol . $planDataSection["FirstInstallmentAmount"]["Amount"] . '</span>';
+				$planDataSectionHtml .= '</td></tr>';
+
+				$planDataSectionHtml .= '<tr class="tablePage2TD" style="">';
+				$planDataSectionHtml .= '<td> '. $planDataSection["SubsequentInstallmentAmount"]["Text"] . '</td>';
+				$planDataSectionHtml .= '<td class="text-right">';
+				$planDataSectionHtml .= '<span> '. $currencySymbol . $planDataSection["SubsequentInstallmentAmount"]["Amount"] . '</span>';
+				$planDataSectionHtml .= '</td></tr>';
+
+				$planDataSectionHtml .= '<tr class="tablePage2TD" style="">';
+				$planDataSectionHtml .= '<td>' . $planDataSection["RequiredAvailableCredit"]["Text"] . '</td>';
+				$planDataSectionHtml .= '<td class="text-right" style="">';
+				$planDataSectionHtml .= '<span>'. $currencySymbol . $planDataSection["RequiredAvailableCredit"]["Amount"] . '</span>';
+				$planDataSectionHtml .= '</td></tr>';
+				echo $planDataSectionHtml;;
+			} ?>
+
+	
+			</tbody>
+			</table></div>
+			<a id="payment-schedule-link" style="">See Complete Payment Schedule</a>
+			</div>
+			</div>
+			<div class="form-block right" style="">
+			<div class="form-block-area">
+			<div>
+			<div class="important_note_sec" style=""><?php echo $approvalUrlResponseArr["ImportantNotesSection"]["ImportantNotesHeader"]["Text"] ?>:</div>
+			<div class="pnlEula" style=""><?php echo $approvalUrlResponseArr["ImportantNotesSection"]["ImportantNotesBody"]["Text"] ; ?></div>
+			<div id="i_acknowledge_area"><input type="checkbox" id="i_acknowledge" class="i_acknowledge" name="i_acknowledge" value="" />
+			<label for="i_acknowledge" class="i_acknowledge_lbl">
+			I acknowledge that I have read and agree to the <a href="#" id="i_acknowledge_content_show" > terms and conditions </a> </label><div style="display:none" class="i_ack_err"> Please select I acknowledge.</div></div>
+
+			</div>
+			</div>
+			</div>
+			</div>
+			<div class="iAgreeBtn" style=""><input id="iagree" type="button" onclick="paymentSave();" value="I agree" style=" ">  </div>
+			<div class="termAndConditionBtn" style=""> <a href="<?php echo $termsConditionsLink ?>" target="_blank" style=""> <?php echo $termsConditionsText ?></a> | <a href="<?php echo $servicesLink ?>" style="" target="_blank"> <?php echo $servicesText ?></a></div>
+
+			</div>
+			<?php } ?>
