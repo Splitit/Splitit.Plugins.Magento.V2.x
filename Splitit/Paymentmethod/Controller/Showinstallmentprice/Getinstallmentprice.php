@@ -14,10 +14,14 @@ class Getinstallmentprice extends \Magento\Framework\App\Action\Action {
 	private $helper;
 	private $payment;
 	private $paymentForm;
+	private $request;
+	private $assetRepo;
 
 	public function execute() {
 		$this->helper = $this->_objectManager->create('Splitit\Paymentmethod\Helper\Data');
 		$this->payment = $this->_objectManager->create('Splitit\Paymentmethod\Model\Payment');
+		$this->assetRepo = $this->_objectManager->create('Magento\Framework\View\Asset\Repository');
+		$this->request = $this->_objectManager->create('Magento\Framework\App\RequestInterface');
 		$this->paymentForm = $this->_objectManager->create('Splitit\Paymentmethod\Model\PaymentForm');
 		$response = [
 			"status" => true,
@@ -38,6 +42,8 @@ class Getinstallmentprice extends \Magento\Framework\App\Action\Action {
 			$isEnable = 0;
 		}
 
+		$params = array('_secure' => $this->request->isSecure());
+
 		$displayInstallmentPriceOnPage = '';
 		$numOfInstallmentForDisplay = '';
 
@@ -53,7 +59,7 @@ class Getinstallmentprice extends \Magento\Framework\App\Action\Action {
 			$displayInstallmentPriceOnPage = $splititLogoArray['installment_price_on_pages'];
 			$numOfInstallmentForDisplay = $splititLogoArray['installments_count'];
 			$helpLink = $splititLogoArray['help_link'];
-			$helpTitle = $splititLogoArray['help_title'];
+			$helpTitle = "<img class='helplogoWidthSrc' src='" . $this->assetRepo->getUrlWithParams('Splitit_Paymentmethod::images/learn_more.svg', $params) . "' alt='Learn More'/>";
 		}
 
 		if (is_null($installmetPriceText)) {

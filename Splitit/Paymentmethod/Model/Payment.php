@@ -86,6 +86,10 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 		$this->requestData = $request->getParams();
 	}
 
+	public function getTitle() {
+		return "0% Interest Monthly Payments";
+	}
+
 	/**
 	 * Authorize payment abstract method
 	 *

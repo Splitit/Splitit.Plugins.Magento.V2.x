@@ -91,6 +91,10 @@ class PaymentRedirect extends \Magento\Payment\Model\Method\AbstractMethod {
 		$this->requestData = $request->getParams();
 	}
 
+	public function getTitle() {
+		return "0% Interest Monthly Payments";
+	}
+
 	public function getCheckoutRedirectUrl() {
 		$data = $this->paymentForm->orderPlaceRedirectUrl();
 		return $data['checkoutUrl'];

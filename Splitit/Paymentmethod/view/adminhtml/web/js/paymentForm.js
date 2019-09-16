@@ -471,6 +471,9 @@ function checkSetting1(){
 
   jQuery.ajax({
     url: baseUrl1 + "splititpaymentmethod/checksetting/checksetting", 
+    type: 'post',
+    dataType: "json",
+    data: {method:'splitit_paymentredirect'},
     showLoader: true,
     success: function(result){
       if(result.status){

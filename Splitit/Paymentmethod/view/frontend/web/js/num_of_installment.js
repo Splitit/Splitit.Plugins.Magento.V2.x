@@ -99,7 +99,7 @@ function runMyScripts(){
 						installments = (productprice/result.numOfInstallmentForDisplay).toFixed(2);
 						installmentNewSpan = result.installmetPriceText.replace('{AMOUNT}',currencySymbol+installments);
 					installmentNewSpan = '<br><span class="cart-installment">'+installmentNewSpan+'</span>';
-						jQuery('table.totals tr:last').after('<tr><td>'+installmentNewSpan+'</td></tr>');    
+						jQuery('table.totals tr:last').after('<tr><td colspan="2">'+installmentNewSpan+'</td></tr>');    
 		    		}else{
 		    			console.log('In cart page totals not found!!');   
 		    		}
@@ -195,7 +195,7 @@ function runMyScriptForCheckout(){
 					installmentNewSpan = result.installmetPriceText.replace('{AMOUNT}',currencySymbol+installments);
 					installmentNewSpan = '<br><span class="cart-installment">'+installmentNewSpan+'</span>';
 					//installmentNewSpan = '<br><span class="cart-installment-onepage">'+currencySymbol+installments+' x '+result.numOfInstallmentForDisplay+' '+result.installmetPriceText+'</span>';
-					jQuery('table.table-totals').find('.cart-installment-onepage').closest('tr').remove();
+					jQuery('table.table-totals').find('.cart-installment').closest('tr').remove();
 					jQuery('table.table-totals tr:last').after('<tr><td>'+installmentNewSpan+'</td></tr>');
 					
 				}

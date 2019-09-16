@@ -14,8 +14,11 @@ var jqueryInterval = setInterval(function(){
         jqueryIsHere = 1;
         clearInterval(jqueryInterval);
         //splitit_fee_types();
+        jQuery(document).ready(function(){
         splitit_fee_table();
         runMyScripts();
+        })
+        
       }else{
         console.log('Element not found!!');
       }
@@ -478,7 +481,10 @@ function createJsonOfDependingOnCartTotal(){
 function checkSetting(){
 
   jQuery.ajax({
-    url: baseUrl + "splititpaymentmethod/checksetting/checksetting", 
+    url: baseUrl1 + "splititpaymentmethod/checksetting/checksetting", 
+    type: 'post',
+    dataType: "json",
+    data: {method:'splitit_paymentmethod'},
     showLoader: true,
     success: function(result){
       if(result.status){
