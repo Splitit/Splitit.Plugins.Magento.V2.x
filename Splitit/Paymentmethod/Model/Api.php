@@ -470,81 +470,53 @@ class Api extends \Magento\Payment\Model\Method\AbstractMethod {
 
 	public function getSplititSupportedCultures($approvalUrl) {
 		$url = $approvalUrl . '?format=json';
-		if (version_compare($this->helper->getMagentoVersion(), '2.2.1', '<')) {
-			$ch = curl_init($url);
-			//$jsonData = json_encode($params);
-			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-			curl_setopt($ch, CURLOPT_POST, 0);
-			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+		$ch = curl_init($url);
+		//$jsonData = json_encode($params);
+		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_POST, 0);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
 
-			$result = curl_exec($ch);
+		$result = curl_exec($ch);
 
-			$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-			$code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-			// check for curl error eg: splitit server down.
-			if (curl_errno($ch)) {
-				//echo 'Curl error: ' . curl_error($ch);
-				$result["serverError"] = $this->getServerDownMsg();
-				return $result = json_encode($result);
-			}
-			curl_close($ch);
-		} else {
-			try {
-
-				$this->curl->setOption(CURLOPT_FOLLOWLOCATION, 1);
-				$this->curl->setOption(CURLOPT_SSL_VERIFYPEER, 0);
-				$this->curl->get($url);
-				$result = $this->curl->getBody();
-
-			} catch (\Exception $e) {
-				$result["errorMsg"] = $this->getServerDownMsg();
-				$result = json_encode($result);
-			}
+		$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		$code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		// check for curl error eg: splitit server down.
+		if (curl_errno($ch)) {
+			//echo 'Curl error: ' . curl_error($ch);
+			$result["serverError"] = $this->getServerDownMsg();
+			return $result = json_encode($result);
 		}
+		curl_close($ch);
 		return $result;
 	}
 
 	public function getApprovalUrlResponseFromApi($approvalUrl) {
 		$url = $approvalUrl . '&format=json';
-		if (version_compare($this->helper->getMagentoVersion(), '2.2.1', '<')) {
-			$ch = curl_init($url);
-			$jsonData = json_encode("");
-			curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-			// curl_setopt($ch, CURLOPT_POST, 1);
-			curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
-			curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-			curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
-			curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-				'Content-Type: application/json',
-				'Content-Length:' . strlen($jsonData))
-			);
-			$result = curl_exec($ch);
+		$ch = curl_init($url);
+		$jsonData = json_encode("");
+		curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "GET");
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		// curl_setopt($ch, CURLOPT_POST, 1);
+		curl_setopt($ch, CURLOPT_POSTFIELDS, $jsonData);
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0);
+		curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+			'Content-Type: application/json',
+			'Content-Length:' . strlen($jsonData))
+		);
+		$result = curl_exec($ch);
 
-			$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-			$code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-			// check for curl error eg: splitit server down.
-			if (curl_errno($ch)) {
-				//echo 'Curl error: ' . curl_error($ch);
-				$result["errorMsg"] = $this->getServerDownMsg();
-				$result = json_encode($result);
-			}
-			curl_close($ch);
-		} else {
-			try {
-
-				$this->curl->setOption(CURLOPT_FOLLOWLOCATION, 1);
-				$this->curl->setOption(CURLOPT_SSL_VERIFYPEER, 0);
-				$this->curl->get($url);
-				$result = $this->curl->getBody();
-
-			} catch (\Exception $e) {
-				$result["errorMsg"] = $this->getServerDownMsg();
-				$result = json_encode($result);
-			}
+		$httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		$code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		// check for curl error eg: splitit server down.
+		if (curl_errno($ch)) {
+			//echo 'Curl error: ' . curl_error($ch);
+			$result["errorMsg"] = $this->getServerDownMsg();
+			$result = json_encode($result);
 		}
+		curl_close($ch);
 		return $result;
 	}
 
