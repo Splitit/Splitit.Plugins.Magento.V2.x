@@ -364,9 +364,9 @@ class Api extends \Magento\Payment\Model\Method\AbstractMethod {
 		$response = ["errorMsg" => "", "successMsg" => "", "status" => false];
 		if ($this->billingAddress->getStreet()[0] == "" || $this->billingAddress->getCity() == "" || $this->billingAddress->getPostcode() == "" || $customerInfo["firstname"] == "" || $customerInfo["lastname"] == "" || $customerInfo["email"] == "" || $this->billingAddress->getTelephone() == "") {
 			$response["errorMsg"] = "Please fill required fields.";
-		} else if (strlen($this->billingAddress->getTelephone()) < 5 || strlen($this->billingAddress->getTelephone()) > 10) {
+		} else if (strlen($this->billingAddress->getTelephone()) < 5 || strlen($this->billingAddress->getTelephone()) > 14) {
 
-			$response["errorMsg"] = __("Splitit does not accept phone number less than 5 digits or greater than 10 digits.");
+			$response["errorMsg"] = __("Splitit does not accept phone number less than 5 digits or greater than 14 digits.");
 		} elseif (!$this->billingAddress->getCity()) {
 			$response["errorMsg"] = __("Splitit does not accept empty city field.");
 		} elseif (!$this->billingAddress->getCountry()) {
