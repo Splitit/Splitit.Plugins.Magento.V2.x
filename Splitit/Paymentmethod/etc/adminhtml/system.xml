@@ -101,6 +101,7 @@
                 </field>
 
                 <field id="depanding_on_cart_total_values" translate="label" type="hidden"  sortOrder="18"  showInDefault="1" showInWebsite="0" showInStore="1">
+                    <label>Depending on cart total values</label>
                 </field>
 
                 <field id="first_payment" translate="label" type="select" sortOrder="19" showInDefault="1" showInWebsite="1" showInStore="0" >
@@ -138,7 +139,7 @@
                 </field>
 
                 <field id="enable_installment_price" translate="label" sortOrder="25" type="select" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Advertise Splitit option throughout my store</label>
+                    <label>Show installment option throughout my store</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
 
@@ -282,6 +283,7 @@
                 </field>
 
                 <field id="depanding_on_cart_total_values" translate="label" type="hidden"  sortOrder="18"  showInDefault="1" showInWebsite="0" showInStore="1">
+                    <label>Depending on cart total values</label>
                 </field>
 
                 <field id="first_payment" translate="label" type="select" sortOrder="19" showInDefault="1" showInWebsite="1" showInStore="0" >
@@ -325,7 +327,7 @@
                 </field>
 
                 <field id="enable_installment_price" translate="label" sortOrder="26" type="select" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Advertise Splitit option throughout my store</label>
+                    <label>Show installment option throughout my store</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
 

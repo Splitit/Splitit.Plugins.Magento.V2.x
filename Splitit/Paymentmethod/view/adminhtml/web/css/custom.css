@@ -22,6 +22,9 @@ tr[id$="_splitit_paymentredirect_faq_link_enabled"]{
 tr[id$="_splitit_paymentredirect_faq_link_title"]{
     display: none;
 }
+tr[id$="_splitit_paymentmethod_depanding_on_cart_total_values"]{
+    display: none;
+}
 button.delete-product-option{
     border: none;
     background: none;

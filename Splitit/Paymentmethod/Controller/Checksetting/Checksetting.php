@@ -1,45 +1,73 @@
 <?php
+
 /**
- * Copyright © 2015 Inchoo d.o.o.
- * created by Zoran Salamun(zoran.salamun@inchoo.net)
+ * Copyright © 2019 Splitit
  */
+
 namespace Splitit\Paymentmethod\Controller\Checksetting;
+
 use Magento\Framework\Controller\ResultFactory;
 
 class Checksetting extends \Magento\Framework\App\Action\Action {
 
+	/**
+	 * Splitit Helper
+	 * @var Splitit\Paymentmethod\Helper\Data
+	 */
 	private $helper;
 
-	public function execute() {
+	/**
+	 * Splitit API model
+	 * @var Splitit\Paymentmethod\Model\Api
+	 */
+	private $apiModelObj;
 
+	/**
+	 * Contructor
+	 * @param \Magento\Framework\App\Action\Context $context
+	 * @param \Splitit\Paymentmethod\Helper\Data $helper
+	 * @param \Splitit\Paymentmethod\Model\Api $apiModelObj
+	 */
+	public function __construct(
+		\Magento\Framework\App\Action\Context $context,
+		\Splitit\Paymentmethod\Helper\Data $helper,
+		\Splitit\Paymentmethod\Model\Api $apiModelObj
+	) {
+		$this->helper = $helper;
+		$this->apiModelObj = $apiModelObj;
+		parent::__construct($context);
+	}
+
+	/**
+	 * To check SplitIt Api credentials are correct
+	 * @return Json
+	 */
+	public function execute() {
 		$response = [
 			"status" => false,
 			"errorMsg" => "",
 			"successMsg" => "",
-
 		];
+
 		$paramMethod = $this->getRequest()->getParam('method');
 		if ($paramMethod) {
-			$this->helper = $this->_objectManager->create('Splitit\Paymentmethod\Helper\Data');
 			$resultJson = $this->resultFactory->create(ResultFactory::TYPE_JSON);
-			if (!$this->helper->getConfig("payment/" . $paramMethod . "/api_username") || !$this->helper->getConfig("payment/" . $paramMethod . "/api_password") || !$this->helper->getConfig("payment/" . $paramMethod . "/api_terminal_key")) {
+			if (!$this->helper->getApiUsername($paramMethod) || !$this->helper->getApiPassword($paramMethod) || !$this->helper->getApiTerminalKey($paramMethod)) {
 				$response['errorMsg'] = "Please enter the credentials and save configuration";
 			} else {
 				$dataForLogin = array(
-					'UserName' => $this->helper->getConfig("payment/" . $paramMethod . "/api_username"),
-					'Password' => $this->helper->getConfig("payment/" . $paramMethod . "/api_password"),
-					'TouchPoint' => array("Code" => "MagentoPlugin", "Version" => "v2.1"),
+					'UserName' => $this->helper->getApiUsername($paramMethod),
+					'Password' => $this->helper->getApiPassword($paramMethod),
+					'TouchPoint' => $this->helper->getApiTouchPointVersion(),
 				);
-
-				$apiModelObj = $this->_objectManager->get('Splitit\Paymentmethod\Model\Api');
-				$loginResponse = $apiModelObj->apiLogin($dataForLogin);
+				$loginResponse = $this->apiModelObj->apiLogin($dataForLogin);
 
 				if (!$loginResponse["status"]) {
 					$response["errorMsg"] = $loginResponse["errorMsg"];
 					$resultJson->setData($response);
 					return $resultJson;
 				}
-				if ($this->helper->getConfig("payment/" . $paramMethod . "/sandbox_flag")) {
+				if ($this->helper->getSandboxFlag($paramMethod)) {
 					$response["successMsg"] = "[Sandbox Mode] Successfully login! API available!";
 				} else {
 					$response["successMsg"] = "[Production Mode] Successfully login! API available!";
@@ -53,7 +81,6 @@ class Checksetting extends \Magento\Framework\App\Action\Action {
 
 		$resultJson->setData($response);
 		return $resultJson;
-
 	}
 
 }

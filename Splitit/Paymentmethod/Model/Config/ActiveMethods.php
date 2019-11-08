@@ -20,11 +20,19 @@ class ActiveMethods
         $this->scopeConfig = $scopeConfig;
     }
 
+    /**
+     * Get active payment methods
+     * @return mixed
+     */
     protected function _getPaymentMethods()
     {
         return $this->paymentConfig->getActiveMethods();
     }
 
+    /**
+     * Return option array for config
+     * @return array
+     */
     public function toOptionArray()
     {
         $methods = [['value'=>'', 'label'=>'']];
