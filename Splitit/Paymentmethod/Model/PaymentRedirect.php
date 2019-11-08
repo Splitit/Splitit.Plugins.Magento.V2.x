@@ -20,8 +20,6 @@ class PaymentRedirect extends \Magento\Payment\Model\Method\AbstractMethod {
 	protected $_isInitializeNeeded = true;
 	protected $_canUseInternal = true;
 	protected $_canUseForMultishipping = false;
-//    protected $_formBlockType = 'pis_payment/form_pisPaymentForm';
-	//    protected $_infoBlockType = 'pis_payment/info_pis';
 	protected $_canAuthorize = true;
 	protected $_canCapture = true;
 	protected $_canCapturePartial = false;
@@ -29,18 +27,14 @@ class PaymentRedirect extends \Magento\Payment\Model\Method\AbstractMethod {
 	protected $_canRefund = true;
 	protected $_canRefundInvoicePartial = true;
 	protected $_canVoid = false;
-	//protected $_canUseInternal              = false;
 	protected $_canUseCheckout = true;
-	//protected $_infoBlockType = 'pis_payment/info_pis';
 	protected $_canCancel = false;
 	protected $api;
 	protected $helper;
-	protected $_checkoutSession;
+	protected $checkoutSession;
 	protected $customerSession;
 	protected $quote;
-	protected $jsonHelper;
-	protected $_store;
-	protected $objectManager;
+	protected $store;
 	protected $paymentForm;
 	private $requestData = null;
 
@@ -57,8 +51,9 @@ class PaymentRedirect extends \Magento\Payment\Model\Method\AbstractMethod {
 		\Magento\Customer\Model\Session $customerSession,
 		\Magento\Store\Api\Data\StoreInterface $store,
 		\Magento\Framework\UrlInterface $urlBuilder,
-		\Magento\Framework\Json\Helper\Data $jsonHelper,
-		\Magento\Checkout\Model\Session $_checkoutSession,
+		\Magento\Checkout\Model\Session $checkoutSession,
+		\Splitit\Paymentmethod\Helper\Data $helper,
+		\Magento\Framework\App\RequestInterface $request,
 		\Magento\Framework\Model\ResourceModel\AbstractResource $resource = null,
 		\Magento\Framework\Data\Collection\AbstractDb $resourceCollection = null,
 		array $data = array()
@@ -76,25 +71,20 @@ class PaymentRedirect extends \Magento\Payment\Model\Method\AbstractMethod {
 			$data
 		);
 		$this->api = $api;
-		$this->_checkoutSession = $_checkoutSession;
+		$this->checkoutSession = $checkoutSession;
 		$this->customerSession = $customerSession;
-		$this->_store = $store;
+		$this->store = $store;
 		$this->urlBuilder = $urlBuilder;
-		$this->jsonHelper = $jsonHelper;
 		$this->paymentForm = $paymentForm;
-		$this->quote = $this->_checkoutSession->getQuote();
-		$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-		$this->objectManager = $objectManager;
-		$this->helper = $objectManager->get('Splitit\Paymentmethod\Helper\Data');
-		// var_dump($this->quote->getPayment()->getExtensionAttributes());
-		$request = $objectManager->get('Magento\Framework\App\RequestInterface');
+		$this->quote = $this->checkoutSession->getQuote();
+		$this->helper = $helper;
 		$this->requestData = $request->getParams();
 	}
 
-	public function getTitle() {
-		return "0% Interest Monthly Payments";
-	}
-
+	/**
+	 * Return checkout URL for payment gateway redirect
+	 * @return string
+	 */
 	public function getCheckoutRedirectUrl() {
 		$data = $this->paymentForm->orderPlaceRedirectUrl();
 		return $data['checkoutUrl'];
@@ -132,7 +122,7 @@ class PaymentRedirect extends \Magento\Payment\Model\Method\AbstractMethod {
 			} else {
 				$authNumber = $payment->getAuthorizationTransaction()->getTxnId();
 			}
-			$paymentAction = $this->helper->getConfig("payment/splitit_paymentredirect/payment_action");
+			$paymentAction = $this->helper->getRedirectPaymentAction();
 			$params = array('InstallmentPlanNumber' => $authNumber);
 			if ($paymentAction == "authorize_capture") {
 				$api = $this->api->getApiUrl();
@@ -145,7 +135,7 @@ class PaymentRedirect extends \Magento\Payment\Model\Method\AbstractMethod {
 			$this->_logger->error(print_r($params, true));
 			$api = $this->api->getApiUrl();
 			$result = $this->api->makePhpCurlRequest($api, "InstallmentPlan/StartInstallments", $params);
-			$result = json_decode($result, true);
+			$result = $this->helper->jsonDecode($result);
 			if (isset($result["ResponseHeader"]) && isset($result["ResponseHeader"]["Errors"]) && !empty($result["ResponseHeader"]["Errors"])) {
 				$errorMsg = "";
 
@@ -212,7 +202,7 @@ class PaymentRedirect extends \Magento\Payment\Model\Method\AbstractMethod {
 			);
 
 			$result = $this->api->makePhpCurlRequest($api, "InstallmentPlan/Cancel", $params);
-			$result = json_decode($result, true);
+			$result = $this->helper->jsonDecode($result);
 			if (isset($result["ResponseHeader"]) && isset($result["ResponseHeader"]["Errors"]) && !empty($result["ResponseHeader"]["Errors"])) {
 				$errorMsg = "";
 
@@ -274,7 +264,7 @@ class PaymentRedirect extends \Magento\Payment\Model\Method\AbstractMethod {
 			);
 
 			$result = $this->api->makePhpCurlRequest($api, "InstallmentPlan/Refund", $params);
-			$result = json_decode($result, true);
+			$result = $this->helper->jsonDecode($result);
 			if (isset($result["ResponseHeader"]) && isset($result["ResponseHeader"]["Errors"]) && !empty($result["ResponseHeader"]["Errors"])) {
 				$errorMsg = "";
 

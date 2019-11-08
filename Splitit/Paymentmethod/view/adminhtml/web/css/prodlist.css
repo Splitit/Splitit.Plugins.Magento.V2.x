@@ -67,3 +67,5 @@
 .ui-menu .ui-menu-item a:hover{
     text-decoration: none;
 }
+.ui-menu { background: whitesmoke; }
+.ui-menu .ui-menu-item a {    color: #000;    cursor: pointer; }

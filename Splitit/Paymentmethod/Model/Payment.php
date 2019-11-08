@@ -26,18 +26,19 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 
 	protected $_paymentApi = false;
 
-	protected $_countryFactory;
+	protected $countryFactory;
 
-	//protected $_minAmount = null;
-	//protected $_maxAmount = null;
 	protected $_supportedCurrencyCodes = array('USD');
 
 	protected $_debugReplacePrivateDataKeys = ['number', 'exp_month', 'exp_year', 'cvc'];
 
-	protected $_apiModel = null;
+	protected $apiModel = null;
+	protected $currency;
+	protected $storeManager;
+	protected $cart;
+	protected $sourceInstallments;
 	private $customerSession;
 	private $helper;
-	private $objectManager = null;
 	private $grandTotal = null;
 	private $requestData = null;
 
@@ -53,6 +54,13 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 		\Magento\Framework\Stdlib\DateTime\TimezoneInterface $localeDate,
 		\Magento\Directory\Model\CountryFactory $countryFactory,
 		\Magento\Customer\Model\Session $customerSession,
+		\Magento\Checkout\Model\Cart $cart,
+		\Magento\Framework\App\RequestInterface $request,
+		\Magento\Store\Model\StoreManagerInterface $storeManager,
+		\Magento\Directory\Model\Currency $currency,
+		\Splitit\Paymentmethod\Model\Api $apiModel,
+		\Splitit\Paymentmethod\Helper\Data $helper,
+		\Splitit\Paymentmethod\Model\Source\Installments $sourceInstallments,
 		array $data = array()
 	) {
 		parent::__construct(
@@ -70,24 +78,17 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 			$data
 		);
 
-		$this->_countryFactory = $countryFactory;
+		$this->countryFactory = $countryFactory;
 
-		//$this->_minAmount = $this->getConfigData('min_order_total');
-		//$this->_maxAmount = $this->getConfigData('max_order_total');
-
-		$this->objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-		$this->_apiModel = $this->objectManager->get('Splitit\Paymentmethod\Model\Api');
+		$this->apiModel = $apiModel;
 		$this->customerSession = $customerSession;
-		$this->helper = $this->objectManager->get('Splitit\Paymentmethod\Helper\Data');
-		$cart = $this->objectManager->get("\Magento\Checkout\Model\Cart");
+		$this->storeManager = $storeManager;
+		$this->currency = $currency;
+		$this->cart = $cart;
+		$this->sourceInstallments = $sourceInstallments;
+		$this->helper = $helper;
 		$this->grandTotal = round($cart->getQuote()->getGrandTotal(), 2);
-//        $this->checkProductBasedAvailability();
-		$request = $this->objectManager->get('Magento\Framework\App\RequestInterface');
 		$this->requestData = $request->getParams();
-	}
-
-	public function getTitle() {
-		return "0% Interest Monthly Payments";
 	}
 
 	/**
@@ -108,11 +109,11 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 
 		try {
 
-			$api = $this->_apiModel->getApiUrl();
+			$api = $this->apiModel->getApiUrl();
 			$result = $this->createInstallmentPlan($api, $payment, $amount);
-			$result = json_decode($result, true);
+			$result = $this->helper->jsonDecode($result);
 
-			// show error if there is any error from spliti it when click on place order
+			/*show error if there is any error from spliti it when click on place order*/
 			if (!$result["ResponseHeader"]["Succeeded"]) {
 				$errorMsg = "";
 				if (isset($result["serverError"])) {
@@ -156,7 +157,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 				false
 			);
 
-			// call InstallmentPlan-UpdatePlan-Params for update "RefOrderNumber" after order creation
+			/*call InstallmentPlan-UpdatePlan-Params for update "RefOrderNumber" after order creation*/
 			$updateStatus = $this->updateRefOrderNumber($api, $order);
 			if ($updateStatus["status"] == false) {
 
@@ -166,6 +167,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 			}
 		} catch (\Exception $e) {
 			$this->debugData(['request' => $this->requestData, 'exception' => $e->getMessage()]);
+			//$this->_logger->error(__($e->getMessage()));
 			$this->_logger->error(__('Payment Authorize error.'));
 			throw new \Magento\Framework\Validator\Exception(__('Payment Authorize error.'));
 		}
@@ -189,19 +191,19 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 			} else {
 				$authNumber = $payment->getAuthorizationTransaction()->getTxnId();
 			}
-			$paymentAction = $this->helper->getConfig("payment/splitit_paymentmethod/payment_action");
+			$paymentAction = $this->helper->getPaymentAction();
 			$params = array('InstallmentPlanNumber' => $authNumber);
 			if ($paymentAction == "authorize_capture") {
-				$api = $this->_apiModel->getApiUrl();
-				$sessionId = $this->_apiModel->getorCreateSplititSessionid();
+				$api = $this->apiModel->getApiUrl();
+				$sessionId = $this->apiModel->getorCreateSplititSessionid();
 			} else {
-				$api = $this->_apiModel->apiLogin();
-				$sessionId = $this->_apiModel->getorCreateSplititSessionid();
+				$api = $this->apiModel->apiLogin();
+				$sessionId = $this->apiModel->getorCreateSplititSessionid();
 			}
 			$params = array_merge($params, array("RequestHeader" => array('SessionId' => $sessionId)));
-			$api = $this->_apiModel->getApiUrl();
-			$result = $this->_apiModel->makePhpCurlRequest($api, "InstallmentPlan/StartInstallments", $params);
-			$result = json_decode($result, true);
+			$api = $this->apiModel->getApiUrl();
+			$result = $this->apiModel->makePhpCurlRequest($api, "InstallmentPlan/StartInstallments", $params);
+			$result = $this->helper->jsonDecode($result);
 			if (isset($result["ResponseHeader"]) && isset($result["ResponseHeader"]["Errors"]) && !empty($result["ResponseHeader"]["Errors"])) {
 				$errorMsg = "";
 
@@ -252,8 +254,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 	public function cancel(\Magento\Payment\Model\InfoInterface $payment) {
 		$transactionId = $payment->getParentTransactionId();
 		try {
-			$apiLogin = $this->_apiModel->apiLogin();
-			$api = $this->_apiModel->getApiUrl();
+			$apiLogin = $this->apiModel->apiLogin();
+			$api = $this->apiModel->getApiUrl();
 			$installmentPlanNumber = $payment->getAuthorizationTransaction()->getTxnId();
 			$ipn = substr($installmentPlanNumber, 0, strpos($installmentPlanNumber, '-'));
 			if ($ipn != "") {
@@ -261,14 +263,14 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 			}
 			$params = array(
 				"RequestHeader" => array(
-					"SessionId" => $this->_apiModel->getorCreateSplititSessionid(),
+					"SessionId" => $this->apiModel->getorCreateSplititSessionid(),
 				),
 				"InstallmentPlanNumber" => $installmentPlanNumber,
 				"RefundUnderCancelation" => "OnlyIfAFullRefundIsPossible",
 			);
 
-			$result = $this->_apiModel->makePhpCurlRequest($api, "InstallmentPlan/Cancel", $params);
-			$result = json_decode($result, true);
+			$result = $this->apiModel->makePhpCurlRequest($api, "InstallmentPlan/Cancel", $params);
+			$result = $this->helper->jsonDecode($result);
 			if (isset($result["ResponseHeader"]) && isset($result["ResponseHeader"]["Errors"]) && !empty($result["ResponseHeader"]["Errors"])) {
 				$errorMsg = "";
 
@@ -312,8 +314,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 	public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount) {
 		$transactionId = $payment->getParentTransactionId();
 		try {
-			$apiLogin = $this->_apiModel->apiLogin();
-			$api = $this->_apiModel->getApiUrl();
+			$apiLogin = $this->apiModel->apiLogin();
+			$api = $this->apiModel->getApiUrl();
 			$installmentPlanNumber = $payment->getAuthorizationTransaction()->getTxnId();
 			$ipn = substr($installmentPlanNumber, 0, strpos($installmentPlanNumber, '-'));
 			if ($ipn != "") {
@@ -321,7 +323,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 			}
 			$params = array(
 				"RequestHeader" => array(
-					"SessionId" => $this->_apiModel->getorCreateSplititSessionid(),
+					"SessionId" => $this->apiModel->getorCreateSplititSessionid(),
 				),
 				"InstallmentPlanNumber" => $installmentPlanNumber,
 				"Amount" => array("Value" => $amount),
@@ -329,9 +331,9 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 
 			);
 
-			$result = $this->_apiModel->makePhpCurlRequest($api, "InstallmentPlan/Refund", $params);
-			$result = json_decode($result, true);
-//            print_r($result);exit;
+			$result = $this->apiModel->makePhpCurlRequest($api, "InstallmentPlan/Refund", $params);
+			$result = $this->helper->jsonDecode($result);
+
 			if (isset($result["ResponseHeader"]) && isset($result["ResponseHeader"]["Errors"]) && !empty($result["ResponseHeader"]["Errors"])) {
 				$errorMsg = "";
 
@@ -377,25 +379,12 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 	 * @return bool
 	 */
 	public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null) {
-//return parent::isAvailable($quote);
+
 		if ($this->checkAvailableInstallments($quote) && $this->checkProductBasedAvailability()) {
 			return parent::isAvailable($quote);
 		} else {
 			return false;
 		}
-		/*return parent::isAvailable($quote);
-			        if ($quote && (
-			            $quote->getBaseGrandTotal() < $this->_minAmount
-			            || ($this->_maxAmount && $quote->getBaseGrandTotal() > $this->_maxAmount))
-			        ) {
-			            return false;
-			        }
-
-			        if (!$this->getConfigData('api_key')) {
-			            return false;
-			        }
-
-		*/
 	}
 
 	/**
@@ -405,22 +394,22 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 	 * @return bool
 	 */
 	public function canUseForCurrency($currencyCode) {
-		/*if (!in_array($currencyCode, $this->_supportedCurrencyCodes)) {
-			            return false;
-		*/
 		return true;
 	}
 
+	/**
+	 * Check if single installment is applicable
+	 * @return boolean
+	 */
 	private function isOneInstallment() {
-		$selectInstallmentSetup = $this->helper->getConfig('payment/splitit_paymentmethod/select_installment_setup');
-		$options = $this->objectManager->get('Splitit\Paymentmethod\Model\Source\Installments')->toOptionArray();
-		$storeManager = $this->objectManager->get('\Magento\Store\Model\StoreManagerInterface');
-		$currentCurrencyCode = $storeManager->getStore()->getCurrentCurrencyCode();
-		$currencySymbol = $this->objectManager->get('\Magento\Directory\Model\Currency')->load($currentCurrencyCode)->getCurrencySymbol();
+		$selectInstallmentSetup = $this->helper->getSelectInstallmentSetup();
+		$options = $this->sourceInstallments->toOptionArray();
+		$currentCurrencyCode = $this->storeManager->getStore()->getCurrentCurrencyCode();
+		$currencySymbol = $this->currency->load($currentCurrencyCode)->getCurrencySymbol();
 
 		$countInstallments = $installmentValue = 0;
 		if ($selectInstallmentSetup == "" || $selectInstallmentSetup == "fixed") {
-			$installments = $this->helper->getConfig("payment/splitit_paymentmethod/fixed_installment");
+			$installments = $this->helper->getFixedInstallment();
 
 			if ($installments) {
 				foreach (explode(',', $installments) as $value) {
@@ -431,24 +420,24 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 			}
 		} else {
 			$totalAmount = $this->grandTotal;
-			$depandingOnCartInstallments = $this->helper->getConfig("payment/splitit_paymentmethod/depanding_on_cart_total_values");
-			$depandingOnCartInstallmentsArr = json_decode($depandingOnCartInstallments);
+			$depandingOnCartInstallments = $this->helper->getDepandingOnCartTotalValues();
+			$depandingOnCartInstallmentsArr = $this->helper->jsonDecode($depandingOnCartInstallments);
 			$dataAsPerCurrency = [];
 			foreach ($depandingOnCartInstallmentsArr as $data) {
-				$dataAsPerCurrency[$data->doctv->currency][] = $data->doctv;
+				$dataAsPerCurrency[$data['doctv']['currency']][] = $data['doctv'];
 			}
 
 			if (count($dataAsPerCurrency) && isset($dataAsPerCurrency[$currentCurrencyCode])) {
 
 				foreach ($dataAsPerCurrency[$currentCurrencyCode] as $data) {
-					if ($totalAmount >= $data->from && !empty($data->to) && $totalAmount <= $data->to) {
-						foreach (explode(',', $data->installments) as $n) {
+					if ($totalAmount >= $data['from'] && !empty($data['to']) && $totalAmount <= $data['to']) {
+						foreach (explode(',', $data['installments']) as $n) {
 							$installmentValue = $n;
 							$countInstallments++;
 						}
 						break;
-					} else if ($totalAmount >= $data->from && empty($data->to)) {
-						foreach (explode(',', $data->installments) as $n) {
+					} else if ($totalAmount >= $data['from'] && empty($data['to'])) {
+						foreach (explode(',', $data['installments']) as $n) {
 							$installmentValue = $n;
 							$countInstallments++;
 						}
@@ -464,13 +453,20 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 		return false;
 	}
 
+	/**
+	 * Create installment plan to Splitit
+	 * @param approvalUrl string
+	 * @param payment object
+	 * @param amount float
+	 * @return json
+	 */
 	protected function createInstallmentPlan($api, $payment, $amount) {
 		$cultureName = $this->helper->getCultureName();
 		$this->_logger->error(__('creating installment plan-----'));
 		if ($this->isOneInstallment()) {
 			$this->_logger->error(__('is one installment-----'));
-			$apiLogin = $this->_apiModel->apiLogin();
-			$params = $this->_apiModel->createDataForInstallmentPlanInit(1);
+			$apiLogin = $this->apiModel->apiLogin();
+			$params = $this->apiModel->createDataForInstallmentPlanInit(1);
 			$params["CreditCardDetails"] = [
 				"CardCvv" => $payment->getCcCid(),
 				"CardNumber" => $payment->getCcNumber(),
@@ -481,14 +477,14 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 				"AreTermsAndConditionsApproved" => "True",
 			];
 			$this->_logger->error("====1 installment ====");
-			$this->_logger->error(json_encode($params));
+			$this->_logger->error($this->helper->jsonEncode($params));
 			$this->_logger->error("==== END ====");
 		} else {
 			$this->_logger->error(__('normal installment-----'));
 			$params = [
 				"RequestHeader" => [
-					"SessionId" => $this->_apiModel->getorCreateSplititSessionid(),
-					"ApiKey" => $this->helper->getConfig("payment/splitit_payment/api_terminal_key"),
+					"SessionId" => $this->apiModel->getorCreateSplititSessionid(),
+					"ApiKey" => $this->helper->getApiTerminalKey("splitit_payment"),
 					"CultureName" => $cultureName,
 				],
 				"InstallmentPlanNumber" => $this->customerSession->getInstallmentPlanNumber(),
@@ -504,15 +500,21 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 			];
 		}
 		$this->_logger->error(print_r($params, true));
-		$result = $this->_apiModel->makePhpCurlRequest($api, "InstallmentPlan/Create", $params);
+		$result = $this->apiModel->makePhpCurlRequest($api, "InstallmentPlan/Create", $params);
 		$this->_logger->error(print_r($result, true));
 		return $result;
 	}
 
+	/**
+	 * Update order in magento
+	 * @param api object
+	 * @param order int
+	 * @return array
+	 */
 	public function updateRefOrderNumber($api, $order) {
 		$params = [
 			"RequestHeader" => [
-				"SessionId" => $this->_apiModel->getorCreateSplititSessionid(),
+				"SessionId" => $this->apiModel->getorCreateSplititSessionid(),
 			],
 			"InstallmentPlanNumber" => $this->customerSession->getInstallmentPlanNumber(),
 			"PlanData" => [
@@ -523,17 +525,17 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 			],
 		];
 		$response = ["status" => false, "errorMsg" => ""];
-		$result = $this->_apiModel->makePhpCurlRequest($api, "InstallmentPlan/Update", $params);
-		//$result = $this->_apiModel->makePhpCurlRequestForUpdate($api, "InstallmentPlan/Update",$params);
-		$decodedResult = json_decode($result, true);
+		$result = $this->apiModel->makePhpCurlRequest($api, "InstallmentPlan/Update", $params);
+		$decodedResult = $this->helper->jsonDecode($result);
 		if (isset($decodedResult["ResponseHeader"]["Succeeded"]) && $decodedResult["ResponseHeader"]["Succeeded"] == 1) {
 			$response["status"] = true;
 		} else if (isset($decodedResult["ResponseHeader"]) && count($decodedResult["ResponseHeader"]["Errors"])) {
 			$errorMsg = "";
+			$errorCount = count($decodedResult["ResponseHeader"]["Errors"]);
 			$i = 1;
 			foreach ($decodedResult["ResponseHeader"]["Errors"] as $key => $value) {
 				$errorMsg .= "Code : " . $value["ErrorCode"] . " - " . $value["Message"];
-				if ($i < count($decodedResult["ResponseHeader"]["Errors"])) {
+				if ($i < $errorCount) {
 					$errorMsg .= ", ";
 				}
 				$i++;
@@ -545,47 +547,50 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 
 	}
 
+	/**
+	 * Check available installments
+	 * @param quote object
+	 * @return bool
+	 */
 	public function checkAvailableInstallments($quote) {
 		$installments = array();
 		$totalAmount = $this->grandTotal;
-		$selectInstallmentSetup = $this->getConfigData('select_installment_setup');
+		$selectInstallmentSetup = $this->helper->getSelectInstallmentSetup();
 
-		$options = $this->objectManager->get('Splitit\Paymentmethod\Model\Source\Installments')->toOptionArray();
+		$options = $this->sourceInstallments->toOptionArray();
 
 		$depandOnCart = 0;
 
 		if ($selectInstallmentSetup == "" || $selectInstallmentSetup == "fixed") {
-			// Select Fixed installment setup
-
-			$fixedInstallments = $this->helper->getConfig("payment/splitit_paymentmethod/fixed_installment");
+			/*Select Fixed installment setup*/
+			$fixedInstallments = $this->helper->getFixedInstallment();
 			$installments = explode(',', $fixedInstallments);
 			if (count($installments) > 0) {
 				return true;
 			}
 
 		} else {
-			// Select Depanding on cart installment setup
+			/*Select Depanding on cart installment setup*/
 			$depandOnCart = 1;
-			$depandingOnCartInstallments = $this->helper->getConfig("payment/splitit_paymentmethod/depanding_on_cart_total_values");
-			$depandingOnCartInstallmentsArr = json_decode($depandingOnCartInstallments);
+			$depandingOnCartInstallments = $this->helper->getDepandingOnCartTotalValues();
+			$depandingOnCartInstallmentsArr = $this->helper->jsonDecode($depandingOnCartInstallments);
 			$dataAsPerCurrency = [];
 			foreach ($depandingOnCartInstallmentsArr as $data) {
-				$dataAsPerCurrency[$data->doctv->currency][] = $data->doctv;
+				$dataAsPerCurrency[$data['doctv']['currency']][] = $data['doctv'];
 			}
-			$storeManager = $this->objectManager->get('\Magento\Store\Model\StoreManagerInterface');
-			$currentCurrencyCode = $storeManager->getStore()->getCurrentCurrencyCode();
+			$currentCurrencyCode = $this->storeManager->getStore()->getCurrentCurrencyCode();
 			if (count($dataAsPerCurrency) && isset($dataAsPerCurrency[$currentCurrencyCode])) {
 
 				foreach ($dataAsPerCurrency[$currentCurrencyCode] as $data) {
-					if ($totalAmount >= $data->from && !empty($data->to) && $totalAmount <= $data->to) {
-						foreach (explode(',', $data->installments) as $n) {
+					if ($totalAmount >= $data['from'] && !empty($data['to']) && $totalAmount <= $data['to']) {
+						foreach (explode(',', $data['installments']) as $n) {
 							if ((array_key_exists($n, $options))) {
 								$installments[$n] = $n;
 							}
 						}
 						break;
-					} else if ($totalAmount >= $data->from && empty($data->to)) {
-						foreach (explode(',', $data->installments) as $n) {
+					} else if ($totalAmount >= $data['from'] && empty($data['to'])) {
+						foreach (explode(',', $data['installments']) as $n) {
 
 							if ((array_key_exists($n, $options))) {
 								$installments[$n] = $n;
@@ -604,19 +609,19 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 
 	}
 
+	/**
+	 * Check product based availability of module
+	 * @return bool
+	 */
 	public function checkProductBasedAvailability() {
 		$check = TRUE;
-		if ($this->helper->getConfig("payment/splitit_paymentmethod/splitit_per_product")) {
-			$cart = $this->objectManager->get('\Magento\Checkout\Model\Cart');
-// retrieve quote items collection
-			//        $itemsCollection = $cart->getQuote()->getItemsCollection();
-			// retrieve quote items array
-			//        $items = $cart->getQuote()->getAllItems();
-			// get array of all items what can be display directly
-			$itemsVisible = $cart->getQuote()->getAllVisibleItems();
-			$allowedProducts = $this->helper->getConfig("payment/splitit_paymentmethod/splitit_product_skus");
+		if ($this->helper->getSplititPerProduct()) {
+
+			/*get array of all items what can be display directly*/
+			$itemsVisible = $this->cart->getQuote()->getAllVisibleItems();
+			$allowedProducts = $this->helper->getSplititProductSkus();
 			$allowedProducts = explode(',', $allowedProducts);
-			if ($this->helper->getConfig("payment/splitit_paymentmethod/splitit_per_product") == 1) {
+			if ($this->helper->getSplititPerProduct() == 1) {
 				$check = TRUE;
 				foreach ($itemsVisible as $item) {
 					if (!in_array($item->getProductId(), $allowedProducts)) {
@@ -625,7 +630,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 					}
 				}
 			}
-			if ($this->helper->getConfig("payment/splitit_paymentmethod/splitit_per_product") == 2) {
+			if ($this->helper->getSplititPerProduct() == 2) {
 				$check = FALSE;
 				foreach ($itemsVisible as $item) {
 					if (in_array($item->getProductId(), $allowedProducts)) {
@@ -635,7 +640,6 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 				}
 			}
 		}
-//        var_dump($check);
 		return $check;
 	}
 

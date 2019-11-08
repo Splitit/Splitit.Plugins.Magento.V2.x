@@ -210,7 +210,7 @@ function closeApprovalPopup(){
 }
 		
 function popWin(mylink, windowname) { 
-	 	console.log('texdasft' );	    
+	 	//console.log('texdasft' );	    
 	    var href;
 	    href=mylink;
 	    window.open(href, windowname, 'width=800,height=1075,scrollbars=yes,left=0,top=0,location=no,status=no,resizable=no'); 

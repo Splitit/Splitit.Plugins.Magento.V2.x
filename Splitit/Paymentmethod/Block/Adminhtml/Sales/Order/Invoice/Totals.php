@@ -4,73 +4,104 @@ namespace Splitit\Paymentmethod\Block\Adminhtml\Sales\Order\Invoice;
 
 class Totals extends \Magento\Framework\View\Element\Template {
 
-    protected $_config;
-    protected $_order;
-    protected $_source;
+	protected $config;
+	protected $order;
+	protected $source;
 
-    public function __construct(
-    \Magento\Framework\View\Element\Template\Context $context, \Magento\Tax\Model\Config $taxConfig, array $data = []
-    ) {
-        $this->_config = $taxConfig;
-        parent::__construct($context, $data);
-    }
+	/**
+	 * Contructor
+	 * @param \Magento\Framework\View\Element\Template\Context $context
+	 * @param \Magento\Tax\Model\Config $taxConfig
+	 * @param array $data
+	 */
+	public function __construct(
+		\Magento\Framework\View\Element\Template\Context $context,
+		\Magento\Tax\Model\Config $taxConfig,
+		array $data = []
+	) {
+		$this->config = $taxConfig;
+		parent::__construct($context, $data);
+	}
 
-    public function displayFullSummary() {
-        return true;
-    }
-    
-    /**
-     * Get data (totals) source model
-     *
-     * @return \Magento\Framework\DataObject
-     */
-    public function getSource()
-    {
-        return $this->getParentBlock()->getSource();
-    }
+	/**
+	 * @return boolean
+	 */
+	public function displayFullSummary() {
+		return true;
+	}
 
-    /**
-     * @return mixed
-     */
-    public function getInvoice()
-    {
-        return $this->getParentBlock()->getInvoice();
-    }
+	/**
+	 * Get data (totals) source model
+	 *
+	 * @return \Magento\Framework\DataObject
+	 */
+	public function getSource() {
+		return $this->getParentBlock()->getSource();
+	}
 
-    public function getStore() {
-        return $this->_order->getStore();
-    }
+	/**
+	 * Return Invoice block
+	 * @return mixed
+	 */
+	public function getInvoice() {
+		return $this->getParentBlock()->getInvoice();
+	}
 
-    public function getOrder() {
-        return $this->_order;
-    }
+	/**
+	 * Get store object
+	 * @return object
+	 */
+	public function getStore() {
+		return $this->order->getStore();
+	}
 
-    public function getLabelProperties() {
-        return $this->getParentBlock()->getLabelProperties();
-    }
+	/**
+	 * Get order object
+	 * @return object
+	 */
+	public function getOrder() {
+		return $this->order;
+	}
 
-    public function getValueProperties() {
-        return $this->getParentBlock()->getValueProperties();
-    }
+	/**
+	 * Get total label properties
+	 * @return mixed
+	 */
+	public function getLabelProperties() {
+		return $this->getParentBlock()->getLabelProperties();
+	}
 
-    public function initTotals() {
-        $parent = $this->getParentBlock();
-        $this->_order = $parent->getOrder();
-        $this->_source = $parent->getSource();
+	/**
+	 * Get label value properties
+	 * @return mixed
+	 */
+	public function getValueProperties() {
+		return $this->getParentBlock()->getValueProperties();
+	}
 
-        $store = $this->getStore();
-        // echo $this->_order->getFeeAmount();exit;
-        $fee = new \Magento\Framework\DataObject(
-                [
-            'code' => 'fee',
-            'strong' => false,
-            'value' => $this->_order->getFeeAmount(),
-            'base_value' => $this->_order->getFeeAmount(),
-            'label' => __('Splitit Fee'),
-                ]
-        );
-        $parent->addTotal($fee, 'fee');
-        return $this;
-    }
+	/**
+	 * Initialize fee totals
+	 *
+	 * @return $this
+	 */
+	public function initTotals() {
+		$parent = $this->getParentBlock();
+		$this->order = $parent->getOrder();
+		$this->source = $parent->getSource();
+
+		$store = $this->getStore();
+		// echo $this->order->getFeeAmount();exit;
+		$fee = new \Magento\Framework\DataObject(
+			[
+				'code' => 'fee',
+				'strong' => false,
+				'value' => $this->order->getFeeAmount(),
+				'base_value' => $this->order->getFeeAmount(),
+				'label' => __('Splitit Fee'),
+			]
+		);
+		$parent->addTotal($fee, 'fee');
+		return $this;
+	}
 
 }

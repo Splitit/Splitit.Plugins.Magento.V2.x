@@ -1,25 +1,45 @@
 <?php
 /**
- * Copyright © 2015 Inchoo d.o.o.
- * created by Zoran Salamun(zoran.salamun@inchoo.net)
+ * Copyright © 2019 Splitit
+ *
  */
 namespace Splitit\Paymentmethod\Controller\Installments;
-use Magento\Directory\Model\Currency;
 use Magento\Framework\Controller\ResultFactory;
 
 class Getinstallment extends \Magento\Framework\App\Action\Action {
 
-	private $helper;
-	/*public function __construct(){
+	protected $helper;
+	protected $cart;
+	protected $splititSource;
+	protected $storeManager;
+	protected $currency;
+	protected $jsonHelper;
+	protected $resultPage;
+	public function __construct(
+		\Magento\Framework\App\Action\Context $context,
+		\Splitit\Paymentmethod\Helper\Data $helper,
+		\Magento\Checkout\Model\Cart $cart,
+		\Splitit\Paymentmethod\Model\Source\Installments $splititSource,
+		\Magento\Store\Model\StoreManagerInterface $storeManager,
+		\Magento\Framework\Json\Helper\Data $jsonHelper,
+		\Magento\Directory\Model\Currency $currency,
+		\Magento\Framework\View\Result\PageFactory $resultPage
+	) {
+		$this->storeManager = $storeManager;
+		$this->currency = $currency;
+		$this->helper = $helper;
+		$this->cart = $cart;
+		$this->splititSource = $splititSource;
+		$this->jsonHelper = $jsonHelper;
+		$this->resultPage = $resultPage;
+		parent::__construct($context);
+	}
 
-		    $this->helper = $jsonHelper;
-		}
-		$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-		$cart = $objectManager->get('\Magento\Checkout\Model\Cart');
-	*/
-
+	/**
+	 * Get number of installment dropdown
+	 * @return Json
+	 **/
 	public function execute() {
-		$this->helper = $this->_objectManager->create('Splitit\Paymentmethod\Helper\Data');
 		$response = [
 			"status" => true,
 			"errorMsg" => "",
@@ -29,19 +49,17 @@ class Getinstallment extends \Magento\Framework\App\Action\Action {
 
 		];
 
-		$cart = $this->_objectManager->get("\Magento\Checkout\Model\Cart");
-		$totalAmount = $cart->getQuote()->getGrandTotal();
+		$totalAmount = $this->cart->getQuote()->getGrandTotal();
 
-		$selectInstallmentSetup = $this->helper->getConfig('payment/splitit_paymentmethod/select_installment_setup');
-		$options = $this->_objectManager->get('Splitit\Paymentmethod\Model\Source\Installments')->toOptionArray();
-		$storeManager = $this->_objectManager->get('\Magento\Store\Model\StoreManagerInterface');
-		$currentCurrencyCode = $storeManager->getStore()->getCurrentCurrencyCode();
-		$currencySymbol = $this->_objectManager->get('\Magento\Directory\Model\Currency')->load($currentCurrencyCode)->getCurrencySymbol();
+		$selectInstallmentSetup = $this->helper->getSelectInstallmentSetup();
+		$options = $this->splititSource->toOptionArray();
+		$currentCurrencyCode = $this->storeManager->getStore()->getCurrentCurrencyCode();
+		$currencySymbol = $this->currency->load($currentCurrencyCode)->getCurrencySymbol();
 
 		$installmentHtml = '<option value="">--' . __('No Installment available') . '--</option>';
 		$countInstallments = $installmentValue = 0;
 		if ($selectInstallmentSetup == "" || $selectInstallmentSetup == "fixed") {
-			$installments = $this->helper->getConfig("payment/splitit_paymentmethod/fixed_installment");
+			$installments = $this->helper->getFixedInstallment();
 
 			if ($installments) {
 				$installmentHtml = '<option value="">--' . __('Please Select') . '--</option>';
@@ -54,25 +72,25 @@ class Getinstallment extends \Magento\Framework\App\Action\Action {
 			}
 		} else {
 			$installmentHtml = '<option value="">--' . __('Please Select') . '--</option>';
-			$depandingOnCartInstallments = $this->helper->getConfig("payment/splitit_paymentmethod/depanding_on_cart_total_values");
-			$depandingOnCartInstallmentsArr = json_decode($depandingOnCartInstallments);
+			$depandingOnCartInstallments = $this->helper->getDepandingOnCartTotalValues();
+			$depandingOnCartInstallmentsArr = $this->jsonHelper->jsonDecode($depandingOnCartInstallments);
 			$dataAsPerCurrency = [];
 			foreach ($depandingOnCartInstallmentsArr as $data) {
-				$dataAsPerCurrency[$data->doctv->currency][] = $data->doctv;
+				$dataAsPerCurrency[$data['doctv']['currency']][] = $data['doctv'];
 			}
 
 			if (count($dataAsPerCurrency) && isset($dataAsPerCurrency[$currentCurrencyCode])) {
 
 				foreach ($dataAsPerCurrency[$currentCurrencyCode] as $data) {
-					if ($totalAmount >= $data->from && !empty($data->to) && $totalAmount <= $data->to) {
-						foreach (explode(',', $data->installments) as $n) {
+					if ($totalAmount >= $data['from'] && !empty($data['to']) && $totalAmount <= $data['to']) {
+						foreach (explode(',', $data['installments']) as $n) {
 							$installmentValue = $n;
 							$countInstallments++;
 							$installmentHtml .= '<option value="' . $n . '">' . $n . ' ' . __('Installments') . '</option>';
 						}
 						break;
-					} else if ($totalAmount >= $data->from && empty($data->to)) {
-						foreach (explode(',', $data->installments) as $n) {
+					} else if ($totalAmount >= $data['from'] && empty($data['to'])) {
+						foreach (explode(',', $data['installments']) as $n) {
 							$installmentValue = $n;
 							$countInstallments++;
 							$installmentHtml .= '<option value="' . $n . '">' . $n . ' ' . __('Installments') . '</option>';
@@ -94,38 +112,20 @@ class Getinstallment extends \Magento\Framework\App\Action\Action {
 
 	}
 
+	/**
+	 * Get help variable frm configurations
+	 * @return array
+	 **/
 	private function getHelpSection() {
-		$baseUrl = $this->_objectManager->get('\Magento\Store\Model\StoreManagerInterface')->getStore()->getBaseUrl();
+		$baseUrl = $this->storeManager->getStore()->getBaseUrl();
 		$help = [];
 
-		if ($this->helper->getConfig("payment/splitit_paymentmethod/faq_link_enabled")) {
-			$help["title"] = $this->helper->getConfig("payment/splitit_paymentmethod/faq_link_title");
+		if ($this->helper->getFaqLinkEnabled()) {
+			$help["title"] = $this->helper->getFaqLinkTitle();
 			$help["link"] = $baseUrl . "splititpaymentmethod/help/help";
-			$help["link"] = $this->helper->getConfig("payment/splitit_paymentmethod/faq_link_title_url");
+			$help["link"] = $this->helper->getFaqLinkTitleUrl();
 		}
 		return $help;
 	}
-
-	/*public function execute() {
-		$this->helper = $this->_objectManager->create('Splitit\Paymentmethod\Helper\Data');
-		$installments = $this->helper->getConfig("payment/splitit_paymentmethod/fixed_installment");
-
-		$cart = $this->_objectManager->get("\Magento\Checkout\Model\Cart");
-		$grandTotal = $cart->getQuote()->getGrandTotal();
-
-		$currencySymbol = $this->_objectManager->get('\Magento\Directory\Model\Currency')->getCurrencySymbol();
-
-		$installmentHtml = '<option value="">--No Intallment available--</option>';
-		if(count($installments)){
-			$installmentHtml = '<option value="">--Please Select--</option>';
-			foreach (explode(',', $installments) as $value) {
-				$installmentHtml .= '<option value="'.$value.'">'.$value.' Installments of '.$currencySymbol.round($grandTotal/$value,2).'</option>';
-			}
-
-		}
-		echo $data = $this->helper->encodeData($installmentHtml);
-		return;
-
-    }*/
 
 }

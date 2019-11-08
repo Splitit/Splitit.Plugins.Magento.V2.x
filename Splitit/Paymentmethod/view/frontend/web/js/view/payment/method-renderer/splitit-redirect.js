@@ -27,7 +27,7 @@ define(
 
             /** Init observable variables */
             initObservable: function () {
-                console.log("splitit-redirect-method-renderer");
+                //console.log("splitit-redirect-method-renderer");
                 this._super()
                     .observe('billingAgreement');
 
@@ -92,8 +92,8 @@ define(
 
             /** Redirect to splitit */
             continueToSplitit: function () {
-                console.log("window.checkoutConfig.payment.splititExpress.redirectUrl["+quote.paymentMethod().method+"]==");
-                console.log(window.checkoutConfig.payment.splititExpress.redirectUrl[quote.paymentMethod().method]);
+                //console.log("window.checkoutConfig.payment.splititExpress.redirectUrl["+quote.paymentMethod().method+"]==");
+                //console.log(window.checkoutConfig.payment.splititExpress.redirectUrl[quote.paymentMethod().method]);
                 if (additionalValidators.validate()) {
                     //update payment method information if additional data was changed
                     this.selectPaymentMethod();
