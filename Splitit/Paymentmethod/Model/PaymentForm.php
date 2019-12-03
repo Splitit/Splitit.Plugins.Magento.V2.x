@@ -156,23 +156,26 @@ class PaymentForm {
 	public function checkForBillingFieldsEmpty($billingAddress, $customerInfo) {
 
 		$response = ["errorMsg" => "", "successMsg" => "", "status" => false];
-		if ($billingAddress->getStreet()[0] == "" || $billingAddress->getCity() == "" || $billingAddress->getPostcode() == "" || $customerInfo["firstname"] == "" || $customerInfo["lastname"] == "" || $customerInfo["email"] == "" || $billingAddress->getTelephone() == "") {
-			$response["errorMsg"] = "Please fill required fields.";
-		} else if (strlen($billingAddress->getTelephone()) < 5 || strlen($billingAddress->getTelephone()) > 10) {
-
-			$response["errorMsg"] = __("Splitit does not accept phone number less than 5 digits or greater than 10 digits.");
+		if ($billingAddress->getStreet()[0] == ""){
+			$response["errorMsg"] = __("Splitit does not accept empty street field.");
+		} elseif($customerInfo["email"]) == ""{
+			$response["errorMsg"] = __("Splitit does not accept empty email field.");
+		} elseif($billingAddress->getTelephone()) == "") {
+			$response["errorMsg"] = __("Splitit does not accept empty phone field.");
+		} else if (strlen($billingAddress->getTelephone()) < 5 || strlen($billingAddress->getTelephone()) > 19) {
+			$response["errorMsg"] = __("Splitit does not accept phone number less than 5 digits or greater than 19 digits.");
 		} elseif (!$billingAddress->getCity()) {
 			$response["errorMsg"] = __("Splitit does not accept empty city field.");
 		} elseif (!$billingAddress->getCountry()) {
-			$response["errorMsg"] = ("Splitit does not accept empty country field.");
+			$response["errorMsg"] = __("Splitit does not accept empty country field.");
 		} elseif (!$billingAddress->getPostcode()) {
-			$response["errorMsg"] = ("Splitit does not accept empty postcode field.");
+			$response["errorMsg"] = __("Splitit does not accept empty postcode field.");
 		} elseif (!$customerInfo["firstname"]) {
-			$response["errorMsg"] = ("Splitit does not accept empty customer name field.");
+			$response["errorMsg"] = __("Splitit does not accept empty customer name field.");
 		} elseif (strlen($customerInfo["firstname"] . ' ' . $customerInfo['lastname']) < 3) {
-			$response["errorMsg"] = ("Splitit does not accept less than 3 characters customer name field.");
+			$response["errorMsg"] = __("Splitit does not accept less than 3 characters customer name field.");
 		} elseif (!filter_var($customerInfo['email'], FILTER_VALIDATE_EMAIL)) {
-			$response["errorMsg"] = ("Splitit does not accept invalid customer email field.");
+			$response["errorMsg"] = __("Splitit does not accept invalid customer email field.");
 		} else {
 			$response["status"] = true;
 		}
