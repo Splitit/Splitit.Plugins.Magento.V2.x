@@ -136,14 +136,14 @@ class Api extends \Magento\Payment\Model\Method\AbstractMethod {
 			$response = ["errorMsg" => "", "successMsg" => "", "status" => false];
 			$apiUrl = $this->getApiUrl();
 			$this->guestEmail = $guestEmail;
-			$params = $this->createDataForInstallmentPlanInit($selectedInstallment);
-			$this->customerSession->setSelectedInstallment($selectedInstallment);
 			/*check if cunsumer dont filled data in billing form in case of onepage checkout.*/
-			$billingFieldsEmpty = $this->checkForBillingFieldsEmpty();
+			/*$billingFieldsEmpty = $this->checkForBillingFieldsEmpty();
 			if (!$billingFieldsEmpty["status"]) {
 				$response["errorMsg"] = $billingFieldsEmpty["errorMsg"];
 				return $response;
-			}
+			}*/
+			$params = $this->createDataForInstallmentPlanInit($selectedInstallment);
+			$this->customerSession->setSelectedInstallment($selectedInstallment);
 			/*call Installment Plan Initiate api to get Approval URL*/
 			$result = $this->makePhpCurlRequest($apiUrl, "InstallmentPlan/Initiate", $params);
 			$decodedResult = $this->helper->jsonDecode($result);
@@ -232,7 +232,7 @@ class Api extends \Magento\Payment\Model\Method\AbstractMethod {
 					"CreateAck" => "NotReceived",
 				],
 			],
-			"BillingAddress" => [
+			/*"BillingAddress" => [
 				"AddressLine" => $billingStreet1,
 				"AddressLine2" => $billingStreet2,
 				"City" => $this->billingAddress->getCity(),
@@ -245,7 +245,7 @@ class Api extends \Magento\Payment\Model\Method\AbstractMethod {
 				"Email" => $customerInfo["email"],
 				"PhoneNumber" => $this->billingAddress->getTelephone(),
 				"CultureName" => $cultureName,
-			],
+			],*/
 		];
 		$cart = $this->quote;
 		$itemsArr = array();

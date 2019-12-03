@@ -37,6 +37,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 	protected $storeManager;
 	protected $cart;
 	protected $sourceInstallments;
+	private $billingAddress;
 	private $customerSession;
 	private $helper;
 	private $grandTotal = null;
@@ -85,6 +86,9 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 		$this->storeManager = $storeManager;
 		$this->currency = $currency;
 		$this->cart = $cart;
+
+		$this->billingAddress = $cart->getQuote()->getBillingAddress();
+
 		$this->sourceInstallments = $sourceInstallments;
 		$this->helper = $helper;
 		$this->grandTotal = round($cart->getQuote()->getGrandTotal(), 2);
@@ -463,6 +467,37 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 	protected function createInstallmentPlan($api, $payment, $amount) {
 		$cultureName = $this->helper->getCultureName();
 		$this->_logger->error(__('creating installment plan-----'));
+
+		$guestEmail = "";
+        if (isset($this->requestData["guestEmail"])) {
+            $guestEmail = $this->requestData["guestEmail"];
+        }
+
+		$customerInfo = $this->customerSession->getCustomer()->getData();
+		if (!isset($customerInfo["firstname"])) {
+			$customerInfo["firstname"] = $this->billingAddress->getFirstname();
+			$customerInfo["lastname"] = $this->billingAddress->getLastname();
+			$customerInfo["email"] = $this->billingAddress->getEmail();
+		}
+		if ($customerInfo["email"] == "") {
+			$customerInfo["email"] = $guestEmail;
+		}
+		$billingStreet1 = "";
+		$billingStreet2 = "";
+		if (isset($this->billingAddress->getStreet()[0])) {
+			$billingStreet1 = $this->billingAddress->getStreet()[0];
+		}
+		if (isset($this->billingAddress->getStreet()[1])) {
+			$billingStreet2 = $this->billingAddress->getStreet()[1];
+		}
+
+		/*check if cunsumer dont filled data in billing form in case of onepage checkout.*/
+		$billingFieldsEmpty = $this->apiModel->checkForBillingFieldsEmpty();
+		if (!$billingFieldsEmpty["status"]) {
+			$response["errorMsg"] = $billingFieldsEmpty["errorMsg"];
+			return $response;
+		}
+
 		if ($this->isOneInstallment()) {
 			$this->_logger->error(__('is one installment-----'));
 			$apiLogin = $this->apiModel->apiLogin();
@@ -499,6 +534,20 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 				],
 			];
 		}
+		$params["BillingAddress"] = [
+				"AddressLine" => $billingStreet1,
+				"AddressLine2" => $billingStreet2,
+				"City" => $this->billingAddress->getCity(),
+				"State" => $this->billingAddress->getRegion(),
+				"Country" => $this->countryFactory->create()->loadByCode($this->billingAddress->getCountry())->getName('en_US'),
+				"Zip" => $this->billingAddress->getPostcode(),
+			];
+		$params["ConsumerData"] = [
+				"FullName" => $customerInfo["firstname"] . " " . $customerInfo["lastname"],
+				"Email" => $customerInfo["email"],
+				"PhoneNumber" => $this->billingAddress->getTelephone(),
+				"CultureName" => $cultureName,
+			];
 		$this->_logger->error(print_r($params, true));
 		$result = $this->apiModel->makePhpCurlRequest($api, "InstallmentPlan/Create", $params);
 		$this->_logger->error(print_r($result, true));
