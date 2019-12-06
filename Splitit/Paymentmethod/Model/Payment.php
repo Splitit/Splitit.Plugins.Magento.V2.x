@@ -494,8 +494,9 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 		/*check if cunsumer dont filled data in billing form in case of onepage checkout.*/
 		$billingFieldsEmpty = $this->apiModel->checkForBillingFieldsEmpty();
 		if (!$billingFieldsEmpty["status"]) {
-			$response["errorMsg"] = $billingFieldsEmpty["errorMsg"];
-			return $response;
+			$errorMsg = $billingFieldsEmpty["errorMsg"];
+			$this->_logger->error(__($errorMsg));
+			throw new \Magento\Framework\Validator\Exception(__($errorMsg));
 		}
 
 		if ($this->isOneInstallment()) {
@@ -690,6 +691,23 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 			}
 		}
 		return $check;
+	}
+
+	/**
+	 * Check product is allowed to show splitit installment price text
+	 * @return bool
+	 */
+	public function isSplititTextVisibleOnProduct($productId) {
+		$show = TRUE;
+		if ($this->helper->getSplititPerProduct()!=0) {
+			$show = FALSE;
+			$allowedProducts = $this->helper->getSplititProductSkus();
+			$allowedProducts = explode(',', $allowedProducts);
+			if (in_array($productId, $allowedProducts)) {
+				$show = TRUE;
+			}
+		}
+		return $show;
 	}
 
 }

@@ -16,12 +16,15 @@ class Getinstallmentprice extends \Magento\Framework\App\Action\Action {
 	private $payment;
 	private $paymentForm;
 	private $cart;
+	private $requestData;
+
 	public function __construct(
 		\Magento\Framework\App\Action\Context $context,
 		\Splitit\Paymentmethod\Helper\Data $helperData,
 		\Magento\Checkout\Model\Session $checkoutSession,
 		\Splitit\Paymentmethod\Model\PaymentForm $paymentForm,
 		\Splitit\Paymentmethod\Model\Payment $payment,
+		\Magento\Framework\App\RequestInterface $request,
 		\Magento\Checkout\Model\Cart $cart
 	) {
 		$this->checkoutSession = $checkoutSession;
@@ -29,6 +32,8 @@ class Getinstallmentprice extends \Magento\Framework\App\Action\Action {
 		$this->payment = $payment;
 		$this->helperData = $helperData;
 		$this->cart = $cart;
+		$this->requestData = $request->getParams();
+
 		parent::__construct($context);
 	}
 
@@ -112,6 +117,13 @@ class Getinstallmentprice extends \Magento\Framework\App\Action\Action {
 
 		$resultJson = $this->resultFactory->create(ResultFactory::TYPE_JSON);
 		if ($this->paymentForm->checkProductBasedAvailability() || $this->payment->checkProductBasedAvailability()) {
+			if(isset($this->requestData['pid']) && $this->requestData['pid']){
+				if($this->paymentForm->isSplititTextVisibleOnProduct($this->requestData['pid']) || $this->payment->isSplititTextVisibleOnProduct($this->requestData['pid'])){
+					return $resultJson->setData($response);
+				} else {
+					return $resultJson->setData(array('status' => false));
+				}
+			}
 			return $resultJson->setData($response);
 		} else {
 			return $resultJson->setData(array('status' => false));

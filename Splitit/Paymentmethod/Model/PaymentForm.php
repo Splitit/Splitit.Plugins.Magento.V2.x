@@ -158,9 +158,9 @@ class PaymentForm {
 		$response = ["errorMsg" => "", "successMsg" => "", "status" => false];
 		if ($billingAddress->getStreet()[0] == ""){
 			$response["errorMsg"] = __("Splitit does not accept empty street field.");
-		} elseif($customerInfo["email"]) == ""{
+		} elseif($customerInfo["email"] == ""){
 			$response["errorMsg"] = __("Splitit does not accept empty email field.");
-		} elseif($billingAddress->getTelephone()) == "") {
+		} elseif($billingAddress->getTelephone() == "") {
 			$response["errorMsg"] = __("Splitit does not accept empty phone field.");
 		} else if (strlen($billingAddress->getTelephone()) < 5 || strlen($billingAddress->getTelephone()) > 19) {
 			$response["errorMsg"] = __("Splitit does not accept phone number less than 5 digits or greater than 19 digits.");
@@ -760,6 +760,23 @@ class PaymentForm {
 			}
 		}
 		return $check;
+	}
+
+	/**
+	 * Check product is allowed to show splitit installment price text
+	 * @return bool
+	 */
+	public function isSplititTextVisibleOnProduct($productId) {
+		$show = TRUE;
+		if ($this->helper->getRedirectSplititPerProduct()!=0) {
+			$show = FALSE;
+			$allowedProducts = $this->helper->getRedirectSplititProductSkus();
+			$allowedProducts = explode(',', $allowedProducts);
+			if (in_array($productId, $allowedProducts)) {
+				$show = TRUE;
+			}
+		}
+		return $show;
 	}
 
 }

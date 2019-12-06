@@ -30,8 +30,13 @@ var jqueryInterval = setInterval(function(){
   }, 1000);
 
 function runMyScripts(){
+	var productId = '';
+	if(jQuery('#product_addtocart_form').length && jQuery('#product_addtocart_form input[name="product"]').length){
+		productId = jQuery('#product_addtocart_form input[name="product"]').val();
+	}
 	jQuery.ajax({
-		url: url + "splititpaymentmethod/showinstallmentprice/getinstallmentprice", 
+		url: url + "splititpaymentmethod/showinstallmentprice/getinstallmentprice",
+		data : { pid : productId},
 		success: function(result){
 			
 			var numOfInstallmentForDisplay = result.numOfInstallmentForDisplay;

@@ -418,9 +418,9 @@ class Api extends \Magento\Payment\Model\Method\AbstractMethod {
 		$response = ["errorMsg" => "", "successMsg" => "", "status" => false];
 		if ($this->billingAddress->getStreet()[0] == ""){
 			$response["errorMsg"] = __("Splitit does not accept empty street field.");
-		} elseif($customerInfo["email"]) == ""{
+		} elseif($customerInfo["email"] == ""){
 			$response["errorMsg"] = __("Splitit does not accept empty email field.");
-		} elseif($this->billingAddress->getTelephone()) == "") {
+		} elseif($this->billingAddress->getTelephone() == "") {
 			$response["errorMsg"] = __("Splitit does not accept empty phone field.");
 		} else if (strlen($this->billingAddress->getTelephone()) < 5 || strlen($this->billingAddress->getTelephone()) > 19) {
 			$response["errorMsg"] = __("Splitit does not accept phone number less than 5 digits or greater than 19 digits.");
