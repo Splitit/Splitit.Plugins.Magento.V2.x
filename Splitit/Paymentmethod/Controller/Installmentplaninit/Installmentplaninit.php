@@ -67,6 +67,9 @@ class Installmentplaninit extends \Magento\Framework\App\Action\Action {
         }
 
         $loginResponse = $this->apiModel->apiLogin();
+        if (!$loginResponse["status"]) {
+            $loginResponse = $this->apiModel->apiLogin();
+        }
         /* check if login successfully or not */
         if (!$loginResponse["status"]) {
             $this->logger->addError($loginResponse["errorMsg"]);
