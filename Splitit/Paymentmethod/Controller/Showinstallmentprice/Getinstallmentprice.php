@@ -128,8 +128,7 @@ class Getinstallmentprice extends \Magento\Framework\App\Action\Action {
 		} else {
 			return $resultJson->setData(array('status' => false));
 		}
-		/* echo $data = $this->helper->encodeData($response);
-          return; */
+		
 	}
 
 }

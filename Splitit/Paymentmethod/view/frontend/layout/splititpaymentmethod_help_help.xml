@@ -8,7 +8,6 @@
     </body>
 
     <referenceContainer name="content">
-        <!-- <block class="Mageplaza\HelloWorld\Block\Display" name="splititpaymentmethod_help" template="Splitit_Paymentmethod::help.phtml" /> -->
         <block class="Magento\Framework\View\Element\Template" name="splititpaymentmethod_help" template="Splitit_Paymentmethod::help.phtml" />
     </referenceContainer>
 </page>

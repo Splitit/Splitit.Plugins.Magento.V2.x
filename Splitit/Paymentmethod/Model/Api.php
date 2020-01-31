@@ -136,12 +136,6 @@ class Api extends \Magento\Payment\Model\Method\AbstractMethod {
 			$response = ["errorMsg" => "", "successMsg" => "", "status" => false];
 			$apiUrl = $this->getApiUrl();
 			$this->guestEmail = $guestEmail;
-			/*check if cunsumer dont filled data in billing form in case of onepage checkout.*/
-			/*$billingFieldsEmpty = $this->checkForBillingFieldsEmpty();
-			if (!$billingFieldsEmpty["status"]) {
-				$response["errorMsg"] = $billingFieldsEmpty["errorMsg"];
-				return $response;
-			}*/
 			$params = $this->createDataForInstallmentPlanInit($selectedInstallment);
 			$this->customerSession->setSelectedInstallment($selectedInstallment);
 			/*call Installment Plan Initiate api to get Approval URL*/
@@ -186,8 +180,7 @@ class Api extends \Magento\Payment\Model\Method\AbstractMethod {
 
 		$firstInstallmentAmount = $this->getFirstInstallmentAmount($selectedInstallment);
 		$cultureName = $this->helper->getCultureName();
-		/*print_r($this->billingAddress->getData());die;
-		print_r($this->billingAddress->getStreet());die("--sdf");*/
+		
 		$customerInfo = $this->customerSession->getCustomer()->getData();
 		if (!isset($customerInfo["firstname"])) {
 			$customerInfo["firstname"] = $this->billingAddress->getFirstname();
@@ -222,7 +215,6 @@ class Api extends \Magento\Payment\Model\Method\AbstractMethod {
 				],
 				"NumberOfInstallments" => $selectedInstallment,
 				"PurchaseMethod" => "ECommerce",
-				/*"RefOrderNumber" => $quote_id,*/
 				"FirstInstallmentAmount" => [
 					"Value" => $firstInstallmentAmount,
 					"CurrencyCode" => $this->currencyCode,
@@ -232,20 +224,6 @@ class Api extends \Magento\Payment\Model\Method\AbstractMethod {
 					"CreateAck" => "NotReceived",
 				],
 			],
-			/*"BillingAddress" => [
-				"AddressLine" => $billingStreet1,
-				"AddressLine2" => $billingStreet2,
-				"City" => $this->billingAddress->getCity(),
-				"State" => $this->billingAddress->getRegion(),
-				"Country" => $this->countryFactory->create()->loadByCode($this->billingAddress->getCountry())->getName('en_US'),
-				"Zip" => $this->billingAddress->getPostcode(),
-			],
-			"ConsumerData" => [
-				"FullName" => $customerInfo["firstname"] . " " . $customerInfo["lastname"],
-				"Email" => $customerInfo["email"],
-				"PhoneNumber" => $this->billingAddress->getTelephone(),
-				"CultureName" => $cultureName,
-			],*/
 		];
 		$cart = $this->quote;
 		$itemsArr = array();

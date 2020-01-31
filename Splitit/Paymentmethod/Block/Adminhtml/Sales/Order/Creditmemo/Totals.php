@@ -40,7 +40,6 @@ class Totals extends \Magento\Framework\View\Element\Template {
         foreach ($creditmemoItems as $citems) {
             $c+=$citems->getQty();
         }
-        /* echo "orderItems=$o creditmemoItems=$c QtyRefunded=$r";exit; */
         $feeAmount = 0;
         if (($c == ($o - $r)) || $this->_source->getFeeAmount()) {
             $feeAmount = $this->_order->getFeeAmount();

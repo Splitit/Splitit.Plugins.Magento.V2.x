@@ -16,11 +16,7 @@
            <css src="Splitit_Paymentmethod::css/custom.css"/>
      
            <!-- for js file -->
-           <!-- <script src="Splitit_Paymentmethod::js/jquery-1.12.4.js"/> -->
            <script src="Splitit_Paymentmethod::js/custom.js"/>
-            
-           <!-- src="Webkul_Grid::js/grid.js" that mean from here get file -->
-           <!-- Webkul_Grid is module name, js/grid.js and css/grid.css are location of files in web folder of module  -->
     </head>
     <body>
         <referenceBlock name="checkout.root">
@@ -63,28 +59,6 @@
                                         </item>
                                     </item>
                                 </item>
-                                <!--Cart Side bar on checkout index -->
-<!--                                <item name="sidebar" xsi:type="array">
-                                    <item name="children" xsi:type="array">
-                                        <item name="summary" xsi:type="array">
-                                            <item name="children" xsi:type="array">
-                                                <item name="totals" xsi:type="array">
-                                                    <item name="children" xsi:type="array">
-                                                        <item name="feeamount" xsi:type="array">
-                                                            <item name="component"  xsi:type="string">Splitit_Paymentmethod/js/view/checkout/cart/totals/fee</item>
-                                                            <item name="sortOrder" xsi:type="string">20</item>
-                                                            <item name="config" xsi:type="array">
-                                                                <item name="template" xsi:type="string">Splitit_Paymentmethod/checkout/cart/totals/fee</item>
-                                                                <item name="title" xsi:type="string" translate="true">Splitit Fee</item>
-                                                            </item>
-                                                        </item>
-                                                    </item>
-                                                </item>
-                                            </item>
-                                        </item>
-                                    </item>
-                                </item>-->
-                                <!--End-->
                             </item>
                         </item>
                     </item>

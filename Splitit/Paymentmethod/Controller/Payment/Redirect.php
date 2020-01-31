@@ -64,8 +64,6 @@ class Redirect extends \Magento\Framework\App\Action\Action {
 	public function execute() {
 
 		$quote = $this->checkoutSession->getQuote();
-		/*print_r($quote->getPayment()->getData());die;*/
-		/*die(get_class($this->checkoutSession->getQuote()));*/
 		$data = $this->paymentForm->orderPlaceRedirectUrl();
 		if ($data['error'] == true && $data["status"] == false) {
 			$this->logger->addError("Split It processing error : " . $data["data"]);
@@ -80,16 +78,7 @@ class Redirect extends \Magento\Framework\App\Action\Action {
 			$resultRedirect->setPath('checkout/cart');
 			return $resultRedirect;
 		}
-
-		/*$order = $this->checkoutSession->getLastRealOrder();
-		$orderId = $order->getEntityId();
-		$payment = $order->getPayment();
-		$payment->setTransactionId($this->checkoutSession->getSplititInstallmentPlanNumber());
-		$payment->save();
-		$order->save();
-		$curlRes = $this->paymentForm->updateRefOrderNumber($this->api, $order);*/
 		$curlRes = $this->paymentForm->updateRefOrderNumber($this->api, $quote);
-
 		if (isset($curlRes["status"]) && $curlRes["status"]) {
 			$this->_redirect($data['checkoutUrl']);
 		}

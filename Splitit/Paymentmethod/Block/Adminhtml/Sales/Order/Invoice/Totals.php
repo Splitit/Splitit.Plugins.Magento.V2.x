@@ -90,7 +90,7 @@ class Totals extends \Magento\Framework\View\Element\Template {
 		$this->source = $parent->getSource();
 
 		$store = $this->getStore();
-		// echo $this->order->getFeeAmount();exit;
+		
 		$fee = new \Magento\Framework\DataObject(
 			[
 				'code' => 'fee',

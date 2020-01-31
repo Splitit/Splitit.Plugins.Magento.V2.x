@@ -106,11 +106,6 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
 	 */
 	public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount) {
-
-		/*if (!$this->canAuthorize()) {
-			            throw new \Magento\Framework\Exception\LocalizedException(__('The authorize action is not available.'));
-		*/
-
 		try {
 
 			$api = $this->apiModel->getApiUrl();
@@ -171,7 +166,6 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 			}
 		} catch (\Exception $e) {
 			$this->debugData(['request' => $this->requestData, 'exception' => $e->getMessage()]);
-			//$this->_logger->error(__($e->getMessage()));
 			$this->_logger->error(__('Payment Authorize error.'));
 			throw new \Magento\Framework\Validator\Exception(__('Payment Authorize error.'));
 		}
