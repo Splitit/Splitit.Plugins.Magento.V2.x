@@ -10,10 +10,29 @@ use Magento\Framework\Controller\ResultFactory;
 
 class Getcurrency extends \Magento\Framework\App\Action\Action {
 
+    /**
+     * Magento Store Manager
+     * @var \Magento\Store\Model\StoreManagerInterface
+     */
     protected $storeManager;
+    /**
+     * Magento Currency Model
+     * @var \Magento\Directory\Model\Currency
+     */
     protected $currency;
+    /**
+     * Magento HTTP Request
+     * @var \Magento\Framework\App\Request\Http
+     */
     protected $request;
 
+    /**
+     * Contructor
+     * @param \Magento\Framework\App\Action\Context $context
+     * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+     * @param \Magento\Directory\Model\Currency $currency
+     * @param \Magento\Framework\App\Request\Http $request
+     */
     public function __construct(
         \Magento\Framework\App\Action\Context $context, 
         \Magento\Store\Model\StoreManagerInterface $storeManager,

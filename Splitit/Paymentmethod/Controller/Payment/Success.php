@@ -30,6 +30,21 @@ class Success extends \Magento\Framework\App\Action\Action {
 	protected $logger;
 	protected $orderSender;
 
+	/**
+     * Contructor
+     * @param \Magento\Framework\App\Action\Context $context
+	 * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+	 * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
+	 * @param \Magento\Sales\Api\Data\OrderInterface $order
+	 * @param \Magento\Quote\Model\QuoteFactory $quoteFactory
+	 * @param \Psr\Log\LoggerInterface $logger
+	 * @param \Splitit\Paymentmethod\Helper\Data $helperData
+	 * @param \Splitit\Paymentmethod\Model\Helper\OrderPlace $orderPlace
+	 * @param \Magento\Checkout\Model\Session $checkoutSession
+	 * @param \Splitit\Paymentmethod\Model\PaymentForm $paymentForm
+	 * @param \Splitit\Paymentmethod\Model\Api $api
+	 * @param \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender
+     */
 	public function __construct(
 		\Magento\Framework\App\Action\Context $context,
 		\Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,

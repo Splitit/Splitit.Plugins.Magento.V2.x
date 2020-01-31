@@ -15,6 +15,13 @@ class Cancel extends \Magento\Framework\App\Action\Action {
     protected $order;
     protected $quoteFactory;
 
+    /**
+     * Contructor
+     * @param \Magento\Framework\App\Action\Context $context
+     * @param \Magento\Sales\Api\Data\OrderInterface $order
+     * @param \Magento\Quote\Model\QuoteFactory $quoteFactory
+     * @param \Magento\Checkout\Model\Session $checkoutSession
+     */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Sales\Api\Data\OrderInterface $order,

@@ -15,6 +15,7 @@ class Installmentplaninit extends \Magento\Framework\App\Action\Action {
     protected $resultJsonFactory;
 
     /**
+     * Contructor
      * @param \Magento\Framework\App\Action\Context $context
      * @param \Magento\Framework\App\Request\Http $request
      * @param \Psr\Log\LoggerInterface $logger
