@@ -254,7 +254,7 @@ function runMyScripts(){
         if(jQuery('[id^=payment_][id$=_splitit_paymentmethod_select_installment_setup]:first').val() == 'depending_on_cart_total'){
           createJsonOfDependingOnCartTotal(); 
         }
-        eval(configForm.submit());
+        /*eval(configForm.submit());*/
       }else{
         if(fromBigger){
           alert("From amount should be lesser than To.");

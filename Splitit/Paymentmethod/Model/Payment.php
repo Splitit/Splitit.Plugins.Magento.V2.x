@@ -514,7 +514,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 			$params = [
 				"RequestHeader" => [
 					"SessionId" => $this->apiModel->getorCreateSplititSessionid(),
-					"ApiKey" => $this->helper->getApiTerminalKey("splitit_payment"),
+					"ApiKey" => $this->helper->getApiTerminalKey("splitit_paymentmethod"),
 					"CultureName" => $cultureName,
 				],
 				"InstallmentPlanNumber" => $this->customerSession->getInstallmentPlanNumber(),
