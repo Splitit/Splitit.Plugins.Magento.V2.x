@@ -39,7 +39,7 @@ class Totals extends \Magento\Framework\App\Action\Action {
 	 * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
 	 * @param \Splitit\Paymentmethod\Helper\Data $helperData
 	 */
-	public function _construct(
+	public function __construct(
 		Context $context,
 		\Magento\Checkout\Model\Session $checkoutSession,
 		\Magento\Framework\Json\Helper\Data $helper,
@@ -60,7 +60,10 @@ class Totals extends \Magento\Framework\App\Action\Action {
 	 * @return JSON
 	 */
 	public function execute() {
-		return json_encode(array('errors'=>false,'message' => 'Re-calculate successful.'));
+		$result = $this->resultJson->create();
+
+	    $result->setData(array('errors'=>false,'message' => 'Re-calculate successful.'));
+	    return $result;
 	}
 
 }
