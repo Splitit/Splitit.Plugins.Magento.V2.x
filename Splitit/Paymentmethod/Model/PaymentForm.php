@@ -687,6 +687,9 @@ class PaymentForm {
 			/*Select Depanding on cart installment setup*/
 			$depandOnCart = 1;
 			$depandingOnCartInstallments = $this->helper->getRedirectDepandingOnCartTotalValues();
+			if(!$depandingOnCartInstallments){
+				return false;
+			}
 			$depandingOnCartInstallmentsArr = $this->helper->jsonDecode($depandingOnCartInstallments);
 			$dataAsPerCurrency = [];
 			foreach ($depandingOnCartInstallmentsArr as $data) {

@@ -100,7 +100,7 @@
                     <!-- <source_model>Test\Testpayment\Model\Source\Installments</source_model> -->
                 </field>
 
-                <field id="depanding_on_cart_total_values" translate="label" type="hidden"  sortOrder="18"  showInDefault="1" showInWebsite="0" showInStore="1">
+                <field id="depanding_on_cart_total_values" translate="label" type="hidden"  sortOrder="18"  showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Depending on cart total values</label>
                 </field>
 
@@ -282,7 +282,7 @@
                     <label>Depending on cart total</label>
                 </field>
 
-                <field id="depanding_on_cart_total_values" translate="label" type="hidden"  sortOrder="18"  showInDefault="1" showInWebsite="0" showInStore="1">
+                <field id="depanding_on_cart_total_values" translate="label" type="hidden"  sortOrder="18"  showInDefault="1" showInWebsite="1" showInStore="1">
                     <label>Depending on cart total values</label>
                 </field>
 
