@@ -90,7 +90,16 @@ table.tablePage2 td{ width:50%; vertical-align: middle; }
 .payment-images{display: inline-block; float:right; padding-left: 20px; }
 .payment-images img{ height: auto; margin: 0 3px; width: 45px;}
 #approval-popup.overflowHidden, .overflowHidden > #main{overflow-y: hidden;}
-.apr-tc{display: inline-block; background: #2E8AB8; color: #fff; padding: 6px 15px; margin: 0 0 20px; width: 320px; cursor: pointer;}
+.apr-tc{
+    display: inline-block;
+    background: #2E8AB8;
+    color: #fff;
+    padding: 6px 15px;
+    margin: 0 0 20px;
+    width: 105px;
+    cursor: pointer;
+    border-radius: 15px;
+}
 .terms-condition-loader{display: none; vertical-align: middle;}
 .terms-conditions{ font-size: 0; }
 .terms-conditions div{font-size: 0; line-height: normal;}
