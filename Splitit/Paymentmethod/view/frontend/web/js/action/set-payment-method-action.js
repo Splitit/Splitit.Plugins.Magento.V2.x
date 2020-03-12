@@ -16,12 +16,23 @@ define(
             var serviceUrl,
                 payload,
                 method = 'put',
-                paymentData = quote.paymentMethod();
-                agreementsAssigner(paymentData);
-                /*if($('#agreement_splitit_paymentredirect_1').length && $('#agreement_splitit_paymentredirect_1').is(':checked')){*/
-                    /*paymentData['extension_attributes']={agreement_ids:[$('#agreement_splitit_paymentredirect_1').val()]};*/
-                    paymentData['additional_data']={installments_no:$('#select-num-of-installments').val()};
-                /*}*/
+                paymentData = quote.paymentMethod(),
+                agreementForm = $('div[data-role=checkout-agreements] input'),
+                agreementData = agreementForm.serializeArray(),
+                agreementIds = [];
+
+                agreementData.forEach(function (item) {
+                    agreementIds.push(item.value);
+                });
+
+                if (paymentData['extension_attributes'] === undefined) {
+                    paymentData['extension_attributes'] = {};
+                }
+
+                paymentData['extension_attributes']['agreement_ids'] = agreementIds;
+                console.log('paymentData===');
+                console.log(paymentData);
+                paymentData['additional_data']={installments_no:$('#select-num-of-installments').val()};
             
             /**
              * Checkout for guest and registered customer.
