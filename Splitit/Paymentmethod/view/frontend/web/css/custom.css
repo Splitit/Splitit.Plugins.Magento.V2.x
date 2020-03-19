@@ -113,4 +113,4 @@ table.tablePage2 td{ width:50%; vertical-align: middle; }
     #payment-schedule{position: relative; width: 100%; }
 }
 @media only screen and (max-width: 767px) {}
-
+.hidden{display: none !important;}
