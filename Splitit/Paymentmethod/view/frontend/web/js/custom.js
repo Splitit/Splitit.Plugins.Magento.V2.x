@@ -100,6 +100,9 @@ window.onload = function(){
 		});
 	}
 	 
+	jQuery(document).on("click", "#splitit-paymentmethod",function(){
+		jQuery("input[name='payment[cc_number]").attr("maxlength","19");
+	});
 
 	jQuery(document).on("click", ".apr-tc",function(){
 		var selectedInstallment = jQuery("#select-num-of-installments").val();
@@ -111,6 +114,10 @@ window.onload = function(){
 		
 		if(ccNum == ""){
 			alert("Please input Credit card number");
+			return;	
+		}
+		if(ccNum.length > 20){
+			alert("Please enter valid Credit card number");
 			return;	
 		}
 		if(ccExpMonth == ""){
