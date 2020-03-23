@@ -12,8 +12,12 @@ class PaymentCancel implements ObserverInterface {
 	protected $logger;
 	protected $jsonHelper;
 	/**
-	 * AddFeeToOrderObserver constructor.
-	 * @param \Magento\Checkout\Model\Session $checkoutSession
+	 * PaymentCancel constructor.
+	 * @param \Splitit\Paymentmethod\Model\Payment $paymentModel
+	 * @param \Magento\Customer\Model\Session $customerSession
+	 * @param \Splitit\Paymentmethod\Model\Api $apiModel
+	 * @param \Magento\Framework\Json\Helper\Data $jsonHelper
+	 * @param \Psr\Log\LoggerInterface $logger
 	 */
 	public function __construct(
 		\Splitit\Paymentmethod\Model\Payment $paymentModel,
@@ -30,7 +34,7 @@ class PaymentCancel implements ObserverInterface {
 	}
 
 	/**
-	 * Set fee to order
+	 * Cancel order on Splitit
 	 *
 	 * @param EventObserver $observer
 	 * @return $this

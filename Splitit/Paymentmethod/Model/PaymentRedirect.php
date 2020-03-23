@@ -263,8 +263,15 @@ class PaymentRedirect extends \Magento\Payment\Model\Method\AbstractMethod {
 
 			);
 
+			$this->_logger->debug("\nFILE: %s \nLINE: %s \nMETHOD: %s \nREQUEST:",[__FILE__,__LINE__,__METHOD__]);
+			$this->_logger->debug(print_r($params, true));
+
 			$result = $this->api->makePhpCurlRequest($api, "InstallmentPlan/Refund", $params);
 			$result = $this->helper->jsonDecode($result);
+
+			$this->_logger->debug("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__." \n RESPONSE: ");
+			$this->_logger->debug(print_r($result, true));
+
 			if (isset($result["ResponseHeader"]) && isset($result["ResponseHeader"]["Errors"]) && !empty($result["ResponseHeader"]["Errors"])) {
 				$errorMsg = "";
 

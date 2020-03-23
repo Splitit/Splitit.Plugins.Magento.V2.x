@@ -329,8 +329,14 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 
 			);
 
+			$this->_logger->debug("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
+			$this->_logger->debug(print_r($params, true));
+
 			$result = $this->apiModel->makePhpCurlRequest($api, "InstallmentPlan/Refund", $params);
 			$result = $this->helper->jsonDecode($result);
+
+			$this->_logger->debug("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
+			$this->_logger->debug(print_r($result, true));
 
 			if (isset($result["ResponseHeader"]) && isset($result["ResponseHeader"]["Errors"]) && !empty($result["ResponseHeader"]["Errors"])) {
 				$errorMsg = "";
@@ -569,7 +575,11 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 			],
 		];
 		$response = ["status" => false, "errorMsg" => ""];
+		$this->_logger->debug("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
+		$this->_logger->debug(print_r($params, true));
 		$result = $this->apiModel->makePhpCurlRequest($api, "InstallmentPlan/Update", $params);
+		$this->_logger->debug("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
+		$this->_logger->debug(print_r($result, true));
 		$decodedResult = $this->helper->jsonDecode($result);
 		if (isset($decodedResult["ResponseHeader"]["Succeeded"]) && $decodedResult["ResponseHeader"]["Succeeded"] == 1) {
 			$response["status"] = true;
