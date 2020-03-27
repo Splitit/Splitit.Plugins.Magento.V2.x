@@ -86,6 +86,7 @@ class Success extends \Magento\Framework\App\Action\Action {
 		$api = $this->paymentForm->_initApi();
 		$planDetails = $this->paymentForm->getInstallmentPlanDetails($this->api);
 
+		$this->logger->addDebug("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 		$this->logger->addDebug('======= get installmentplan details :  ======= ');
 		$this->logger->addDebug(print_r($planDetails, TRUE));
 
@@ -94,6 +95,7 @@ class Success extends \Magento\Framework\App\Action\Action {
 
 		$grandTotal = number_format((float) $quote->getGrandTotal(), 2, '.', '');
 		$planDetails["grandTotal"] = number_format((float) $planDetails["grandTotal"], 2, '.', '');
+		$this->logger->addDebug("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 		$this->logger->addDebug('======= grandTotal(quote):' . $grandTotal . ', grandTotal(planDetails):' . $planDetails["grandTotal"] . '   ======= ');
 		if ($grandTotal == $planDetails["grandTotal"] && ($planDetails["planStatus"] == "PendingMerchantShipmentNotice" || $planDetails["planStatus"] == "InProgress")) {
 			$this->orderPlace->execute($quote, array());
@@ -130,11 +132,13 @@ class Success extends \Magento\Framework\App\Action\Action {
 			$order->save();
 			$curlRes = $this->paymentForm->updateRefOrderNumber($this->api, $order);
 
+			$this->logger->addDebug("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 			$this->logger->addDebug('====== Order Id =====:' . $orderId . '==== Order Increment Id ======:' . $orderIncrementId);
 
 			$this->_redirect("checkout/onepage/success")->sendResponse();
 		} else {
 
+			$this->logger->addDebug("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 			$this->logger->addDebug('====== Order cancel due to Grand total and Payment detail total coming from Api is not same. =====');
 			$cancelResponse = $this->paymentForm->cancelInstallmentPlan($this->api, $params["InstallmentPlanNumber"]);
 			if ($cancelResponse["status"]) {

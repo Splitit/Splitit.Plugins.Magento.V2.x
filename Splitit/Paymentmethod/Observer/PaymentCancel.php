@@ -40,6 +40,8 @@ class PaymentCancel implements ObserverInterface {
 	 * @return $this
 	 */
 	public function execute(\Magento\Framework\Event\Observer $observer) {
+		$this->logger->debug("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
+		$this->logger->error("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 		$order = $observer->getEvent()->getOrder();
 		$payment = $order->getPayment();
 		$this->logger->debug(get_class($payment));

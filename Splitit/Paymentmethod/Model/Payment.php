@@ -106,6 +106,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
 	 */
 	public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount) {
+		$this->_logger->error("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 		try {
 
 			$api = $this->apiModel->getApiUrl();
@@ -182,6 +183,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 	 * @throws \Magento\Framework\Validator\Exception
 	 */
 	public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount) {
+		$this->_logger->error("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 		try {
 			if (!$payment->getAuthorizationTransaction()) {
 				$this->authorize($payment, $amount);
@@ -251,6 +253,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 	 */
 	public function cancel(\Magento\Payment\Model\InfoInterface $payment) {
 		$transactionId = $payment->getParentTransactionId();
+		$this->_logger->error("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 		try {
 			$apiLogin = $this->apiModel->apiLogin();
 			$api = $this->apiModel->getApiUrl();
@@ -311,6 +314,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 	 */
 	public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount) {
 		$transactionId = $payment->getParentTransactionId();
+		$this->_logger->error("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
+		$this->_logger->debug("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 		try {
 			$apiLogin = $this->apiModel->apiLogin();
 			$api = $this->apiModel->getApiUrl();
@@ -466,6 +471,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 	 */
 	protected function createInstallmentPlan($api, $payment, $amount) {
 		$cultureName = $this->helper->getCultureName();
+		$this->_logger->error("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 		$this->_logger->error(__('creating installment plan-----'));
 
 		$guestEmail = "";
@@ -562,6 +568,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 	 * @return array
 	 */
 	public function updateRefOrderNumber($api, $order) {
+		$this->_logger->debug("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 		$params = [
 			"RequestHeader" => [
 				"SessionId" => $this->apiModel->getorCreateSplititSessionid(),

@@ -115,6 +115,7 @@ class PaymentRedirect extends \Magento\Payment\Model\Method\AbstractMethod {
 	 * @throws \Magento\Framework\Validator\Exception
 	 */
 	public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount) {
+		$this->_logger->error("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 		try {
 			if (!$payment->getAuthorizationTransaction()) {
 				$this->authorize($payment, $amount);
@@ -185,6 +186,7 @@ class PaymentRedirect extends \Magento\Payment\Model\Method\AbstractMethod {
 	 */
 	public function cancel(\Magento\Payment\Model\InfoInterface $payment) {
 		$transactionId = $payment->getParentTransactionId();
+		$this->_logger->error("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 		try {
 			$apiLogin = $this->api->apiLogin();
 			$api = $this->api->getApiUrl();
@@ -245,6 +247,8 @@ class PaymentRedirect extends \Magento\Payment\Model\Method\AbstractMethod {
 	 */
 	public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount) {
 		$transactionId = $payment->getParentTransactionId();
+		$this->_logger->debug("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
+		$this->_logger->error("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 		try {
 			$apiLogin = $this->api->apiLogin();
 			$api = $this->api->getApiUrl();

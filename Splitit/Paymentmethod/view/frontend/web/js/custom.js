@@ -5,6 +5,7 @@ window.onload = function(){
 	var url = window.location.hostname;
 	var http = window.location.protocol;
 	var baseUrl = http+"//"+url+"/";
+	window.changeIns = true;
 
 	jQuery(document).ready(function(){
 		jQuery('div.field.noi.required.num-of-installments').appendTo(jQuery('form fieldset.fieldset'));
@@ -152,15 +153,19 @@ window.onload = function(){
 		if(!jQuery('#splitit_paymentmethod_cc').is(":checked")){
 			return false;
 		}
-		installmentPlanInitiate(true,true);
+		if(window.changeIns){
+			installmentPlanInitiate(true,true);
+		}
 	});
 	jQuery(document).on("click", ".apr-tc",function(){
 		installmentPlanInitiate(true);
+		window.changeIns = false;
 	});
 	// check on change of Number of Installments
 	jQuery(document).on("change", "#select-num-of-installments", function(){
 		// disable place order button
-		jQuery("button#splitit-form").prop("disabled",true);
+		// jQuery("button#splitit-form").prop("disabled",true);
+		window.changeIns = true;
 	});
 	jQuery(document).on("click", ".approval-popup_ovelay", function(){
 		jQuery("#approval-popup").remove();
