@@ -247,9 +247,14 @@ class PaymentForm {
 	 */
 	protected function createInstallmentPlan($api, $payment, $amount) {
 		$cultureName = $this->helper->getCultureName(true);
+		$dataForLogin = array(
+			'UserName' => $this->helper->getApiUsername("splitit_paymentredirect"),
+			'Password' => $this->helper->getApiPassword("splitit_paymentredirect"),
+			'TouchPoint' => $this->helper->getApiTouchPointVersion(),
+		);
 		$params = array(
 			"RequestHeader" => array(
-				"SessionId" => $this->api->getorCreateSplititSessionid(),
+				"SessionId" => $this->api->getorCreateSplititSessionid($dataForLogin),
 				"ApiKey" => $this->helper->getApiTerminalKey('splitit_paymentredirect'),
 				"CultureName" => $cultureName,
 			),
@@ -309,10 +314,14 @@ class PaymentForm {
 	public function updateRefOrderNumber($api, $order) {
 
 		$this->logger->addDebug("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
-
+		$dataForLogin = array(
+			'UserName' => $this->helper->getApiUsername("splitit_paymentredirect"),
+			'Password' => $this->helper->getApiPassword("splitit_paymentredirect"),
+			'TouchPoint' => $this->helper->getApiTouchPointVersion(),
+		);
 		$params = array(
 			"RequestHeader" => array(
-				"SessionId" => $this->api->getorCreateSplititSessionid(),
+				"SessionId" => $this->api->getorCreateSplititSessionid($dataForLogin),
 			),
 			"InstallmentPlanNumber" => $this->checkoutSession->getSplititInstallmentPlanNumber(),
 			"PlanData" => array(
@@ -449,9 +458,15 @@ class PaymentForm {
 		}
 		$getStreet = $billAddress->getStreet();
 
+		$dataForLogin = array(
+			'UserName' => $this->helper->getApiUsername("splitit_paymentredirect"),
+			'Password' => $this->helper->getApiPassword("splitit_paymentredirect"),
+			'TouchPoint' => $this->helper->getApiTouchPointVersion(),
+		);
+
 		$params = array(
 			"RequestHeader" => array(
-				"SessionId" => $this->api->getorCreateSplititSessionid(),
+				"SessionId" => $this->api->getorCreateSplititSessionid($dataForLogin),
 				"ApiKey" => $this->helper->getApiTerminalKey('splitit_paymentredirect'),
 			),
 			"PlanData" => array(
@@ -570,9 +585,14 @@ class PaymentForm {
 	 * @return array
 	 */
 	public function getInstallmentPlanDetails($api) {
+		$dataForLogin = array(
+			'UserName' => $this->helper->getApiUsername("splitit_paymentredirect"),
+			'Password' => $this->helper->getApiPassword("splitit_paymentredirect"),
+			'TouchPoint' => $this->helper->getApiTouchPointVersion(),
+		);
 		$params = array(
 			"RequestHeader" => array(
-				"SessionId" => $this->api->getorCreateSplititSessionid(),
+				"SessionId" => $this->api->getorCreateSplititSessionid($dataForLogin),
 			),
 			"QueryCriteria" => array(
 				"InstallmentPlanNumber" => $this->checkoutSession->getSplititInstallmentPlanNumber(),
@@ -616,9 +636,14 @@ class PaymentForm {
 	 * @return array
 	 */
 	public function cancelInstallmentPlan($api, $installmentPlanNumber) {
+		$dataForLogin = array(
+			'UserName' => $this->helper->getApiUsername("splitit_paymentredirect"),
+			'Password' => $this->helper->getApiPassword("splitit_paymentredirect"),
+			'TouchPoint' => $this->helper->getApiTouchPointVersion(),
+		);
 		$params = array(
 			"RequestHeader" => array(
-				"SessionId" => $this->api->getorCreateSplititSessionid(),
+				"SessionId" => $this->api->getorCreateSplititSessionid($dataForLogin),
 			),
 			"InstallmentPlanNumber" => $installmentPlanNumber,
 			"RefundUnderCancelation" => "OnlyIfAFullRefundIsPossible",

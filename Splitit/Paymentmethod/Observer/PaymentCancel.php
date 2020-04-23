@@ -45,10 +45,19 @@ class PaymentCancel implements ObserverInterface {
 		$order = $observer->getEvent()->getOrder();
 		$payment = $order->getPayment();
 		$this->logger->debug(get_class($payment));
+		$this->logger->debug('$payment->getMethod()===');
+		$this->logger->debug($payment->getMethod());
+		$this->logger->debug('$payment->getCode()===');
+		$this->logger->debug($payment->getCode());
 		$transactionId = $payment->getParentTransactionId();
 		$this->logger->debug('transactionId=' . $transactionId);
 		try {
-			$apiLogin = $this->apiModel->apiLogin();
+			$dataForLogin = array(
+				'UserName' => $this->helper->getApiUsername($payment->getMethod()),
+				'Password' => $this->helper->getApiPassword($payment->getMethod()),
+				'TouchPoint' => $this->helper->getApiTouchPointVersion(),
+			);
+			$apiLogin = $this->apiModel->apiLogin($dataForLogin);
 			$api = $this->apiModel->getApiUrl();
 			if ($payment->getAuthorizationTransaction()) {
 				$installmentPlanNumber = $payment->getAuthorizationTransaction()->getTxnId();
