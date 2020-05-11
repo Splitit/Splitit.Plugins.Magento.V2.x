@@ -489,7 +489,7 @@ class Api extends \Magento\Payment\Model\Method\AbstractMethod {
 
 		} catch (\Exception $e) {
 			$result["errorMsg"] = $this->getServerDownMsg();
-			echo $e->getMessage();
+			
 			$result = $this->helper->jsonEncode($result);
 		}
 		return $result;

@@ -11,6 +11,7 @@ class PaymentCancel implements ObserverInterface {
 	protected $customerSession;
 	protected $logger;
 	protected $jsonHelper;
+	private $helper;
 	/**
 	 * PaymentCancel constructor.
 	 * @param \Splitit\Paymentmethod\Model\Payment $paymentModel
@@ -24,6 +25,7 @@ class PaymentCancel implements ObserverInterface {
 		\Magento\Customer\Model\Session $customerSession,
 		\Splitit\Paymentmethod\Model\Api $apiModel,
 		\Magento\Framework\Json\Helper\Data $jsonHelper,
+		\Splitit\Paymentmethod\Helper\Data $helper,
 		\Psr\Log\LoggerInterface $logger
 	) {
 		$this->logger = $logger;
@@ -31,6 +33,7 @@ class PaymentCancel implements ObserverInterface {
 		$this->paymentModel = $paymentModel;
 		$this->apiModel = $apiModel;
 		$this->jsonHelper = $jsonHelper;
+		$this->helper = $helper;
 	}
 
 	/**
@@ -46,11 +49,11 @@ class PaymentCancel implements ObserverInterface {
 		$payment = $order->getPayment();
 		$this->logger->debug(get_class($payment));
 		$this->logger->debug('$payment->getMethod()===');
-		$this->logger->debug($payment->getMethod());
+		$this->logger->debug(print_r($payment->getMethod(),true));
 		$this->logger->debug('$payment->getCode()===');
-		$this->logger->debug($payment->getCode());
+		$this->logger->debug(print_r($payment->getCode(),true));
 		$transactionId = $payment->getParentTransactionId();
-		$this->logger->debug('transactionId=' . $transactionId);
+		$this->logger->debug('transactionId=' . print_r($transactionId,true));
 		try {
 			$dataForLogin = array(
 				'UserName' => $this->helper->getApiUsername($payment->getMethod()),
@@ -61,7 +64,7 @@ class PaymentCancel implements ObserverInterface {
 			$api = $this->apiModel->getApiUrl();
 			if ($payment->getAuthorizationTransaction()) {
 				$installmentPlanNumber = $payment->getAuthorizationTransaction()->getTxnId();
-				$this->logger->debug('IPN=' . $installmentPlanNumber);
+				$this->logger->debug('IPN=' . print_r($installmentPlanNumber,true));
 				$ipn = substr($installmentPlanNumber, 0, strpos($installmentPlanNumber, '-'));
 				if ($ipn != "") {
 					$installmentPlanNumber = $ipn;
@@ -101,7 +104,7 @@ class PaymentCancel implements ObserverInterface {
 				}
 			}
 		} catch (\Exception $e) {
-			$this->logger->debug(['transaction_id' => $transactionId, 'exception' => $e->getMessage()]);
+			$this->logger->debug(print_r(['transaction_id' => $transactionId, 'exception' => $e->getMessage(), 'stackTrace'=>$e->getTraceAsString()],true));
 			$this->logger->error(__('Payment cancel error.'));
 		}
 		return $this;
