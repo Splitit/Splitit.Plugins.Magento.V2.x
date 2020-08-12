@@ -64,6 +64,9 @@ define(
 
             /** Returns billing agreement data */
             getBillingAgreementCode: function () {
+                if(this.item == undefined || this.item.method == undefined){
+                    return false;
+                }
                 return window.checkoutConfig.payment.splititExpress.billingAgreementCode[this.item.method];
             },
 

@@ -70,10 +70,10 @@ class Api extends \Magento\Payment\Model\Method\AbstractMethod {
 	/** check if splititsession id not exist create new
 	 **	return string
 	 **/
-	public function getorCreateSplititSessionid() {
+	public function getorCreateSplititSessionid($dataForLogin = array()) {
 		$this->logger->error("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 		if (!$this->customerSession->getSplititSessionid()) {
-			$this->apiLogin();
+			$this->apiLogin($dataForLogin);
 			$this->logger->error('New Session Id :' . $this->customerSession->getSplititSessionid());
 		} else {
 			$this->logger->error('Old Session Id :' . $this->customerSession->getSplititSessionid());
@@ -489,7 +489,7 @@ class Api extends \Magento\Payment\Model\Method\AbstractMethod {
 
 		} catch (\Exception $e) {
 			$result["errorMsg"] = $this->getServerDownMsg();
-			echo $e->getMessage();
+			
 			$result = $this->helper->jsonEncode($result);
 		}
 		return $result;
