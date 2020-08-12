@@ -101,7 +101,7 @@ class ExpressConfigProvider implements ConfigProviderInterface {
 				'splititExpress' => [
 					'paymentAcceptanceMarkHref' => $this->scopeConfig->getValue('payment/splitit_paymentmethod/faq_link_title_url', \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
 					'paymentAcceptanceMarkSrc' => $this->scopeConfig->getValue('payment/splitit_paymentmethod/splitit_logo_src', \Magento\Store\Model\ScopeInterface::SCOPE_STORE),
-					'questionMark' => $this->helpBlock->getViewFileUrl('Splitit_Paymentmethod::images/learn_more.svg'),
+					'questionMark' => $this->helpBlock->getViewFileUrl('Splitit_Paymentmethod::images/learn_more.png'),
 					'isContextCheckout' => false,
 					'inContextConfig' => [],
 				],
