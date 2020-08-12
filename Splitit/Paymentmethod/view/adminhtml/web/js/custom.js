@@ -13,9 +13,7 @@ var jqueryInterval = setInterval(function(){
       if(depandingOnCart){
         jqueryIsHere = 1;
         clearInterval(jqueryInterval);
-        //splitit_fee_types();
         jQuery(document).ready(function(){
-          splitit_fee_table();
           runMyScripts();
         })
         
@@ -498,55 +496,4 @@ function checkSetting(){
       } 
     }
   });
-}
-
-function splitit_fee_types(){
-    jQuery(document).on('change','[id^=payment_][id$=_splitit_paymentmethod_splitit_fee_types]:first',function(){
-        jQuery('[id^=payment_][id$=_splitit_paymentmethod_splitit_fees]:first').trigger('change');
-    });
-    jQuery(document).on('change','[id^=payment_][id$=_splitit_paymentredirect_splitit_fee_types]:first',function(){
-        jQuery('[id^=payment_][id$=_splitit_paymentredirect_splitit_fees]:first').trigger('change');
-    });
-    jQuery(document).on('change','[id^=payment_][id$=_splitit_paymentmethod_splitit_fees]:first',function(){
-        if(jQuery(this).val()>50){
-        if(jQuery('[id^=payment_][id$=_splitit_paymentmethod_splitit_fee_types]:first').val()==1){
-            jQuery(this).val(50);
-        }
-        }
-    });
-    jQuery(document).on('change','[id^=payment_][id$=_splitit_paymentredirect_splitit_fees]:first',function(){
-        if(jQuery(this).val()>50){
-        if(jQuery('[id^=payment_][id$=_splitit_paymentredirect_splitit_fee_types]:first').val()==1){
-            jQuery(this).val(50);
-        }
-        }
-    });
-}
-
-function splitit_fee_table(){
-    var table=jQuery('[id^=row_payment_][id$=_splitit_paymentmethod_splitit_fee_table]:first');
-   // console.log('row_payment_us_splitit_paymentmethod_splitit_fee_table loaded');
-    while(table.find('tbody tr').length!=23){
-        table.find('button.action-add').click();
-    }
-    table.find('tfoot').remove();
-    table.find('th').last().remove();
-    var i=2;
-    table.find('tbody tr').each(function(){
-        var tr=jQuery(this);
-        tr.find('td input[name*="noi"]').attr('readonly',true).val(i++);
-        if(tr.find('td input[name*="fixed"]').val()==''||parseFloat(tr.find('td input[name*="fixed"]').val())<=0){
-            tr.find('td input[name*="fixed"]').val('0.00');
-        }
-        if(tr.find('td input[name*="percent"]').val()==''||parseFloat(tr.find('td input[name*="percent"]').val())<=0){
-            tr.find('td input[name*="percent"]').val('0.00');
-        }
-        tr.find('td input[name*="percent"]').on('change',function(){
-            if(parseFloat(jQuery(this).val())>30){
-                alert("Percent value cannot be greater than 30");
-                jQuery(this).val('30.00');
-            }
-        });
-        tr.find('td.col-actions').remove();
-    });
 }

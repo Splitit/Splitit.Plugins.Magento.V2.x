@@ -171,7 +171,7 @@ $approvalUrlResponseArr = $approvalUrlResponseArr['data'];
 			<div>
 			<div class="important_note_sec" style=""><?php echo $approvalUrlResponseArr["ImportantNotesSection"]["ImportantNotesHeader"]["Text"] ?>:</div>
 			<div class="pnlEula" style=""><?php echo $approvalUrlResponseArr["ImportantNotesSection"]["ImportantNotesBody"]["Text"] ; ?></div>
-			<div id="i_acknowledge_area"><input type="checkbox" id="i_acknowledge" class="i_acknowledge" name="i_acknowledge" value="" />
+			<div id="i_acknowledge_area" style="display: none;"><input type="checkbox" id="i_acknowledge" class="i_acknowledge" name="i_acknowledge" value="1" checked="checked" />
 			<label for="i_acknowledge" class="i_acknowledge_lbl">
 			I acknowledge that I have read and agree to the <a href="#" id="i_acknowledge_content_show" > terms and conditions </a> </label><div style="display:none" class="i_ack_err"> Please select I acknowledge.</div></div>
 

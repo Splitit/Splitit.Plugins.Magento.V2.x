@@ -5,6 +5,7 @@ window.onload = function(){
 	var url = window.location.hostname;
 	var http = window.location.protocol;
 	var baseUrl = http+"//"+url+"/";
+	window.changeIns = true;
 
 	jQuery(document).ready(function(){
 		jQuery('div.field.noi.required.num-of-installments').appendTo(jQuery('form fieldset.fieldset'));
@@ -26,7 +27,6 @@ window.onload = function(){
 	});
 	
         jQuery(document).on('click','input[type="radio"]',function(e){
-            jQuery('.table-totals tbody').find('tr.totals.splititfee').remove();
             runMyScriptForCheckout();
             installmentPlanInitiate(false);
         });
@@ -36,37 +36,20 @@ window.onload = function(){
                 jQuery('#splitit_paymentmethod').parent().append('<input type="hidden" id="pageReloaded" value="1"/>');
             }
         	if(jQuery('#splitit_paymentmethod,#splitit_paymentredirect').is(':checked')){                    
-        		splititFees(jQuery('#select-num-of-installments').val());
         		runMyScriptForCheckout();
         		clearInterval(interval);
         	}
         	},1000);
         });
         jQuery(document).on('click','#splitit_paymentmethod,#splitit_paymentredirect',function(e){
-            splititFees(jQuery('#select-num-of-installments').val());
             runMyScriptForCheckout();
         });
         jQuery(document).on('change','#select-num-of-installments',function(e){
-            splititFees(jQuery('#select-num-of-installments').val());
             jQuery('#pageReloaded').val('0');
             setTimeout(function(){
                 jQuery('#splitit_paymentmethod').trigger('click');                
             },1000);
-        });
-
-        function splititFees(selectedIns){
-        	jQuery.ajax({
-        		url: baseUrl + "splititpaymentmethod/index/update",
-                        data : {selectedIns:selectedIns},
-        		showLoader: true,
-        		success: function(result){
-        			if(result.success){
-        				jQuery('.table-totals tbody').find('tr.totals.splititfee').remove();
-        				jQuery('.table-totals tbody').find('tr.totals.sub').after('<tr class="totals fee splititfee excl"><th class="mark" colspan="1" scope="row">Splitit Fees</th><td class="amount"><span class="price" data-bind="text: getFormattedPrice()">'+result.data.splitit_fees+'</span></td></tr>');
-        			}			
-        		}
-        	});
-        }*/
+        });*/
 
 	function getInstallmentOptions(){
 		jQuery.ajax({
@@ -170,15 +153,19 @@ window.onload = function(){
 		if(!jQuery('#splitit_paymentmethod_cc').is(":checked")){
 			return false;
 		}
-		installmentPlanInitiate(true,true);
+		if(window.changeIns){
+			installmentPlanInitiate(true,true);
+		}
 	});
 	jQuery(document).on("click", ".apr-tc",function(){
 		installmentPlanInitiate(true);
+		window.changeIns = false;
 	});
 	// check on change of Number of Installments
 	jQuery(document).on("change", "#select-num-of-installments", function(){
 		// disable place order button
-		jQuery("button#splitit-form").prop("disabled",true);
+		// jQuery("button#splitit-form").prop("disabled",true);
+		window.changeIns = true;
 	});
 	jQuery(document).on("click", ".approval-popup_ovelay", function(){
 		jQuery("#approval-popup").remove();

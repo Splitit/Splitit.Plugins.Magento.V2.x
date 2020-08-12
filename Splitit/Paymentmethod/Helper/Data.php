@@ -9,19 +9,9 @@ use \Magento\Framework\View\Element\Template\Context;
 class Data extends AbstractHelper {
 
 	/**
-	 * Total Code
-	 */
-	const TOTAL_CODE = 'fee_amount';
-
-	/**
 	 * Grand Total Code
 	 */
 	const GRAND_TOTAL_CODE = 'grand_total';
-
-	/**
-	 * @var array
-	 */
-	public $methodFee = NULL;
 
 	public $checkoutSession;
 	public $productMetadataInterface;
@@ -57,7 +47,6 @@ class Data extends AbstractHelper {
 		$this->SupportedCulturesSource = $SupportedCulturesSource;
 		$this->jsonHelper = $jsonHelper;
 		parent::__construct($context);
-		$this->_getMethodFee();
 	}
 
 	/**
@@ -138,42 +127,6 @@ class Data extends AbstractHelper {
 	 */
 	public function getApiUrl($method) {
 		return $this->getConfig("payment/" . $method . "/api_url");
-	}
-
-	/**
-	 * To get the config value of splitit_fee_table
-	 * @param method string
-	 * @return string
-	 */
-	public function getSplititFeeTable($method) {
-		return $this->getConfig("payment/" . $method . "/splitit_fee_table");
-	}
-
-	/**
-	 * To get the config value of splitit_fee_types
-	 * @param method string
-	 * @return string
-	 */
-	public function getSplititFeeTypes($method) {
-		return $this->getConfig("payment/" . $method . "/splitit_fee_types");
-	}
-
-	/**
-	 * To get the config value of splitit_fee_on_total
-	 * @param method string
-	 * @return string
-	 */
-	public function getSplititFeeOnTotalByMethod($method) {
-		return $this->getConfig("payment/" . $method . "/splitit_fee_on_total");
-	}
-
-	/**
-	 * To get the config value of splitit_fees
-	 * @param method string
-	 * @return string
-	 */
-	public function getSplititFeesByMethod($method) {
-		return $this->getConfig("payment/" . $method . "/splitit_fees");
 	}
 
 	/**
@@ -393,38 +346,6 @@ class Data extends AbstractHelper {
 	}
 
 	/**
-	 * To get the config value of splitit_fees
-	 * @return string
-	 */
-	public function getSplititFees() {
-		return $this->getConfig('payment/splitit_paymentmethod/splitit_fees');
-	}
-
-	/**
-	 * To get the config value of splitit_per_product
-	 * @return string
-	 */
-	public function getRedirectSplititFees() {
-		return $this->getConfig('payment/splitit_paymentredirect/splitit_fees');
-	}
-
-	/**
-	 * To get the config value of splitit_fee_on_total
-	 * @return string
-	 */
-	public function getSplititFeeOnTotal() {
-		return $this->getConfig('payment/splitit_paymentmethod/splitit_fee_on_total');
-	}
-
-	/**
-	 * To get the config value of splitit_fee_on_total
-	 * @return string
-	 */
-	public function getRedirectSplititFeeOnTotal() {
-		return $this->getConfig('payment/splitit_paymentredirect/splitit_fee_on_total');
-	}
-
-	/**
 	 * To get the config value of active
 	 * @return string
 	 */
@@ -558,127 +479,6 @@ class Data extends AbstractHelper {
 			return $decodedResult["SupportedCultures"];
 		}
 		return array();
-	}
-
-	/**
-	 * Retrieve Payment Method Fees from Store Config
-	 * @return array
-	 */
-	protected function _getMethodFee() {
-
-		if (is_null($this->methodFee)) {
-			$this->methodFee['splitit_paymentmethod'] = array(
-				'fee' => $this->getSplititFees(),
-			);
-			$this->methodFee['splitit_paymentredirect'] = array(
-				'fee' => $this->getRedirectSplititFees(),
-			);
-		}
-		return $this->methodFee;
-	}
-
-	/**
-	 * Check if Extension is Enabled config
-	 * @return bool
-	 */
-	public function isEnabled($method = '') {
-		if ($method) {
-			return $this->getSplititFeeOnTotal();
-		}
-		return $this->getRedirectSplititFeeOnTotal();
-	}
-
-	/**
-	 * @param \Magento\Quote\Model\Quote $quote
-	 * @return bool
-	 */
-	public function canApply(\Magento\Quote\Model\Quote $quote) {
-
-		/** check module or config **/
-		if ($method = $quote->getPayment()->getMethod()) {
-			if ($this->isEnabled($method)) {
-				if (isset($this->methodFee[$method])) {
-					return true;
-				}
-			}
-		}
-		return false;
-	}
-
-	/**
-	 * @param \Magento\Quote\Model\Quote $quote
-	 * @return float|int
-	 */
-	public function getFee(\Magento\Quote\Model\Quote $quote) {
-		$method = $quote->getPayment()->getMethod();
-		$fee = $this->methodFee[$method]['fee'];
-
-		if ($method == 'splitit_paymentmethod') {
-			$fee = 0;
-			if (version_compare($this->getMagentoVersion(), '2.3.0', '<')) {
-
-				$feeTable = @unserialize($this->getSplititFeeTable($method));
-				if ($feeTable == false) {
-					$feeTable = $this->jsonHelper->jsonDecode($this->getSplititFeeTable($method));
-				}
-			} else {
-
-				$feeTable = $this->jsonHelper->jsonDecode($this->getSplititFeeTable($method));
-			}
-			$selectedInstallment = $this->checkoutSession->getSelectedIns();
-
-			if ($selectedInstallment) {
-				foreach ($feeTable as $value) {
-					if ($value['noi'] == $selectedInstallment) {
-						$fixedFee = $value['fixed'];
-						$percentFee = $value['percent'];
-						$totals = $quote->getTotals();
-						$sum = 0;
-						foreach ($totals as $total) {
-							if (($total->getCode() != self::TOTAL_CODE) && ($total->getCode() != self::GRAND_TOTAL_CODE)) {
-								$sum += (float) $total->getValue();
-							}
-							if (($total->getCode() == 'shipping') && ($total->getValue() == 0)) {
-								$sum += (float) $quote->getShippingAddress()->getShippingAmount();
-							}
-						}
-
-						return ($sum * ($percentFee / 100)) + $fixedFee;
-					}
-				}
-			}
-			return $fee;
-		} else {
-
-			$feeType = $this->getFeeType($method);
-			if ($feeType == \Splitit\Paymentmethod\Model\Source\Feetypes::FIXED) {
-				return $fee;
-			} else {
-				$totals = $quote->getTotals();
-				$sum = 0;
-				foreach ($totals as $total) {
-					if (($total->getCode() != self::TOTAL_CODE) && ($total->getCode() != self::GRAND_TOTAL_CODE)) {
-						$sum += (float) $total->getValue();
-					}
-					if (($total->getCode() == 'shipping') && ($total->getValue() == 0)) {
-						$sum += (float) $quote->getShippingAddress()->getShippingAmount();
-					}
-				}
-
-				return ($sum * ($fee / 100));
-			}
-		}
-	}
-
-	/**
-	 * Retrieve Fee type from Store config (Percent or Fixed)
-	 * @return string
-	 */
-	public function getFeeType($method = '') {
-		if ($method) {
-			return $this->getSplititFeeTypes($method);
-		}
-		return $this->getSplititFeeTypes('splitit_paymentmethod');
 	}
 
 	/**

@@ -79,6 +79,8 @@ class PaymentForm {
 	 */
 	public function orderPlaceRedirectUrl() {
 
+		$this->logger->error("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
+
 		$api = $this->_initApi();
 
 		$response = array(
@@ -306,6 +308,8 @@ class PaymentForm {
 	 */
 	public function updateRefOrderNumber($api, $order) {
 
+		$this->logger->addDebug("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
+
 		$params = array(
 			"RequestHeader" => array(
 				"SessionId" => $this->api->getorCreateSplititSessionid(),
@@ -352,6 +356,8 @@ class PaymentForm {
 	 * @return array
 	 */
 	public function installmentplaninitForHostedSolution() {
+		$this->logger->error("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
+		$this->logger->addDebug("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 		$session = $this->checkoutSession;
 		$quote_id = $session->getQuoteId();
 		$firstInstallmentAmount = $this->getFirstInstallmentAmountHosted();

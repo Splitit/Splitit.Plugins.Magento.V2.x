@@ -115,6 +115,7 @@ class PaymentRedirect extends \Magento\Payment\Model\Method\AbstractMethod {
 	 * @throws \Magento\Framework\Validator\Exception
 	 */
 	public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount) {
+		$this->_logger->error("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 		try {
 			if (!$payment->getAuthorizationTransaction()) {
 				$this->authorize($payment, $amount);
@@ -185,6 +186,7 @@ class PaymentRedirect extends \Magento\Payment\Model\Method\AbstractMethod {
 	 */
 	public function cancel(\Magento\Payment\Model\InfoInterface $payment) {
 		$transactionId = $payment->getParentTransactionId();
+		$this->_logger->error("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 		try {
 			$apiLogin = $this->api->apiLogin();
 			$api = $this->api->getApiUrl();
@@ -245,6 +247,8 @@ class PaymentRedirect extends \Magento\Payment\Model\Method\AbstractMethod {
 	 */
 	public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount) {
 		$transactionId = $payment->getParentTransactionId();
+		$this->_logger->debug("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
+		$this->_logger->error("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 		try {
 			$apiLogin = $this->api->apiLogin();
 			$api = $this->api->getApiUrl();
@@ -263,8 +267,15 @@ class PaymentRedirect extends \Magento\Payment\Model\Method\AbstractMethod {
 
 			);
 
+			$this->_logger->debug("\nFILE: %s \nLINE: %s \nMETHOD: %s \nREQUEST:",[__FILE__,__LINE__,__METHOD__]);
+			$this->_logger->debug(print_r($params, true));
+
 			$result = $this->api->makePhpCurlRequest($api, "InstallmentPlan/Refund", $params);
 			$result = $this->helper->jsonDecode($result);
+
+			$this->_logger->debug("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__." \n RESPONSE: ");
+			$this->_logger->debug(print_r($result, true));
+
 			if (isset($result["ResponseHeader"]) && isset($result["ResponseHeader"]["Errors"]) && !empty($result["ResponseHeader"]["Errors"])) {
 				$errorMsg = "";
 

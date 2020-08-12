@@ -12,10 +12,17 @@
 -->
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
 
-    <virtualType name="Splitit\Paymentmethod\Model\ConfigProvider" type="Magento\Payment\Model\CcGenericConfigProvider">
+    <type name="Magento\Payment\Model\CcGenericConfigProvider">
         <arguments>
             <argument name="methodCodes" xsi:type="array">
                 <item name="splitit_paymentmethod" xsi:type="const">Splitit\Paymentmethod\Model\Payment::CODE</item>
+            </argument>
+        </arguments>
+    </type>
+    
+    <virtualType name="Splitit\Paymentmethod\Model\ConfigProvider" type="Magento\Payment\Model\CcGenericConfigProvider">
+        <arguments>
+            <argument name="methodCodes" xsi:type="array">
                 <item name="splitit_paymentredirect" xsi:type="const">Splitit\Paymentmethod\Model\PaymentRedirect::CODE</item>
             </argument>
         </arguments>
@@ -24,7 +31,6 @@
     <type name="Magento\Checkout\Model\CompositeConfigProvider">
         <arguments>
             <argument name="configProviders" xsi:type="array">
-                <item name="splitit_paymentmethod_config_provider" xsi:type="object">Splitit\Paymentmethod\Model\ConfigProvider</item>
                 <item name="splitit_paymentredirect_config_provider" xsi:type="object">Splitit\Paymentmethod\Model\ExpressConfigProvider</item>
             </argument>
         </arguments>

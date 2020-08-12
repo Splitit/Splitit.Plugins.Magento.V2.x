@@ -106,6 +106,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 	 * @SuppressWarnings(PHPMD.UnusedFormalParameter)
 	 */
 	public function authorize(\Magento\Payment\Model\InfoInterface $payment, $amount) {
+		$this->_logger->error("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 		try {
 
 			$api = $this->apiModel->getApiUrl();
@@ -182,6 +183,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 	 * @throws \Magento\Framework\Validator\Exception
 	 */
 	public function capture(\Magento\Payment\Model\InfoInterface $payment, $amount) {
+		$this->_logger->error("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 		try {
 			if (!$payment->getAuthorizationTransaction()) {
 				$this->authorize($payment, $amount);
@@ -251,6 +253,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 	 */
 	public function cancel(\Magento\Payment\Model\InfoInterface $payment) {
 		$transactionId = $payment->getParentTransactionId();
+		$this->_logger->error("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 		try {
 			$apiLogin = $this->apiModel->apiLogin();
 			$api = $this->apiModel->getApiUrl();
@@ -311,6 +314,8 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 	 */
 	public function refund(\Magento\Payment\Model\InfoInterface $payment, $amount) {
 		$transactionId = $payment->getParentTransactionId();
+		$this->_logger->error("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
+		$this->_logger->debug("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 		try {
 			$apiLogin = $this->apiModel->apiLogin();
 			$api = $this->apiModel->getApiUrl();
@@ -329,8 +334,14 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 
 			);
 
+			$this->_logger->debug("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
+			$this->_logger->debug(print_r($params, true));
+
 			$result = $this->apiModel->makePhpCurlRequest($api, "InstallmentPlan/Refund", $params);
 			$result = $this->helper->jsonDecode($result);
+
+			$this->_logger->debug("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
+			$this->_logger->debug(print_r($result, true));
 
 			if (isset($result["ResponseHeader"]) && isset($result["ResponseHeader"]["Errors"]) && !empty($result["ResponseHeader"]["Errors"])) {
 				$errorMsg = "";
@@ -460,6 +471,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 	 */
 	protected function createInstallmentPlan($api, $payment, $amount) {
 		$cultureName = $this->helper->getCultureName();
+		$this->_logger->error("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 		$this->_logger->error(__('creating installment plan-----'));
 
 		$guestEmail = "";
@@ -556,6 +568,7 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 	 * @return array
 	 */
 	public function updateRefOrderNumber($api, $order) {
+		$this->_logger->debug("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 		$params = [
 			"RequestHeader" => [
 				"SessionId" => $this->apiModel->getorCreateSplititSessionid(),
@@ -569,7 +582,11 @@ class Payment extends \Magento\Payment\Model\Method\Cc {
 			],
 		];
 		$response = ["status" => false, "errorMsg" => ""];
+		$this->_logger->debug("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
+		$this->_logger->debug(print_r($params, true));
 		$result = $this->apiModel->makePhpCurlRequest($api, "InstallmentPlan/Update", $params);
+		$this->_logger->debug("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
+		$this->_logger->debug(print_r($result, true));
 		$decodedResult = $this->helper->jsonDecode($result);
 		if (isset($decodedResult["ResponseHeader"]["Succeeded"]) && $decodedResult["ResponseHeader"]["Succeeded"] == 1) {
 			$response["status"] = true;

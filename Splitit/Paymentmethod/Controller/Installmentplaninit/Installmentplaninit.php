@@ -73,6 +73,7 @@ class Installmentplaninit extends \Magento\Framework\App\Action\Action {
         }
         /* check if login successfully or not */
         if (!$loginResponse["status"]) {
+            $this->logger->addError("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
             $this->logger->addError($loginResponse["errorMsg"]);
             $response["errorMsg"] = 'Error in processing your order. Please try again later.';
             return $resultJson->setData($response);
@@ -91,6 +92,7 @@ class Installmentplaninit extends \Magento\Framework\App\Action\Action {
             $response["successMsg"] = $block;
         } else {
             $response["errorMsg"] = 'Error in processing your order. Please try again later.';
+            $this->logger->addError("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
             $this->logger->addError($installmentPlanInitResponse["errorMsg"]);
             if ($installmentPlanInitResponse["errorMsg"]) {
                 $response["errorMsg"] = $installmentPlanInitResponse["errorMsg"];

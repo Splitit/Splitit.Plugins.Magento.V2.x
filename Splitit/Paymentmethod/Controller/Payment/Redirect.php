@@ -79,6 +79,7 @@ class Redirect extends \Magento\Framework\App\Action\Action {
 		$quote = $this->checkoutSession->getQuote();
 		$data = $this->paymentForm->orderPlaceRedirectUrl();
 		if ($data['error'] == true && $data["status"] == false) {
+			$this->logger->addError("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 			$this->logger->addError("Split It processing error : " . $data["data"]);
 			if (isset($data["errorMsg"]) && $data["errorMsg"]) {
 				$this->messageManager->addErrorMessage(__($data["errorMsg"]));

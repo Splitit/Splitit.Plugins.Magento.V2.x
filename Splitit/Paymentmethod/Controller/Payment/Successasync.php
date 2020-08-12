@@ -90,6 +90,7 @@ class Successasync extends \Magento\Framework\App\Action\Action {
 		$params = $this->getRequest()->getParams();
 
 		$this->checkoutSession->setSplititInstallmentPlanNumber($params['InstallmentPlanNumber']);
+		$this->logger->addDebug("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 		$this->logger->addDebug('======= successAsyncAction :  =======InstallmentPlanNumber coming from splitit in url: ' . $params["InstallmentPlanNumber"]);
 		$this->logger->addDebug('======= quote Id from Splitit :  ======= '.$params['RefOrderNumber']);
 		$quote = $this->quoteRepository->get($params['RefOrderNumber']);

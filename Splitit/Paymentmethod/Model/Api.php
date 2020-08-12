@@ -71,6 +71,7 @@ class Api extends \Magento\Payment\Model\Method\AbstractMethod {
 	 **	return string
 	 **/
 	public function getorCreateSplititSessionid() {
+		$this->logger->error("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 		if (!$this->customerSession->getSplititSessionid()) {
 			$this->apiLogin();
 			$this->logger->error('New Session Id :' . $this->customerSession->getSplititSessionid());
@@ -132,14 +133,17 @@ class Api extends \Magento\Payment\Model\Method\AbstractMethod {
 	 * @return array
 	 */
 	public function installmentPlanInit($selectedInstallment, $guestEmail) {
+		$this->logger->error("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 		try {
 			$response = ["errorMsg" => "", "successMsg" => "", "status" => false];
 			$apiUrl = $this->getApiUrl();
 			$this->guestEmail = $guestEmail;
 			$params = $this->createDataForInstallmentPlanInit($selectedInstallment);
+			$this->logger->error(print_r($params,true));
 			$this->customerSession->setSelectedInstallment($selectedInstallment);
 			/*call Installment Plan Initiate api to get Approval URL*/
 			$result = $this->makePhpCurlRequest($apiUrl, "InstallmentPlan/Initiate", $params);
+			$this->logger->error(print_r($result,true));
 			$decodedResult = $this->helper->jsonDecode($result);
 			/*check for curl error*/
 			if (isset($decodedResult["errorMsg"])) {
@@ -165,6 +169,7 @@ class Api extends \Magento\Payment\Model\Method\AbstractMethod {
 				$response["errorMsg"] = $decodedResult["serverError"];
 			}
 		} catch (\Exception $e) {
+			$this->logger->error($e->getMessage());
 			$response["errorMsg"] = $e->getMessage();
 		}
 
