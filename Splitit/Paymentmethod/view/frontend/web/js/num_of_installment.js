@@ -178,7 +178,7 @@ function runMyScriptForCheckout(){
 				}
 				var helpLink = '<a style="float: none;" href="javascript:void(0);" onclick="popWin(\'' +result.help.splitit_paymentredirect.link + '\',\'' +  result.help.splitit_paymentredirect.title + '\')">'+result.help.splitit_paymentredirect.title+'</a>';
 				
-				jQuery("#splitit-paymentredirect").append(helpLink);	
+				jQuery("#splitit-paymentredirect").append(helpLink);
 			}
 			if(result.isActive){
 				var priceSpan = "";

@@ -23,7 +23,7 @@
                 <cctypes>AE,VI,MC,DI,JCB</cctypes>
                 <allowspecific>0</allowspecific>
                 <min_order_total>0.50</min_order_total>
-                <api_url>https://web-api.splitit.com/</api_url>
+                <api_url>https://webapi.production.splitit.com/</api_url>
                 <api_url_sandbox>https://web-api-sandbox.splitit.com/</api_url_sandbox>
                 <faq_link_enabled>1</faq_link_enabled>
                 <faq_link_title>Tell me more</faq_link_title>
@@ -42,7 +42,7 @@
                 <api_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />                
                 <allowspecific>0</allowspecific>
                 <min_order_total>0.50</min_order_total>
-                <api_url>https://web-api.splitit.com/</api_url>
+                <api_url>https://webapi.production.splitit.com/</api_url>
                 <api_url_sandbox>https://web-api-sandbox.splitit.com/</api_url_sandbox>
                 <faq_link_enabled>1</faq_link_enabled>
                 <faq_link_title>Tell me more</faq_link_title>
