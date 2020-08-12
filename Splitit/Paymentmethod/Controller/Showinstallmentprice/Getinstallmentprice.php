@@ -18,6 +18,16 @@ class Getinstallmentprice extends \Magento\Framework\App\Action\Action {
 	private $cart;
 	private $requestData;
 
+	/**
+     * Contructor
+     * @param \Magento\Framework\App\Action\Context $context
+	 * @param \Splitit\Paymentmethod\Helper\Data $helperData
+	 * @param \Magento\Checkout\Model\Session $checkoutSession
+	 * @param \Splitit\Paymentmethod\Model\PaymentForm $paymentForm
+	 * @param \Splitit\Paymentmethod\Model\Payment $payment
+	 * @param \Magento\Framework\App\RequestInterface $request
+	 * @param \Magento\Checkout\Model\Cart $cart
+     */
 	public function __construct(
 		\Magento\Framework\App\Action\Context $context,
 		\Splitit\Paymentmethod\Helper\Data $helperData,
@@ -128,8 +138,7 @@ class Getinstallmentprice extends \Magento\Framework\App\Action\Action {
 		} else {
 			return $resultJson->setData(array('status' => false));
 		}
-		/* echo $data = $this->helper->encodeData($response);
-          return; */
+		
 	}
 
 }

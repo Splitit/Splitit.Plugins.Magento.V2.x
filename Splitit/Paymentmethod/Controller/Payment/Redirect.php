@@ -33,6 +33,19 @@ class Redirect extends \Magento\Framework\App\Action\Action {
 	protected $api;
 	protected $logger;
 
+	/**
+     * Contructor
+     * @param \Magento\Framework\App\Action\Context $context
+	 * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+	 * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
+	 * @param \Magento\Sales\Api\Data\OrderInterface $order
+	 * @param \Magento\Quote\Model\QuoteFactory $quoteFactory
+	 * @param \Splitit\Paymentmethod\Helper\Data $helperData
+	 * @param \Psr\Log\LoggerInterface $logger
+	 * @param \Magento\Checkout\Model\Session $checkoutSession
+	 * @param \Splitit\Paymentmethod\Model\PaymentForm $paymentForm
+	 * @param \Splitit\Paymentmethod\Model\Api $api
+     */
 	public function __construct(
 		\Magento\Framework\App\Action\Context $context,
 		\Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
@@ -64,8 +77,6 @@ class Redirect extends \Magento\Framework\App\Action\Action {
 	public function execute() {
 
 		$quote = $this->checkoutSession->getQuote();
-		/*print_r($quote->getPayment()->getData());die;*/
-		/*die(get_class($this->checkoutSession->getQuote()));*/
 		$data = $this->paymentForm->orderPlaceRedirectUrl();
 		if ($data['error'] == true && $data["status"] == false) {
 			$this->logger->addError("Split It processing error : " . $data["data"]);
@@ -80,16 +91,7 @@ class Redirect extends \Magento\Framework\App\Action\Action {
 			$resultRedirect->setPath('checkout/cart');
 			return $resultRedirect;
 		}
-
-		/*$order = $this->checkoutSession->getLastRealOrder();
-		$orderId = $order->getEntityId();
-		$payment = $order->getPayment();
-		$payment->setTransactionId($this->checkoutSession->getSplititInstallmentPlanNumber());
-		$payment->save();
-		$order->save();
-		$curlRes = $this->paymentForm->updateRefOrderNumber($this->api, $order);*/
 		$curlRes = $this->paymentForm->updateRefOrderNumber($this->api, $quote);
-
 		if (isset($curlRes["status"]) && $curlRes["status"]) {
 			$this->_redirect($data['checkoutUrl']);
 		}

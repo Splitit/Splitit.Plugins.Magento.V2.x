@@ -36,6 +36,22 @@ class Successasync extends \Magento\Framework\App\Action\Action {
 	protected $orderSender;
 	protected $orderPlace;
 
+	/**
+     * Contructor
+     * @param \Magento\Framework\App\Action\Context $context
+	 * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+	 * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
+	 * @param \Magento\Sales\Api\Data\OrderInterface $order
+	 * @param \Magento\Quote\Model\QuoteFactory $quoteFactory
+	 * @param \Magento\Quote\Api\CartRepositoryInterface $quoteRepository
+	 * @param \Splitit\Paymentmethod\Model\Helper\OrderPlace $orderPlace
+	 * @param \Psr\Log\LoggerInterface $logger
+	 * @param \Splitit\Paymentmethod\Helper\Data $helperData
+	 * @param \Magento\Checkout\Model\Session $checkoutSession
+	 * @param \Splitit\Paymentmethod\Model\PaymentForm $paymentForm
+	 * @param \Splitit\Paymentmethod\Model\Api $api
+	 * @param \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender
+     */
 	public function __construct(
 		\Magento\Framework\App\Action\Context $context,
 		\Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
@@ -76,7 +92,6 @@ class Successasync extends \Magento\Framework\App\Action\Action {
 		$this->checkoutSession->setSplititInstallmentPlanNumber($params['InstallmentPlanNumber']);
 		$this->logger->addDebug('======= successAsyncAction :  =======InstallmentPlanNumber coming from splitit in url: ' . $params["InstallmentPlanNumber"]);
 		$this->logger->addDebug('======= quote Id from Splitit :  ======= '.$params['RefOrderNumber']);
-		/*$order = $this->order->loadByIncrementId($params['RefOrderNumber']);*/
 		$quote = $this->quoteRepository->get($params['RefOrderNumber']);
 		$api = $this->paymentForm->_initApi();
 		$planDetails = $this->paymentForm->getInstallmentPlanDetails($this->api);
@@ -87,9 +102,6 @@ class Successasync extends \Magento\Framework\App\Action\Action {
 		$orderId = 0;
 		$orderIncrementId = 0;
 
-		// $orderId = $order->getEntityId();
-		// $orderIncrementId = $order->getIncrementId();
-		// $orderObj = $this->order->load($orderId);
 		$grandTotal = number_format((float) $quote->getGrandTotal(), 2, '.', '');
 		$planDetails["grandTotal"] = number_format((float) $planDetails["grandTotal"], 2, '.', '');
 		$this->logger->addDebug('======= grandTotal(orderObj):' . $grandTotal . ', grandTotal(planDetails):' . $planDetails["grandTotal"] . '   ======= ');
@@ -113,10 +125,6 @@ class Successasync extends \Magento\Framework\App\Action\Action {
 			$payment->setIsTransactionApproved(true);
 
 			$payment->registerAuthorizationNotification($grandTotal);
-			/*$payment->setAdditionalInformation(
-				               [\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS => (array) $planDetails]
-			*/
-
 			$this->logger->addDebug('======= add order status to history  ======= ');
 			$orderObj->addStatusToHistory(
 				$orderObj->getStatus(), 'Payment InstallmentPlan was created with number ID: '
@@ -131,16 +139,12 @@ class Successasync extends \Magento\Framework\App\Action\Action {
 					false, 'Payment NotifyOrderShipped was sent with number ID: ' . $this->checkoutSession->getSplititInstallmentPlanNumber(), false
 				);
 			}
-			/*$orderObj->queueNewOrderEmail();
-           $orderObj->sendNewOrderEmail();*/
 			$this->logger->addDebug('======= order send email  ======= ');
 			$this->orderSender->send($orderObj);
 			$orderObj->save();
 			$curlRes = $this->paymentForm->updateRefOrderNumber($this->api, $orderObj);
 
 			$this->logger->addDebug('====== Order Id =====:' . $orderId . '==== Order Increment Id ======:' . $orderIncrementId);
-
-			/*$this->_redirect("checkout/onepage/success")->sendResponse();*/
 		} else {
 			$this->logger->addDebug('====== Order Grand total and Payment detail total coming from Api is not same. =====');
 			$this->logger->addDebug('Grand Total : ' . $grandTotal);

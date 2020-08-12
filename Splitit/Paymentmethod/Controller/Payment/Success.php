@@ -30,6 +30,21 @@ class Success extends \Magento\Framework\App\Action\Action {
 	protected $logger;
 	protected $orderSender;
 
+	/**
+     * Contructor
+     * @param \Magento\Framework\App\Action\Context $context
+	 * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+	 * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
+	 * @param \Magento\Sales\Api\Data\OrderInterface $order
+	 * @param \Magento\Quote\Model\QuoteFactory $quoteFactory
+	 * @param \Psr\Log\LoggerInterface $logger
+	 * @param \Splitit\Paymentmethod\Helper\Data $helperData
+	 * @param \Splitit\Paymentmethod\Model\Helper\OrderPlace $orderPlace
+	 * @param \Magento\Checkout\Model\Session $checkoutSession
+	 * @param \Splitit\Paymentmethod\Model\PaymentForm $paymentForm
+	 * @param \Splitit\Paymentmethod\Model\Api $api
+	 * @param \Magento\Sales\Model\Order\Email\Sender\OrderSender $orderSender
+     */
 	public function __construct(
 		\Magento\Framework\App\Action\Context $context,
 		\Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
@@ -64,8 +79,6 @@ class Success extends \Magento\Framework\App\Action\Action {
 	 **/
 	public function execute() {
 		$quote = $this->checkoutSession->getQuote();
-		// $order = $this->checkoutSession->getLastRealOrder();
-
 		$params = $this->getRequest()->getParams();
 		if (!$this->checkoutSession->getSplititInstallmentPlanNumber()) {
 			$this->checkoutSession->setSplititInstallmentPlanNumber($params['InstallmentPlanNumber']);
@@ -79,9 +92,6 @@ class Success extends \Magento\Framework\App\Action\Action {
 		$orderId = 0;
 		$orderIncrementId = 0;
 
-		// $orderId = $order->getEntityId();
-		// $orderIncrementId = $order->getIncrementId();
-		// $orderObj = $this->order->load($orderId);
 		$grandTotal = number_format((float) $quote->getGrandTotal(), 2, '.', '');
 		$planDetails["grandTotal"] = number_format((float) $planDetails["grandTotal"], 2, '.', '');
 		$this->logger->addDebug('======= grandTotal(quote):' . $grandTotal . ', grandTotal(planDetails):' . $planDetails["grandTotal"] . '   ======= ');
@@ -104,9 +114,6 @@ class Success extends \Magento\Framework\App\Action\Action {
 			$payment->setIsTransactionApproved(true);
 
 			$payment->registerAuthorizationNotification($grandTotal);
-			/*$payment->setAdditionalInformation(
-				               [\Magento\Sales\Model\Order\Payment\Transaction::RAW_DETAILS => (array) $planDetails]
-			*/
 			$order->addStatusToHistory(
 				$order->getStatus(), 'Payment InstallmentPlan was created with number ID: '
 				. $this->checkoutSession->getSplititInstallmentPlanNumber(), false
@@ -119,8 +126,6 @@ class Success extends \Magento\Framework\App\Action\Action {
 					false, 'Payment NotifyOrderShipped was sent with number ID: ' . $this->checkoutSession->getSplititInstallmentPlanNumber(), false
 				);
 			}
-			/*$orderObj->queueNewOrderEmail();
-            $orderObj->sendNewOrderEmail();*/
 			$this->orderSender->send($order);
 			$order->save();
 			$curlRes = $this->paymentForm->updateRefOrderNumber($this->api, $order);
@@ -133,7 +138,6 @@ class Success extends \Magento\Framework\App\Action\Action {
 			$this->logger->addDebug('====== Order cancel due to Grand total and Payment detail total coming from Api is not same. =====');
 			$cancelResponse = $this->paymentForm->cancelInstallmentPlan($this->api, $params["InstallmentPlanNumber"]);
 			if ($cancelResponse["status"]) {
-				/*$this->_redirect("splititpaymentmethod/payment/cancel")->sendResponse();*/
 				$this->_redirect("checkout/cart")->sendResponse();
 			}
 		}

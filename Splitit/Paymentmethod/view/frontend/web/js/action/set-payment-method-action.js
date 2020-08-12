@@ -7,21 +7,22 @@ define(
         'mage/storage',
         'Magento_Checkout/js/model/error-processor',
         'Magento_Customer/js/model/customer',
-        'Magento_Checkout/js/model/full-screen-loader'
+        'Magento_Checkout/js/model/full-screen-loader',
+        'Magento_CheckoutAgreements/js/model/agreements-assigner'
     ],
-    function ($, quote, urlBuilder, storage, errorProcessor, customer, fullScreenLoader) {
+    function ($, quote, urlBuilder, storage, errorProcessor, customer, fullScreenLoader, agreementsAssigner) {
         'use strict';
         return function (messageContainer) {
             var serviceUrl,
                 payload,
                 method = 'put',
                 paymentData = quote.paymentMethod();
-                //console.log($('#agreement_splitit_paymentredirect_1').attr('name'));
-                if($('#agreement_splitit_paymentredirect_1').length && $('#agreement_splitit_paymentredirect_1').is(':checked')){
-                    paymentData['extension_attributes']={agreement_ids:[$('#agreement_splitit_paymentredirect_1').val()]};
+                agreementsAssigner(paymentData);
+                /*if($('#agreement_splitit_paymentredirect_1').length && $('#agreement_splitit_paymentredirect_1').is(':checked')){*/
+                    /*paymentData['extension_attributes']={agreement_ids:[$('#agreement_splitit_paymentredirect_1').val()]};*/
                     paymentData['additional_data']={installments_no:$('#select-num-of-installments').val()};
-                }
-            //console.log("setPaymentMethodAction");
+                /*}*/
+            
             /**
              * Checkout for guest and registered customer.
              */

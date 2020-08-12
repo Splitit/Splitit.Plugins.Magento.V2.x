@@ -131,7 +131,6 @@ class PaymentForm {
 
 			if (!($bags[0] == "" || $billAddress->getCity() == "" || $billAddress->getPostcode() == "" || $customerInfo["firstname"] == "" || $customerInfo["lastname"] == "" || $customerInfo["email"] == "" || $billAddress->getTelephone() == "")) {
 				if ($this->quoteValidator->validateBeforeSubmit($quote)) {
-					// $this->orderPlace->execute($quote, array());
 				}
 			}
 			$this->checkoutSession->setSplititQuoteId($quote->getId());
@@ -317,8 +316,6 @@ class PaymentForm {
 					"CreateAck" => "Received",
 				),
 				"RefOrderNumber" => '',
-				/*"RefOrderNumber" => $order->getIncrementId(),*/
-				/*"RefOrderNumber" => $quote->getId(),*/
 			),
 		);
 		if($order instanceof \Magento\Quote\Model\Quote\Interceptor){
@@ -397,7 +394,7 @@ class PaymentForm {
 				$installmentPlan = $decodedResult["InstallmentPlan"]["InstallmentPlanNumber"];
 				$response["installmentPlanNumber"] = $decodedResult["InstallmentPlan"]["InstallmentPlanNumber"];
 				/*store installment plan number in session, so that will not call init again & again if customer clicks on radio button*/
-				/*$this->customerSession->setSplititInstallmentPlanNumber($installmentPlan);*/
+				
 				$this->logger->addDebug('======= installmentplaninit : response from splitit =======InstallmentPlanNumber : ' . $installmentPlan);
 				$this->logger->addDebug(print_r($decodedResult, TRUE));
 				/*store information in splitit_hosted_solution for successExit and Async*/
@@ -690,6 +687,9 @@ class PaymentForm {
 			/*Select Depanding on cart installment setup*/
 			$depandOnCart = 1;
 			$depandingOnCartInstallments = $this->helper->getRedirectDepandingOnCartTotalValues();
+			if(!$depandingOnCartInstallments){
+				return false;
+			}
 			$depandingOnCartInstallmentsArr = $this->helper->jsonDecode($depandingOnCartInstallments);
 			$dataAsPerCurrency = [];
 			foreach ($depandingOnCartInstallmentsArr as $data) {

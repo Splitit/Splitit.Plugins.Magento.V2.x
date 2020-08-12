@@ -116,14 +116,6 @@ class Curl extends \Magento\Framework\HTTP\Client\Curl {
 			$this->curlOption(CURLOPT_CUSTOMREQUEST, $method);
 		}
 
-		/*if (count($this->_headers)) {
-			$heads = [];
-			foreach ($this->_headers as $k => $v) {
-				$heads[] = $k . ': ' . $v;
-			}
-			$this->curlOption(CURLOPT_HTTPHEADER, $heads);
-		}*/
-
 		if (count($this->_cookies)) {
 			$cookies = [];
 			foreach ($this->_cookies as $k => $v) {

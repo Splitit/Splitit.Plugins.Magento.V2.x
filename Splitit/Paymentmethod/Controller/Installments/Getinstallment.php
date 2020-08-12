@@ -15,6 +15,18 @@ class Getinstallment extends \Magento\Framework\App\Action\Action {
 	protected $currency;
 	protected $jsonHelper;
 	protected $resultPage;
+
+	/**
+     * Contructor
+     * @param \Magento\Framework\App\Action\Context $context
+	 * @param \Splitit\Paymentmethod\Helper\Data $helper
+	 * @param \Magento\Checkout\Model\Cart $cart
+	 * @param \Splitit\Paymentmethod\Model\Source\Installments $splititSource
+	 * @param \Magento\Store\Model\StoreManagerInterface $storeManager
+	 * @param \Magento\Framework\Json\Helper\Data $jsonHelper
+	 * @param \Magento\Directory\Model\Currency $currency
+	 * @param \Magento\Framework\View\Result\PageFactory $resultPage
+     */
 	public function __construct(
 		\Magento\Framework\App\Action\Context $context,
 		\Splitit\Paymentmethod\Helper\Data $helper,

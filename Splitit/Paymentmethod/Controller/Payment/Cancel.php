@@ -15,6 +15,13 @@ class Cancel extends \Magento\Framework\App\Action\Action {
     protected $order;
     protected $quoteFactory;
 
+    /**
+     * Contructor
+     * @param \Magento\Framework\App\Action\Context $context
+     * @param \Magento\Sales\Api\Data\OrderInterface $order
+     * @param \Magento\Quote\Model\QuoteFactory $quoteFactory
+     * @param \Magento\Checkout\Model\Session $checkoutSession
+     */
     public function __construct(
         \Magento\Framework\App\Action\Context $context,
         \Magento\Sales\Api\Data\OrderInterface $order,
@@ -33,26 +40,6 @@ class Cancel extends \Magento\Framework\App\Action\Action {
      **/
     public function execute() {
         $session = $this->checkoutSession;
-        /*$session->setQuoteId($session->getSplititQuoteId());
-        
-        if ($session->getLastRealOrderId()) {
-            $order = $this->order->loadByIncrementId($session->getLastRealOrderId());
-            if ($order->getId()) {
-                $order->cancel()->save();
-            }
-            $this->checkoutSession->restoreQuote();
-            $order = $session->getLastRealOrder();
-            $quote = $this->quoteFactory->create()->load($order->getQuoteId());
-            if ($quote->getId()) {
-                $quote->setIsActive(1)
-                    ->setReservedOrderId(null)
-                    ->save();
-                $session
-                    ->replaceQuote($quote)
-                    ->unsLastRealOrderId();
-                
-            }
-        }*/    
         $this->_redirect("checkout/cart")->sendResponse();
     }
 

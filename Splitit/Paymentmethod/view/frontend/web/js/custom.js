@@ -1,23 +1,12 @@
 window.onload = function(){
 	
 	var splititAvail = 0;
-	/*var curUrl      = window.location.href; 
-	var baseUrl = "";
-
-	baseUrl = curUrl.substring(0, curUrl.indexOf('checkout'));*/
+	
 	var url = window.location.hostname;
 	var http = window.location.protocol;
 	var baseUrl = http+"//"+url+"/";
 	
-	/*var sitInterval = setInterval(function(){
-		splititAvail = jQuery('#splitit_paymentmethod').length;
-		console.log(splititAvail);
-		if(splititAvail > 0){
-			// get num of installment and help link url if active in configuration
-			//getInstallmentOptions();
-			clearInterval(sitInterval);
-		}	
-	}, 2000);*/
+	
 	jQuery(document).on("focus", "form.splitit-form input, form.splitit-form select",function(){
 		var numOfInstallmentLength = jQuery("select#select-num-of-installments option").length;
 		if(numOfInstallmentLength == 1){
@@ -72,16 +61,7 @@ window.onload = function(){
 			url: baseUrl + "splititpaymentmethod/installments/getinstallment", 
 			showLoader: true,
 			success: function(result){
-				
-				
-			// show help link
-			/*if(result.helpSection.link != undefined){
-				var helpLink = '<a style="float: none;" href="javascript:void(0);" onclick="popWin(\'' +result.helpSection.link + '\',\'' +  result.helpSection.title + '\')">'+result.helpSection.title+'</a>';
-				
-				jQuery("#splitit-paymentmethod").append(helpLink);	
-			}*/
 			
-
 			// show installments
 			jQuery("#select-num-of-installments").html(result.installmentHtml);
 			// disable place order button
@@ -142,12 +122,12 @@ window.onload = function(){
 						jQuery("#approval-popup").remove();
 						jQuery(".approval-popup_ovelay").remove();
 						jQuery('body').append(result.successMsg);
-						//console.log(result.successMsg);
+			
 					}else{
 						jQuery(".loading-mask").hide();
 						alert(result.errorMsg);
 					}
-			//jQuery("#select-num-of-installments").html(jQuery.parseJSON(result));
+			
 		}});
 	});
 	// check on change of Number of Installments
@@ -210,8 +190,7 @@ function closeApprovalPopup(){
 }
 		
 function popWin(mylink, windowname) { 
-	 	//console.log('texdasft' );	    
-	    var href;
+	 	var href;
 	    href=mylink;
 	    window.open(href, windowname, 'width=800,height=1075,scrollbars=yes,left=0,top=0,location=no,status=no,resizable=no'); 
 	    return false; 

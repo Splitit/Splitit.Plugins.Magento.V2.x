@@ -9,7 +9,6 @@ var jqueryInterval = setInterval(function(){
     
     if(window.jQuery){
       clearInterval(jqueryInterval);      
-      //console.log('jQuery found!!');  
       //tell me more button
 	    jQuery(document).on('click', '#tell-me-more', function(e){
 	    	
@@ -25,7 +24,7 @@ var jqueryInterval = setInterval(function(){
 	    }); 
       runMyScripts(); 
      }else{
-      //console.log('jQuery not found!!');
+      
      }       
   }, 1000);
 
@@ -107,7 +106,7 @@ function runMyScripts(){
 					installmentNewSpan = '<br><span class="cart-installment">'+installmentNewSpan+'</span>';
 						jQuery('table.totals tr:last').after('<tr><td>'+installmentNewSpan+'</td></tr>');    
 		    		}else{
-		    			//console.log('In cart page totals not found!!');   
+		    			
 		    		}
 			      
 			      }, 3000);
@@ -127,7 +126,6 @@ function runMyScripts(){
 							installments = (productprice/result.numOfInstallmentForDisplay).toFixed(2);
 							installmentNewSpan = result.installmetPriceText.replace('{AMOUNT}',currencySymbol+installments);
 							installmentNewSpan = '<br><span class="cart-installment">'+installmentNewSpan+'</span>';
-							//installmentNewSpan = '<br><span class="cart-installment-onepage">'+currencySymbol+installments+' x '+result.numOfInstallmentForDisplay+' '+result.installmetPriceText+'</span>';
 							jQuery('div.iwd-grand-total-item').after(installmentNewSpan);
 						}
 					}, 3000);	
@@ -147,15 +145,12 @@ function runMyScripts(){
     	var hashInterval = setInterval(function(){  
     		if(jQuery("table.table-totals").length){
     			clearInterval(hashInterval);      
-			    //console.log('# payment found!!');   
 			    runMyScriptForCheckout(); 		
     		}else{
-    			//console.log('else interval # payment not found!!');   
     		}
 	      
 	      }, 3000);
 	     }else{
-	      //console.log('# payment not found!!');
 	     }       
 	  
 }
@@ -201,7 +196,6 @@ function runMyScriptForCheckout(){
 					installments = (productprice/result.numOfInstallmentForDisplay).toFixed(2);
 					installmentNewSpan = result.installmetPriceText.replace('{AMOUNT}',currencySymbol+installments);
 					installmentNewSpan = '<br><span class="cart-installment">'+installmentNewSpan+'</span>';
-					//installmentNewSpan = '<br><span class="cart-installment-onepage">'+currencySymbol+installments+' x '+result.numOfInstallmentForDisplay+' '+result.installmetPriceText+'</span>';
 					jQuery('.cart-installment').closest('tr').remove();
 					jQuery('table.table-totals').find('.cart-installment-onepage').closest('tr').remove();
 					jQuery('table.table-totals tr:last').after('<tr><td>'+installmentNewSpan+'</td></tr>');

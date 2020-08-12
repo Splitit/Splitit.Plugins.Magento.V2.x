@@ -134,14 +134,12 @@ define([
             this.storeId = id;
             this.storeSelectorHide();
             this.sidebarShow();
-            //this.loadArea(['header', 'sidebar','data'], true);
             this.dataShow();
             this.loadArea(['header', 'data'], true);
         },
 
         setCurrencyId : function(id){
             this.currencyId = id;
-            //this.loadArea(['sidebar', 'data'], true);
             this.loadArea(['data'], true);
         },
 
@@ -224,8 +222,6 @@ define([
                 if (name == 'country_id' || name == 'customer_address_id') {
                     this.loadArea(['shipping_method', 'billing_method', 'totals', 'items'], true, data);
                 }
-                // added for reloading of default sender and default recipient for giftmessages
-                //this.loadArea(['giftmessage'], true, data);
             }
         },
 
