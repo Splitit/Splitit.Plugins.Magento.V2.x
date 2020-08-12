@@ -99,52 +99,46 @@ window.onload = function(){
 			}
 		});
 	}
-
+	 
 
 	jQuery(document).on("click", ".apr-tc",function(){
-		var postcodeContainer = jQuery('div[name="shippingAddress.postcode"] input');
-		var postcode = postcodeContainer.val();
-		postcodeContainer.val('').change();
-		postcodeContainer.val(postcode).change();
+		var selectedInstallment = jQuery("#select-num-of-installments").val();
+		var ccNum = jQuery("form.splitit-form").find("input[name='payment[cc_number]']").val();
+		var ccExpMonth = jQuery("form.splitit-form").find("select[name='payment[cc_exp_month]']").val();
+		var ccExpYear = jQuery("form.splitit-form").find("select[name='payment[cc_exp_year]']").val();
+		var ccCvv = jQuery("form.splitit-form").find("input[name='payment[cc_cid]']").val();
+		var guestEmail = jQuery("input#customer-email").val();
+		
+		if(ccNum == ""){
+			alert("Please input Credit card number");
+			return;	
+		}
+		if(ccExpMonth == ""){
+			alert("Please select Expiration month");
+			return;	
+		}
+		if(ccExpYear == ""){
+			alert("Please select Expiration year");
+			return;	
+		}
+		if(ccCvv == ""){
+			alert("Please input Card verification number");
+			return;	
+		}
+		if(selectedInstallment == ""){
+			alert("Please select Number of installments");
+			return;
+		}
 
-		setTimeout(function() {		// run init call after address is updated
-			var selectedInstallment = jQuery("#select-num-of-installments").val();
-			var ccNum = jQuery("form.splitit-form").find("input[name='payment[cc_number]']").val();
-			var ccExpMonth = jQuery("form.splitit-form").find("select[name='payment[cc_exp_month]']").val();
-			var ccExpYear = jQuery("form.splitit-form").find("select[name='payment[cc_exp_year]']").val();
-			var ccCvv = jQuery("form.splitit-form").find("input[name='payment[cc_cid]']").val();
-			var guestEmail = jQuery("input#customer-email").val();
-
-			if(ccNum == ""){
-				alert("Please input Credit card number");
-				return;
-			}
-			if(ccExpMonth == ""){
-				alert("Please select Expiration month");
-				return;
-			}
-			if(ccExpYear == ""){
-				alert("Please select Expiration year");
-				return;
-			}
-			if(ccCvv == ""){
-				alert("Please input Card verification number");
-				return;
-			}
-			if(selectedInstallment == ""){
-				alert("Please select Number of installments");
-				return;
-			}
-
-			jQuery.ajax({
-				url: baseUrl + "splititpaymentmethod/installmentplaninit/installmentplaninit",
-				type : 'POST',
-				dataType:'json',
-				data:{"selectedInstallment":selectedInstallment, "guestEmail":guestEmail},
-				showLoader: true,
-				success: function(result){
+		jQuery.ajax({
+			url: baseUrl + "splititpaymentmethod/installmentplaninit/installmentplaninit", 
+			type : 'POST',
+	        dataType:'json',
+	        data:{"selectedInstallment":selectedInstallment, "guestEmail":guestEmail},
+	        showLoader: true,
+			success: function(result){
 					if(result.status){
-
+						
 						jQuery("#approval-popup").remove();
 						jQuery(".approval-popup_ovelay").remove();
 						jQuery('body').append(result.successMsg);
@@ -153,9 +147,8 @@ window.onload = function(){
 						jQuery(".loading-mask").hide();
 						alert(result.errorMsg);
 					}
-					//jQuery("#select-num-of-installments").html(jQuery.parseJSON(result));
-				}});
-		}, 3500);
+			//jQuery("#select-num-of-installments").html(jQuery.parseJSON(result));
+		}});
 	});
 	// check on change of Number of Installments
 	jQuery(document).on("change", "#select-num-of-installments", function(){
