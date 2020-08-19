@@ -74,6 +74,10 @@ window.onload = function(){
 			}
 		});
 	}
+  
+	jQuery(document).on("click", "#splitit-paymentmethod",function(){
+		jQuery("input[name='payment[cc_number]").attr("maxlength","19");
+	});
 
 	function installmentPlanInitiate(validate=false,isOrder=false) {
 		if(validate == undefined){
@@ -85,6 +89,7 @@ window.onload = function(){
 		var ccExpYear = jQuery("form.splitit-form").find("select[name='payment[cc_exp_year]']").val();
 		var ccCvv = jQuery("form.splitit-form").find("input[name='payment[cc_cid]']").val();
 		var guestEmail = jQuery("input#customer-email").val();
+
 		if(validate){
 			if(ccNum == ""){
 				alert("Please input Credit card number");
@@ -110,7 +115,7 @@ window.onload = function(){
 				alert("Please select Number of installments");
 				jQuery('#splitit_paymentmethod_cc').attr('checked', false);
 				return;
-			}			
+			}
 		}
 
 		jQuery.ajax({
