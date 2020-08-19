@@ -28,7 +28,7 @@ class UpgradeData implements UpgradeDataInterface
     {
         $setup->startSetup();
 
-        if (version_compare($context->getVersion(), '0.2.1', '<')) {
+        if (version_compare($context->getVersion(), '1.8.2', '<')) {
             $logoUrl = 'https://splitit-logos-prod-new.s3.amazonaws.com/Official_Splitit_Logo_V2.png';
             $helpUrl = 'https://s3.amazonaws.com/splitit-images-prod-new/learnmore/en-us/V1-USD.png';
             $this->configResource->saveConfig('payment/splitit_paymentmethod/splitit_logo_src', $logoUrl);
