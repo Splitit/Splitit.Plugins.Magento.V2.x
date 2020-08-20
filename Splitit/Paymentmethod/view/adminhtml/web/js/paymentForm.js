@@ -15,10 +15,10 @@ var jqueryInterval1 = setInterval(function(){
         clearInterval(jqueryInterval1);      
         runMyScripts1();     
       }else{
-        console.log('Element not found!!');
+        //console.log('Element not found!!');
       }
     } else {
-      console.log("jQuery not found.")
+      //console.log("jQuery not found.")
     }
   }, 1000);
 
@@ -27,7 +27,7 @@ var productListInterval1 = setInterval(function(){
   if((typeof prodList1 != 'undefined')&&prodList1){
     clearInterval(productListInterval1);
     jQuery(document).on('click','.close-btn-prod-list1',function(){
-        console.log('prod1 remove clicked');
+        //console.log('prod1 remove clicked');
         var $elemId1 = jQuery('#'+jQuery(prodList1).attr('id')+'_prodlist');
         var prodId1 = jQuery(this).parent().attr('data-proid');
         var terms1 = split( $elemId1.val() );
@@ -52,7 +52,7 @@ function autoPopulateProds1(prodList1){
     type: 'POST',
     dataType: 'json',
     success: function(result1){
-      console.log(result1);
+      //console.log(result1);
       result1.forEach(function(ash1){
         jQuery('<div class="search-item-box" title="'+ash1.label+'" data-proid="'+ash1.value+'">'
           +ash1.label+'<span class="close-btn-prod-list1"></span</div>')
@@ -200,7 +200,7 @@ function runMyScripts1(){
         if(flag1P == 0 && Object.keys(fromToArrP[doctv_currencyP]).length > 1){
           for(var jP=0; jP<Object.keys(fromToArrP[doctv_currencyP]).length-1; jP++){
              if(((doctv_fromP >= fromToArrP[doctv_currencyP][jP]["from"] && doctv_fromP <= fromToArrP[doctv_currencyP][jP]["to"]) || (doctv_toP >= fromToArrP[doctv_currencyP][jP]["from"] && doctv_toP <= fromToArrP[doctv_currencyP][jP]["to"])) && doctv_currencyP == fromToArrP[doctv_currencyP][jP]["currency"]){
-              console.log("forrrr");
+              //console.log("forrrr");
               jQuery(this).find(".doctv_from").css("border","1px solid red");
               jQuery(this).find(".doctv_to").css("border","1px solid red");
               flag1P++;
@@ -338,7 +338,7 @@ function getTableHtml1(){
 
 function getTableInnerContent1(){
   var jsonValueP = jQuery("[id^=payment_][id$=_splitit_paymentredirect_depanding_on_cart_total_values]:first").val();
-  console.log(jsonValueP);
+  //console.log(jsonValueP);
   if(jsonValueP == "" || jsonValueP == undefined){
     return getRowHtml1();
   }else{
@@ -462,7 +462,7 @@ function createJsonOfDependingOnCartTotal1(){
         iP++;      
     });
     objectP = JSON.stringify(objectP);
-    console.log(objectP);
+    //console.log(objectP);
     jQuery("[id^=payment_][id$=_splitit_paymentredirect_depanding_on_cart_total_values]:first").val(objectP);
 
 }

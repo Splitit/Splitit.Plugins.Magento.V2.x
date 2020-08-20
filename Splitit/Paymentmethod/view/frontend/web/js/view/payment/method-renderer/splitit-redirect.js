@@ -27,7 +27,7 @@ define(
 
             /** Init observable variables */
             initObservable: function () {
-                console.log("splitit-redirect-method-renderer");
+                
                 this._super()
                     .observe('billingAgreement');
 
@@ -42,15 +42,7 @@ define(
                 win.document.writeln("<body style='margin:0px'><img width=100% src='"+event.currentTarget.href+"' />");
                 win.document.writeln("</body>");
                 win.document.write('<title>Splitit Learn More</title>');
-                /*window.open(
-                    $(event.target).attr('href'),
-                    'olcwhatissplitit',
-                    'toolbar=no, location=no,' +
-                    ' directories=no, status=no,' +
-                    ' menubar=no, scrollbars=yes,' +
-                    ' resizable=yes, ,left=0,' +
-                    ' top=0, width=400, height=350'
-                );*/
+                
 
                 return false;
             },
@@ -72,6 +64,9 @@ define(
 
             /** Returns billing agreement data */
             getBillingAgreementCode: function () {
+                if(this.item == undefined || this.item.method == undefined){
+                    return false;
+                }
                 return window.checkoutConfig.payment.splititExpress.billingAgreementCode[this.item.method];
             },
 
@@ -92,8 +87,7 @@ define(
 
             /** Redirect to splitit */
             continueToSplitit: function () {
-                console.log("window.checkoutConfig.payment.splititExpress.redirectUrl["+quote.paymentMethod().method+"]==");
-                console.log(window.checkoutConfig.payment.splititExpress.redirectUrl[quote.paymentMethod().method]);
+                
                 if (additionalValidators.validate()) {
                     //update payment method information if additional data was changed
                     this.selectPaymentMethod();

@@ -100,7 +100,8 @@
                     <!-- <source_model>Test\Testpayment\Model\Source\Installments</source_model> -->
                 </field>
 
-                <field id="depanding_on_cart_total_values" translate="label" type="hidden"  sortOrder="18"  showInDefault="1" showInWebsite="0" showInStore="1">
+                <field id="depanding_on_cart_total_values" translate="label" type="hidden"  sortOrder="18"  showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Depending on cart total values</label>
                 </field>
 
                 <field id="first_payment" translate="label" type="select" sortOrder="19" showInDefault="1" showInWebsite="1" showInStore="0" >
@@ -115,19 +116,6 @@
                     </depends>
                 </field>
 
-                <field id="splitit_fee_on_total" translate="label" sortOrder="21" type="select" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Enable Splitit Fees</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field>
-                <field id="splitit_fee_table" translate="label comment tooltip" sortOrder="22" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Splitit Fee by Number of Installments(NOI)</label>
-                    <frontend_model>Splitit\Paymentmethod\Block\Adminhtml\System\Config\Form\Field\Feetable</frontend_model>
-                    <backend_model>Magento\Config\Model\Config\Backend\Serialized\ArraySerialized</backend_model>
-                    <depends>
-                        <field id="splitit_fee_on_total">1</field>
-                    </depends>
-                </field>
-
                 <field id="splitit_per_product" translate="label" type="select" sortOrder="23" showInDefault="1" showInWebsite="1" showInStore="0" >
                     <label>Enable Splitit per product</label>
                     <source_model>Splitit\Paymentmethod\Model\Source\Perproduct</source_model>
@@ -138,7 +126,7 @@
                 </field>
 
                 <field id="enable_installment_price" translate="label" sortOrder="25" type="select" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Advertise Splitit option throughout my store</label>
+                    <label>Show installment option throughout my store</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
 
@@ -281,7 +269,8 @@
                     <label>Depending on cart total</label>
                 </field>
 
-                <field id="depanding_on_cart_total_values" translate="label" type="hidden"  sortOrder="18"  showInDefault="1" showInWebsite="0" showInStore="1">
+                <field id="depanding_on_cart_total_values" translate="label" type="hidden"  sortOrder="18"  showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Depending on cart total values</label>
                 </field>
 
                 <field id="first_payment" translate="label" type="select" sortOrder="19" showInDefault="1" showInWebsite="1" showInStore="0" >
@@ -296,25 +285,6 @@
                     </depends>
                 </field>
 
-                <field id="splitit_fee_on_total" translate="label" sortOrder="21" type="select" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Enable Splitit Fees</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field>
-                <field id="splitit_fee_types" translate="label" sortOrder="22" type="select" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Fee Method</label>
-                    <source_model>Splitit\Paymentmethod\Model\Source\Feetypes</source_model>
-                    <depends>
-                        <field id="splitit_fee_on_total">1</field>
-                    </depends>
-                </field>
-                <field id="splitit_fees" translate="label" sortOrder="23"  showInDefault="1" showInWebsite="1" showInStore="0" >
-                    <label>Fees Amount/Percentage</label>
-                    <depends>
-                        <field id="splitit_fee_on_total">1</field>
-                    </depends>
-                    <validate>required-entry validate-zero-or-greater validate-number</validate>
-                </field>
-
                 <field id="splitit_per_product" translate="label" type="select" sortOrder="24" showInDefault="1" showInWebsite="1" showInStore="0" >
                     <label>Enable Splitit per product</label>
                     <source_model>Splitit\Paymentmethod\Model\Source\Perproduct</source_model>
@@ -325,7 +295,7 @@
                 </field>
 
                 <field id="enable_installment_price" translate="label" sortOrder="26" type="select" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Advertise Splitit option throughout my store</label>
+                    <label>Show installment option throughout my store</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
 

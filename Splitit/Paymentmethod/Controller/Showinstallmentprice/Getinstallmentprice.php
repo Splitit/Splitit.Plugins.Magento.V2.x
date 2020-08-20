@@ -1,8 +1,8 @@
 <?php
 
 /**
- * Copyright © 2015 Inchoo d.o.o.
- * created by Zoran Salamun(zoran.salamun@inchoo.net)
+ * Copyright © 2019 Splitit
+ *
  */
 
 namespace Splitit\Paymentmethod\Controller\Showinstallmentprice;
@@ -12,17 +12,47 @@ use Magento\Framework\Controller\ResultFactory;
 class Getinstallmentprice extends \Magento\Framework\App\Action\Action {
 
 	private $helper;
+	private $helperData;
 	private $payment;
 	private $paymentForm;
-	private $request;
-	private $assetRepo;
+	private $cart;
+	private $requestData;
 
+	/**
+     * Contructor
+     * @param \Magento\Framework\App\Action\Context $context
+	 * @param \Splitit\Paymentmethod\Helper\Data $helperData
+	 * @param \Magento\Checkout\Model\Session $checkoutSession
+	 * @param \Splitit\Paymentmethod\Model\PaymentForm $paymentForm
+	 * @param \Splitit\Paymentmethod\Model\Payment $payment
+	 * @param \Magento\Framework\App\RequestInterface $request
+	 * @param \Magento\Checkout\Model\Cart $cart
+     */
+	public function __construct(
+		\Magento\Framework\App\Action\Context $context,
+		\Splitit\Paymentmethod\Helper\Data $helperData,
+		\Magento\Checkout\Model\Session $checkoutSession,
+		\Splitit\Paymentmethod\Model\PaymentForm $paymentForm,
+		\Splitit\Paymentmethod\Model\Payment $payment,
+		\Magento\Framework\App\RequestInterface $request,
+		\Magento\Checkout\Model\Cart $cart
+	) {
+		$this->checkoutSession = $checkoutSession;
+		$this->paymentForm = $paymentForm;
+		$this->payment = $payment;
+		$this->helperData = $helperData;
+		$this->cart = $cart;
+		$this->requestData = $request->getParams();
+
+		parent::__construct($context);
+	}
+
+	/**
+	 * Get number of available installments based on total
+	 * @return Json
+	 **/
 	public function execute() {
-		$this->helper = $this->_objectManager->create('Splitit\Paymentmethod\Helper\Data');
-		$this->payment = $this->_objectManager->create('Splitit\Paymentmethod\Model\Payment');
-		$this->assetRepo = $this->_objectManager->create('Magento\Framework\View\Asset\Repository');
-		$this->request = $this->_objectManager->create('Magento\Framework\App\RequestInterface');
-		$this->paymentForm = $this->_objectManager->create('Splitit\Paymentmethod\Model\PaymentForm');
+		$this->helper = $this->helperData;
 		$response = [
 			"status" => true,
 			"help" => ['splitit_paymentmethod' => [], 'splitit_paymentredirect' => []],
@@ -37,12 +67,10 @@ class Getinstallmentprice extends \Magento\Framework\App\Action\Action {
 			"splititLogoBackgroundSrc" => "",
 		];
 
-		$isEnable = $this->helper->getConfig("payment/splitit_paymentmethod/enable_installment_price");
+		$isEnable = $this->helper->getEnableInstallmentPrice();
 		if ($isEnable == "") {
 			$isEnable = 0;
 		}
-
-		$params = array('_secure' => $this->request->isSecure());
 
 		$displayInstallmentPriceOnPage = '';
 		$numOfInstallmentForDisplay = '';
@@ -59,7 +87,7 @@ class Getinstallmentprice extends \Magento\Framework\App\Action\Action {
 			$displayInstallmentPriceOnPage = $splititLogoArray['installment_price_on_pages'];
 			$numOfInstallmentForDisplay = $splititLogoArray['installments_count'];
 			$helpLink = $splititLogoArray['help_link'];
-			$helpTitle = "<img class='helplogoWidthSrc' src='" . $this->assetRepo->getUrlWithParams('Splitit_Paymentmethod::images/learn_more.svg', $params) . "' alt='Learn More'/>";
+			$helpTitle = $splititLogoArray['help_title'];
 		}
 
 		if (is_null($installmetPriceText)) {
@@ -93,19 +121,24 @@ class Getinstallmentprice extends \Magento\Framework\App\Action\Action {
 		$response["numOfInstallmentForDisplay"] = $numOfInstallmentForDisplay;
 		$response["installmetPriceText"] = __($installmetPriceText);
 
-		$cart = $this->_objectManager->get("\Magento\Checkout\Model\Cart");
-		$totalAmount = $cart->getQuote()->getGrandTotal();
+		$totalAmount = $this->cart->getQuote()->getGrandTotal();
 		$response["grandTotal"] = number_format((float) $totalAmount, 2, '.', '');
 		$response["currencySymbol"] = $this->helper->getCurrencyData();
 
 		$resultJson = $this->resultFactory->create(ResultFactory::TYPE_JSON);
 		if ($this->paymentForm->checkProductBasedAvailability() || $this->payment->checkProductBasedAvailability()) {
+			if(isset($this->requestData['pid']) && $this->requestData['pid']){
+				if($this->paymentForm->isSplititTextVisibleOnProduct($this->requestData['pid']) || $this->payment->isSplititTextVisibleOnProduct($this->requestData['pid'])){
+					return $resultJson->setData($response);
+				} else {
+					return $resultJson->setData(array('status' => false));
+				}
+			}
 			return $resultJson->setData($response);
 		} else {
 			return $resultJson->setData(array('status' => false));
 		}
-		/* echo $data = $this->helper->encodeData($response);
-          return; */
+		
 	}
 
 }

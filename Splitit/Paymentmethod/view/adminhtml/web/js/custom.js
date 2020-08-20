@@ -13,17 +13,15 @@ var jqueryInterval = setInterval(function(){
       if(depandingOnCart){
         jqueryIsHere = 1;
         clearInterval(jqueryInterval);
-        //splitit_fee_types();
         jQuery(document).ready(function(){
-        splitit_fee_table();
-        runMyScripts();
+          runMyScripts();
         })
         
       }else{
-        console.log('Element not found!!');
+        //console.log('Element not found!!');
       }
     } else {
-      console.log("jQuery not found.")
+      //console.log("jQuery not found.")
     }
   }, 1000);
 
@@ -32,7 +30,7 @@ var productListInterval = setInterval(function(){
   if((typeof prodList != 'undefined')&&prodList){
     clearInterval(productListInterval);
     jQuery(document).on('click','.close-btn-prod-list',function(){
-        console.log('prod remove clicked');
+        //console.log('prod remove clicked');
         var inputPadding  = jQuery(prodList).css('padding-left'),
             widthLastItem = jQuery('.selected-item-conatiner .search-item-box:last-of-type').outerWidth();
         var $elemId = jQuery('#'+jQuery(prodList).attr('id')+'_prodlist');
@@ -66,7 +64,7 @@ function autoPopulateProds(prodList){
     type: 'POST',
     dataType: 'json',
     success: function(result){
-      console.log(result);
+      //console.log(result);
       result.forEach(function(ash){
         jQuery('<div class="search-item-box" title="'+ash.label+'" data-proid="'+ash.value+'">'
           +ash.label+'<span class="close-btn-prod-list"></span</div>')
@@ -160,7 +158,6 @@ function runMyScripts(){
         var i=0;
         jQuery("#tier_price_container tr").each(function(){
         
-        
         var doctv_from = parseFloat(jQuery(this).find(".doctv_from").val());
         var doctv_to = parseFloat(jQuery(this).find(".doctv_to").val());
         var doctv_currency = jQuery(this).find(".doctv_currency").val();
@@ -214,7 +211,7 @@ function runMyScripts(){
         if(flag1 == 0 && Object.keys(fromToArr[doctv_currency]).length > 1){
           for(var j=0; j<Object.keys(fromToArr[doctv_currency]).length-1; j++){
              if(((doctv_from >= fromToArr[doctv_currency][j]["from"] && doctv_from <= fromToArr[doctv_currency][j]["to"]) || (doctv_to >= fromToArr[doctv_currency][j]["from"] && doctv_to <= fromToArr[doctv_currency][j]["to"])) && doctv_currency == fromToArr[doctv_currency][j]["currency"]){
-              console.log("forrrr");
+              //console.log("forrrr");
               jQuery(this).find(".doctv_from").css("border","1px solid red");
               jQuery(this).find(".doctv_to").css("border","1px solid red");
               flag1++;
@@ -255,7 +252,7 @@ function runMyScripts(){
         if(jQuery('[id^=payment_][id$=_splitit_paymentmethod_select_installment_setup]:first').val() == 'depending_on_cart_total'){
           createJsonOfDependingOnCartTotal(); 
         }
-        eval(configForm.submit());
+        /*eval(configForm.submit());*/
       }else{
         if(fromBigger){
           alert("From amount should be lesser than To.");
@@ -351,6 +348,8 @@ function getTableHtml(){
 
 function getTableInnerContent(){
   var jsonValue = jQuery("[id^=payment_][id$=_splitit_paymentmethod_depanding_on_cart_total_values]:first").val();
+  console.log('jsonValue===');
+  console.log(jsonValue);
   if(jsonValue == "" || jsonValue == undefined){
     return getRowHtml();
   }else{
@@ -385,6 +384,8 @@ function getRowHtmlFromJson(){
   var doctv = JSON.parse(jQuery("[id^=payment_][id$=_splitit_paymentmethod_depanding_on_cart_total_values]:first").val());
   var rowHtml = "";
   jQuery.each( doctv, function( index, value ){
+    console.log('from='+value.doctv.from);
+    console.log('to='+value.doctv.to);
       rowHtml += '<tr>';
         rowHtml += '<td style="padding: 8px;"> From<br><span class="base-currency-symbol">'+getCurrencyCode(value.doctv.currency)+'</span><input type="text" class="doctv_from" name="doctv_from" value="'+value.doctv.from+'" /><br>To<br><span class="base-currency-symbol">'+getCurrencyCode(value.doctv.currency)+'</span><input type="text" class="doctv_to" name="doctv_to" value="'+value.doctv.to+'" /> </td>';
         rowHtml += '<td style="padding: 8px;"> <select id="" name="doctv_installments" class=" select multiselect doctv_installments" size="10" multiple="multiple">';
@@ -457,7 +458,7 @@ function getCurrencyCode(selectedCurrency){
 function createJsonOfDependingOnCartTotal(){
      var i = 0;
      var object = {};
-
+    // alert('createJsonOfDependingOnCartTotal');
      jQuery("#tiers_table.splitit tbody").find('tr').each(function() {
         var $this = jQuery(this);
         var installments = [];
@@ -474,8 +475,9 @@ function createJsonOfDependingOnCartTotal(){
         i++;      
     });
     object = JSON.stringify(object);
+    console.log(object);
     jQuery("[id^=payment_][id$=_splitit_paymentmethod_depanding_on_cart_total_values]:first").val(object);
-
+   // alert(jQuery("[id^=payment_][id$=_splitit_paymentmethod_depanding_on_cart_total_values]:first").val());
 }
 
 function checkSetting(){
@@ -494,55 +496,4 @@ function checkSetting(){
       } 
     }
   });
-}
-
-function splitit_fee_types(){
-    jQuery(document).on('change','[id^=payment_][id$=_splitit_paymentmethod_splitit_fee_types]:first',function(){
-        jQuery('[id^=payment_][id$=_splitit_paymentmethod_splitit_fees]:first').trigger('change');
-    });
-    jQuery(document).on('change','[id^=payment_][id$=_splitit_paymentredirect_splitit_fee_types]:first',function(){
-        jQuery('[id^=payment_][id$=_splitit_paymentredirect_splitit_fees]:first').trigger('change');
-    });
-    jQuery(document).on('change','[id^=payment_][id$=_splitit_paymentmethod_splitit_fees]:first',function(){
-        if(jQuery(this).val()>50){
-        if(jQuery('[id^=payment_][id$=_splitit_paymentmethod_splitit_fee_types]:first').val()==1){
-            jQuery(this).val(50);
-        }
-        }
-    });
-    jQuery(document).on('change','[id^=payment_][id$=_splitit_paymentredirect_splitit_fees]:first',function(){
-        if(jQuery(this).val()>50){
-        if(jQuery('[id^=payment_][id$=_splitit_paymentredirect_splitit_fee_types]:first').val()==1){
-            jQuery(this).val(50);
-        }
-        }
-    });
-}
-
-function splitit_fee_table(){
-    var table=jQuery('[id^=row_payment_][id$=_splitit_paymentmethod_splitit_fee_table]:first');
-    console.log('row_payment_us_splitit_paymentmethod_splitit_fee_table loaded');
-    while(table.find('tbody tr').length!=23){
-        table.find('button.action-add').click();
-    }
-    table.find('tfoot').remove();
-    table.find('th').last().remove();
-    var i=2;
-    table.find('tbody tr').each(function(){
-        var tr=jQuery(this);
-        tr.find('td input[name*="noi"]').attr('readonly',true).val(i++);
-        if(tr.find('td input[name*="fixed"]').val()==''||parseFloat(tr.find('td input[name*="fixed"]').val())<=0){
-            tr.find('td input[name*="fixed"]').val('0.00');
-        }
-        if(tr.find('td input[name*="percent"]').val()==''||parseFloat(tr.find('td input[name*="percent"]').val())<=0){
-            tr.find('td input[name*="percent"]').val('0.00');
-        }
-        tr.find('td input[name*="percent"]').on('change',function(){
-            if(parseFloat(jQuery(this).val())>30){
-                alert("Percent value cannot be greater than 30");
-                jQuery(this).val('30.00');
-            }
-        });
-        tr.find('td.col-actions').remove();
-    });
 }

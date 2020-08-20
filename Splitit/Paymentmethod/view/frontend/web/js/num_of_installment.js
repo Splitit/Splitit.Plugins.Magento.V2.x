@@ -9,7 +9,6 @@ var jqueryInterval = setInterval(function(){
     
     if(window.jQuery){
       clearInterval(jqueryInterval);      
-      console.log('jQuery found!!');  
       //tell me more button
 	    jQuery(document).on('click', '#tell-me-more', function(e){
 	    	
@@ -25,24 +24,30 @@ var jqueryInterval = setInterval(function(){
 	    }); 
       runMyScripts(); 
      }else{
-      console.log('jQuery not found!!');
+      
      }       
   }, 1000);
 
 function runMyScripts(){
+	var productId = '';
+	if(jQuery('#product_addtocart_form').length && jQuery('#product_addtocart_form input[name="product"]').length){
+		productId = jQuery('#product_addtocart_form input[name="product"]').val();
+	}
 	jQuery.ajax({
-		url: url + "splititpaymentmethod/showinstallmentprice/getinstallmentprice", 
+		url: url + "splititpaymentmethod/showinstallmentprice/getinstallmentprice",
+		data : { pid : productId},
 		success: function(result){
 			
 			var numOfInstallmentForDisplay = result.numOfInstallmentForDisplay;
+			var splititpaymentmethod = jQuery("#splitit-paymentmethod");
 			// show help link
 			if(result.help.splitit_paymentmethod.link != undefined){
-				if(jQuery("#splitit-paymentmethod").find('a').length){
-					jQuery("#splitit-paymentmethod").find('a').remove();
+				if(splititpaymentmethod.find('a').length){
+					splititpaymentmethod.find('a').remove();
 				}
 				var helpLink = '<a style="float: none;" href="javascript:void(0);" onclick="popWin(\'' +result.help.splitit_paymentmethod.link + '\',\'' +  result.help.splitit_paymentmethod.title + '\')">'+result.help.splitit_paymentmethod.title+'</a>';
 				
-				jQuery("#splitit-paymentmethod").append(helpLink);	
+				splititpaymentmethod.append(helpLink);	
 			}
 			// show help link
 			if(result.help.splitit_paymentredirect.link != undefined){
@@ -99,9 +104,9 @@ function runMyScripts(){
 						installments = (productprice/result.numOfInstallmentForDisplay).toFixed(2);
 						installmentNewSpan = result.installmetPriceText.replace('{AMOUNT}',currencySymbol+installments);
 					installmentNewSpan = '<br><span class="cart-installment">'+installmentNewSpan+'</span>';
-						jQuery('table.totals tr:last').after('<tr><td colspan="2">'+installmentNewSpan+'</td></tr>');    
+						jQuery('table.totals tr:last').after('<tr><td>'+installmentNewSpan+'</td></tr>');    
 		    		}else{
-		    			console.log('In cart page totals not found!!');   
+		    			
 		    		}
 			      
 			      }, 3000);
@@ -121,7 +126,6 @@ function runMyScripts(){
 							installments = (productprice/result.numOfInstallmentForDisplay).toFixed(2);
 							installmentNewSpan = result.installmetPriceText.replace('{AMOUNT}',currencySymbol+installments);
 							installmentNewSpan = '<br><span class="cart-installment">'+installmentNewSpan+'</span>';
-							//installmentNewSpan = '<br><span class="cart-installment-onepage">'+currencySymbol+installments+' x '+result.numOfInstallmentForDisplay+' '+result.installmetPriceText+'</span>';
 							jQuery('div.iwd-grand-total-item').after(installmentNewSpan);
 						}
 					}, 3000);	
@@ -141,15 +145,12 @@ function runMyScripts(){
     	var hashInterval = setInterval(function(){  
     		if(jQuery("table.table-totals").length){
     			clearInterval(hashInterval);      
-			    console.log('# payment found!!');   
 			    runMyScriptForCheckout(); 		
     		}else{
-    			console.log('else interval # payment not found!!');   
     		}
 	      
 	      }, 3000);
 	     }else{
-	      console.log('# payment not found!!');
 	     }       
 	  
 }
@@ -160,14 +161,15 @@ function runMyScriptForCheckout(){
 		success: function(result){
 			
 			var numOfInstallmentForDisplay = result.numOfInstallmentForDisplay;
+			var splititpaymentmethod = jQuery("#splitit-paymentmethod");
 			// show help link
 			if(result.help.splitit_paymentmethod.link != undefined){
-				if(jQuery("#splitit-paymentmethod").find('a').length){
-					jQuery("#splitit-paymentmethod").find('a').remove();
+				if(splititpaymentmethod.find('a').length){
+					splititpaymentmethod.find('a').remove();
 				}
 				var helpLink = '<a style="float: none;" href="javascript:void(0);" onclick="popWin(\'' +result.help.splitit_paymentmethod.link + '\',\'' +  result.help.splitit_paymentmethod.title + '\')">'+result.help.splitit_paymentmethod.title+'</a>';
 				
-				jQuery("#splitit-paymentmethod").append(helpLink);	
+				splititpaymentmethod.append(helpLink);	
 			}
 			// show help link
 			if(result.help.splitit_paymentredirect.link != undefined){
@@ -176,7 +178,7 @@ function runMyScriptForCheckout(){
 				}
 				var helpLink = '<a style="float: none;" href="javascript:void(0);" onclick="popWin(\'' +result.help.splitit_paymentredirect.link + '\',\'' +  result.help.splitit_paymentredirect.title + '\')">'+result.help.splitit_paymentredirect.title+'</a>';
 				
-				jQuery("#splitit-paymentredirect").append(helpLink);	
+				jQuery("#splitit-paymentredirect").append(helpLink);
 			}
 			if(result.isActive){
 				var priceSpan = "";
@@ -194,8 +196,8 @@ function runMyScriptForCheckout(){
 					installments = (productprice/result.numOfInstallmentForDisplay).toFixed(2);
 					installmentNewSpan = result.installmetPriceText.replace('{AMOUNT}',currencySymbol+installments);
 					installmentNewSpan = '<br><span class="cart-installment">'+installmentNewSpan+'</span>';
-					//installmentNewSpan = '<br><span class="cart-installment-onepage">'+currencySymbol+installments+' x '+result.numOfInstallmentForDisplay+' '+result.installmetPriceText+'</span>';
-					jQuery('table.table-totals').find('.cart-installment').closest('tr').remove();
+					jQuery('.cart-installment').closest('tr').remove();
+					jQuery('table.table-totals').find('.cart-installment-onepage').closest('tr').remove();
 					jQuery('table.table-totals tr:last').after('<tr><td>'+installmentNewSpan+'</td></tr>');
 					
 				}

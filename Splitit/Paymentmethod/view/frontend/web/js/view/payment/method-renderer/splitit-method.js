@@ -39,15 +39,7 @@ define(
                 win.document.writeln("<body style='margin:0px'><img width=100% src='"+event.currentTarget.href+"' />");
                 win.document.writeln("</body>");
                 win.document.write('<title>Splitit Learn More</title>');
-                /*window.open(
-                    $(event.target).attr('href'),
-                    'olcwhatissplitit',
-                    'toolbar=no, location=no,' +
-                    ' directories=no, status=no,' +
-                    ' menubar=no, scrollbars=yes,' +
-                    ' resizable=yes, ,left=0,' +
-                    ' top=0, width=400, height=350'
-                );*/
+                
 
                 return false;
             },

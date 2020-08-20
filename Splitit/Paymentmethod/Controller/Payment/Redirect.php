@@ -22,7 +22,7 @@ class Redirect extends \Magento\Framework\App\Action\Action {
 	/**
 	 * @var \Splitit\Paymentmethod\Helper\Data
 	 */
-	protected $_helperData;
+	protected $helperData;
 
 	/**
 	 * @var \Magento\Sales\Api\Data\OrderInterface $order
@@ -33,6 +33,19 @@ class Redirect extends \Magento\Framework\App\Action\Action {
 	protected $api;
 	protected $logger;
 
+	/**
+     * Contructor
+     * @param \Magento\Framework\App\Action\Context $context
+	 * @param \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+	 * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
+	 * @param \Magento\Sales\Api\Data\OrderInterface $order
+	 * @param \Magento\Quote\Model\QuoteFactory $quoteFactory
+	 * @param \Splitit\Paymentmethod\Helper\Data $helperData
+	 * @param \Psr\Log\LoggerInterface $logger
+	 * @param \Magento\Checkout\Model\Session $checkoutSession
+	 * @param \Splitit\Paymentmethod\Model\PaymentForm $paymentForm
+	 * @param \Splitit\Paymentmethod\Model\Api $api
+     */
 	public function __construct(
 		\Magento\Framework\App\Action\Context $context,
 		\Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig,
@@ -40,52 +53,46 @@ class Redirect extends \Magento\Framework\App\Action\Action {
 		\Magento\Sales\Api\Data\OrderInterface $order,
 		\Magento\Quote\Model\QuoteFactory $quoteFactory,
 		\Splitit\Paymentmethod\Helper\Data $helperData,
-		\Psr\Log\LoggerInterface $logger
+		\Psr\Log\LoggerInterface $logger,
+		\Magento\Checkout\Model\Session $checkoutSession,
+		\Splitit\Paymentmethod\Model\PaymentForm $paymentForm,
+		\Splitit\Paymentmethod\Model\Api $api
 	) {
 		$this->scopeConfig = $scopeConfig;
 		$this->resultJsonFactory = $resultJsonFactory;
-		$this->_helperData = $helperData;
+		$this->helperData = $helperData;
 		$this->order = $order;
 		$this->quoteFactory = $quoteFactory;
 		$this->logger = $logger;
-		$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-		$this->checkoutSession = $objectManager->get('\Magento\Checkout\Model\Session');
-		$this->paymentForm = $objectManager->get('\Splitit\Paymentmethod\Model\PaymentForm');
-		$this->api = $objectManager->get('\Splitit\Paymentmethod\Model\Api');
+		$this->checkoutSession = $checkoutSession;
+		$this->paymentForm = $paymentForm;
+		$this->api = $api;
 		parent::__construct($context);
 	}
 
+	/**
+	 * Splitit redirect to Splitit Server
+	 * @return void
+	 **/
 	public function execute() {
 
-//        die("redirect controller");
+		$quote = $this->checkoutSession->getQuote();
 		$data = $this->paymentForm->orderPlaceRedirectUrl();
-		// echo '<pre>'; print_r($data); die;
 		if ($data['error'] == true && $data["status"] == false) {
+			$this->logger->addError("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 			$this->logger->addError("Split It processing error : " . $data["data"]);
 			if (isset($data["errorMsg"]) && $data["errorMsg"]) {
-				$this->messageManager->addErrorMessage($data["errorMsg"]);
-				$this->checkoutSession->setErrorMessage($data["errorMsg"]);
+				$this->messageManager->addErrorMessage(__($data["errorMsg"]));
+				$this->checkoutSession->setErrorMessage(__($data["errorMsg"]));
 			} else {
-				$this->messageManager->addErrorMessage('Error in processing your order. Please try again later.');
-				$this->checkoutSession->setErrorMessage('Error in processing your order. Please try again later.');
+				$this->messageManager->addErrorMessage(__('Error in processing your order. Please try again later.'));
+				$this->checkoutSession->setErrorMessage(__('Error in processing your order. Please try again later.'));
 			}
 			$resultRedirect = $this->resultRedirectFactory->create();
 			$resultRedirect->setPath('checkout/cart');
 			return $resultRedirect;
-
-			//	$this->_redirect('checkout/cart')->sendResponse();
-			// exit;
 		}
-		$order = $this->checkoutSession->getLastRealOrder();
-		$orderId = $order->getEntityId();
-		$payment = $order->getPayment();
-//        var_dump($this->checkoutSession->getData());exit;
-		$payment->setTransactionId($this->checkoutSession->getSplititInstallmentPlanNumber());
-		$payment->save();
-		$order->save();
-		$curlRes = $this->paymentForm->updateRefOrderNumber($this->api, $order);
-//        echo $orderId;
-		//        print_r($curlRes);exit;
+		$curlRes = $this->paymentForm->updateRefOrderNumber($this->api, $quote);
 		if (isset($curlRes["status"]) && $curlRes["status"]) {
 			$this->_redirect($data['checkoutUrl']);
 		}

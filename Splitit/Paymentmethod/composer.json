@@ -2,7 +2,7 @@
     "name": "splitit/paymentmethod",
     "description": "Splitit integration for Magento 2",
     "type": "magento2-module",
-    "version": "0.2.0",
+    "version": "1.8.2",
     "license": [
         "OSL-3.0"
     ],

@@ -23,13 +23,13 @@
                 <cctypes>AE,VI,MC,DI,JCB</cctypes>
                 <allowspecific>0</allowspecific>
                 <min_order_total>0.50</min_order_total>
-                <api_url>https://web-api.splitit.com/</api_url>
+                <api_url>https://webapi.production.splitit.com/</api_url>
                 <api_url_sandbox>https://web-api-sandbox.splitit.com/</api_url_sandbox>
                 <faq_link_enabled>1</faq_link_enabled>
                 <faq_link_title>Tell me more</faq_link_title>
-                <faq_link_title_url>https://s3.amazonaws.com/splitit-images-prod/learnmore/en-us/V1-USD.png</faq_link_title_url>
-                <splitit_logo_src>https://s3.amazonaws.com/splitit-logos/Offical Splitit Logo.png</splitit_logo_src>
-                <splitit_logo__bakcground_href>https://s3.amazonaws.com/splitit-images-prod/learnmore/en-us/V1-USD.png</splitit_logo__bakcground_href>
+                <faq_link_title_url>https://s3.amazonaws.com/splitit-images-prod-new/learnmore/en-us/V1-USD.png</faq_link_title_url>
+                <splitit_logo_src>https://splitit-logos-prod-new.s3.amazonaws.com/Official_Splitit_Logo_V2.png</splitit_logo_src>
+                <splitit_logo__bakcground_href>https://s3.amazonaws.com/splitit-images-prod-new/learnmore/en-us/V1-USD.png</splitit_logo__bakcground_href>
                 <check_setting>Check settings</check_setting>
                 <installment_price_text>or {NOI} interest-free payments of {AMOUNT} with</installment_price_text>
             </splitit_paymentmethod>
@@ -39,16 +39,16 @@
                 <payment_action>authorize</payment_action>
                 <order_status>pending_payment</order_status>
                 <title>SPLITIT 0% Interest Monthly Payments</title>
-                <api_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />                
+                <api_key backend_model="Magento\Config\Model\Config\Backend\Encrypted" />
                 <allowspecific>0</allowspecific>
                 <min_order_total>0.50</min_order_total>
-                <api_url>https://web-api.splitit.com/</api_url>
+                <api_url>https://webapi.production.splitit.com/</api_url>
                 <api_url_sandbox>https://web-api-sandbox.splitit.com/</api_url_sandbox>
                 <faq_link_enabled>1</faq_link_enabled>
                 <faq_link_title>Tell me more</faq_link_title>
-                <faq_link_title_url>https://s3.amazonaws.com/splitit-images-prod/learnmore/en-us/V1-USD.png</faq_link_title_url>
-                <splitit_logo_src>https://s3.amazonaws.com/splitit-logos/Offical Splitit Logo.png</splitit_logo_src>
-                <splitit_logo__bakcground_href>https://s3.amazonaws.com/splitit-images-prod/learnmore/en-us/V1-USD.png</splitit_logo__bakcground_href>
+                <faq_link_title_url>https://s3.amazonaws.com/splitit-images-prod-new/learnmore/en-us/V1-USD.png</faq_link_title_url>
+                <splitit_logo_src>https://splitit-logos-prod-new.s3.amazonaws.com/Official_Splitit_Logo_V2.png</splitit_logo_src>
+                <splitit_logo__bakcground_href>https://s3.amazonaws.com/splitit-images-prod-new/learnmore/en-us/V1-USD.png</splitit_logo__bakcground_href>
                 <check_setting>Check settings</check_setting>
                 <installment_price_text>or {NOI} interest-free payments of {AMOUNT} with SPLITIT</installment_price_text>
             </splitit_paymentredirect>

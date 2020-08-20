@@ -4,96 +4,109 @@ namespace Splitit\Paymentmethod\Observer;
 
 use Magento\Framework\Event\ObserverInterface;
 
-class PaymentCancel implements ObserverInterface
-{
-    /**
-     * @var \Magento\Checkout\Model\Session
-     */
-    protected $objectManager;
-    protected $_paymentModel;
-    protected $_apiModel;
-    protected $customerSession;
-    protected $_logger;
+class PaymentCancel implements ObserverInterface {
 
-    /**
-     * AddFeeToOrderObserver constructor.
-     * @param \Magento\Checkout\Model\Session $checkoutSession
-     */
-    public function __construct(
-        \Splitit\Paymentmethod\Model\Payment $paymentModel,
-        \Magento\Customer\Model\Session $customerSession,
-        \Psr\Log\LoggerInterface $logger
-    )
-    {
-        $this->_logger = $logger;
-        $this->customerSession = $customerSession;
-        $this->_paymentModel = $paymentModel;
-        $this->objectManager = \Magento\Framework\App\ObjectManager::getInstance();
-        $this->_apiModel = $this->objectManager->get('Splitit\Paymentmethod\Model\Api');
-    }
+	protected $paymentModel;
+	protected $apiModel;
+	protected $customerSession;
+	protected $logger;
+	protected $jsonHelper;
+	private $helper;
+	/**
+	 * PaymentCancel constructor.
+	 * @param \Splitit\Paymentmethod\Model\Payment $paymentModel
+	 * @param \Magento\Customer\Model\Session $customerSession
+	 * @param \Splitit\Paymentmethod\Model\Api $apiModel
+	 * @param \Magento\Framework\Json\Helper\Data $jsonHelper
+	 * @param \Psr\Log\LoggerInterface $logger
+	 */
+	public function __construct(
+		\Splitit\Paymentmethod\Model\Payment $paymentModel,
+		\Magento\Customer\Model\Session $customerSession,
+		\Splitit\Paymentmethod\Model\Api $apiModel,
+		\Magento\Framework\Json\Helper\Data $jsonHelper,
+		\Splitit\Paymentmethod\Helper\Data $helper,
+		\Psr\Log\LoggerInterface $logger
+	) {
+		$this->logger = $logger;
+		$this->customerSession = $customerSession;
+		$this->paymentModel = $paymentModel;
+		$this->apiModel = $apiModel;
+		$this->jsonHelper = $jsonHelper;
+		$this->helper = $helper;
+	}
 
-    /**
-     * Set fee to order
-     *
-     * @param EventObserver $observer
-     * @return $this
-     */
-    public function execute(\Magento\Framework\Event\Observer $observer)
-    {
-        $order=$observer->getEvent()->getOrder();
-        $payment=$order->getPayment();
-        $this->_logger->debug(get_class($payment));
-        $transactionId = $payment->getParentTransactionId();
-        $this->_logger->debug('transactionId='.$transactionId);
-        try {
-            $apiLogin = $this->_apiModel->apiLogin();
-            $api = $this->_apiModel->getApiUrl();
-            if($payment->getAuthorizationTransaction()){
-            $installmentPlanNumber = $payment->getAuthorizationTransaction()->getTxnId();
-            $this->_logger->debug('IPN='.$installmentPlanNumber);
-            $ipn = substr($installmentPlanNumber, 0, strpos($installmentPlanNumber, '-'));
-            if($ipn != ""){
-                $installmentPlanNumber = $ipn;
-            }
-            $params = array(
-                "RequestHeader" => array(
-                    "SessionId" => $this->customerSession->getSplititSessionid(),
-                ),
-                "InstallmentPlanNumber" => $installmentPlanNumber,
-                "RefundUnderCancelation" => "OnlyIfAFullRefundIsPossible"
-            );
+	/**
+	 * Cancel order on Splitit
+	 *
+	 * @param EventObserver $observer
+	 * @return $this
+	 */
+	public function execute(\Magento\Framework\Event\Observer $observer) {
+		$this->logger->debug("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
+		$this->logger->error("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
+		$order = $observer->getEvent()->getOrder();
+		$payment = $order->getPayment();
+		$this->logger->debug(get_class($payment));
+		$this->logger->debug('$payment->getMethod()===');
+		$this->logger->debug(print_r($payment->getMethod(),true));
+		$this->logger->debug('$payment->getCode()===');
+		$this->logger->debug(print_r($payment->getCode(),true));
+		$transactionId = $payment->getParentTransactionId();
+		$this->logger->debug('transactionId=' . print_r($transactionId,true));
+		try {
+			$dataForLogin = array(
+				'UserName' => $this->helper->getApiUsername($payment->getMethod()),
+				'Password' => $this->helper->getApiPassword($payment->getMethod()),
+				'TouchPoint' => $this->helper->getApiTouchPointVersion(),
+			);
+			$apiLogin = $this->apiModel->apiLogin($dataForLogin);
+			$api = $this->apiModel->getApiUrl();
+			if ($payment->getAuthorizationTransaction()) {
+				$installmentPlanNumber = $payment->getAuthorizationTransaction()->getTxnId();
+				$this->logger->debug('IPN=' . print_r($installmentPlanNumber,true));
+				$ipn = substr($installmentPlanNumber, 0, strpos($installmentPlanNumber, '-'));
+				if ($ipn != "") {
+					$installmentPlanNumber = $ipn;
+				}
+				$params = array(
+					"RequestHeader" => array(
+						"SessionId" => $this->customerSession->getSplititSessionid(),
+					),
+					"InstallmentPlanNumber" => $installmentPlanNumber,
+					"RefundUnderCancelation" => "OnlyIfAFullRefundIsPossible",
+				);
 
-            $result = $this->_apiModel->makePhpCurlRequest($api, "InstallmentPlan/Cancel",$params);
-            $result = json_decode($result, true);
-            if (isset($result["ResponseHeader"])&&isset($result["ResponseHeader"]["Errors"])&&!empty($result["ResponseHeader"]["Errors"])) {
-                $errorMsg = "";
-                
-                $errorCode = 503;
-                $isErrorCode503Found = 0;
-                foreach ($result["ResponseHeader"]["Errors"] as $key => $value) {
-                    $errorMsg .= $value["ErrorCode"]." : ".$value["Message"];
-                    if($value["ErrorCode"] == $errorCode){
-                        $isErrorCode503Found = 1;
-                        break;
-                    }
-                }    
-                
-                
-                if($isErrorCode503Found == 0){
-                    $this->_logger->error(__($errorMsg));
-                    throw new \Magento\Framework\Validator\Exception(__($errorMsg));
-                }
+				$result = $this->apiModel->makePhpCurlRequest($api, "InstallmentPlan/Cancel", $params);
+				$result = $this->jsonHelper->jsonDecode($result);
+				if (isset($result["ResponseHeader"]) && isset($result["ResponseHeader"]["Errors"]) && !empty($result["ResponseHeader"]["Errors"])) {
+					$errorMsg = "";
 
-            }elseif(isset($result["serverError"])){
-                $errorMsg = $result["serverError"];
-                $this->_logger->error(__($errorMsg));
-                throw new \Magento\Framework\Validator\Exception(__($errorMsg));
-            }
-            }
-        } catch (\Exception $e) {
-            $this->_logger->debug(['transaction_id' => $transactionId, 'exception' => $e->getMessage()]);
-            $this->_logger->error(__('Payment cancel error.'));
-        }
-        return $this;
-    }
+					$errorCode = 503;
+					$isErrorCode503Found = 0;
+					foreach ($result["ResponseHeader"]["Errors"] as $key => $value) {
+						$errorMsg .= $value["ErrorCode"] . " : " . $value["Message"];
+						if ($value["ErrorCode"] == $errorCode) {
+							$isErrorCode503Found = 1;
+							break;
+						}
+					}
+
+					if ($isErrorCode503Found == 0) {
+						$this->logger->error(__($errorMsg));
+						throw new \Magento\Framework\Validator\Exception(__($errorMsg));
+					}
+
+				} elseif (isset($result["serverError"])) {
+					$errorMsg = $result["serverError"];
+					$this->logger->error(__($errorMsg));
+					throw new \Magento\Framework\Validator\Exception(__($errorMsg));
+				}
+			}
+		} catch (\Exception $e) {
+			$this->logger->debug(print_r(['transaction_id' => $transactionId, 'exception' => $e->getMessage(), 'stackTrace'=>$e->getTraceAsString()],true));
+			$this->logger->error(__('Payment cancel error.'));
+		}
+		return $this;
+	}
 }
