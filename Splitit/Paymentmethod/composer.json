@@ -11,5 +11,11 @@
         "psr-4": {
           "Splitit\\Paymentmethod\\": ""
         }
-     }
+    },
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://github.com/Splitit/Splitit.Plugins.Magento.V2.x"
+        }
+    ]
 }
