@@ -11,14 +11,15 @@
 */
 -->
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
-    <head>
-           <!-- for css file -->
-           <css src="Splitit_Paymentmethod::css/custom.css"/>
-     
-           <!-- for js file -->
-           <script src="Splitit_Paymentmethod::js/custom.js"/>
-    </head>
     <body>
+        <referenceBlock name="head.additional">
+            <block class="Splitit\Paymentmethod\Block\RenderHeadLinks" name="splitit.renderheadlinks">
+                <arguments>
+                    <argument name="css" xsi:type="string">Splitit_Paymentmethod::css/custom.css</argument>
+                    <argument name="js" xsi:type="string">Splitit_Paymentmethod::js/custom.js</argument>
+                </arguments>
+            </block>
+        </referenceBlock>
         <referenceBlock name="checkout.root">
             <arguments>
                 <argument name="jsLayout" xsi:type="array">

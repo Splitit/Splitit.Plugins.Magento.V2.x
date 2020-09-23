@@ -74,7 +74,7 @@ window.onload = function(){
 			}
 		});
 	}
-  
+
 	jQuery(document).on("click", "#splitit-paymentmethod",function(){
 		jQuery("input[name='payment[cc_number]").attr("maxlength","19");
 	});
@@ -148,8 +148,8 @@ window.onload = function(){
 			
 					} else {
 						jQuery(".loading-mask").hide();
-						alert(result.errorMsg);
-					}
+                        alert(result.errorMsg);
+                    }
 			
 		}});
 	}
