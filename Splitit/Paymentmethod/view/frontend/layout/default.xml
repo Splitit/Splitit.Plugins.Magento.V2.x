@@ -1,9 +1,13 @@
 <?xml version="1.0"?>
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"  xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
-   <head>
-   		<css src="Splitit_Paymentmethod::css/num_of_installment.css"/>
-   		<!-- <script src="Splitit_Paymentmethod::js/jquery-1.12.4.js"/> -->
-    	<script src="Splitit_Paymentmethod::js/num_of_installment.js"/>
-   </head>
-   <body/>
+   <body>
+       <referenceBlock name="head.additional">
+           <block class="Splitit\Paymentmethod\Block\RenderHeadLinks" name="splitit.renderheadlinks.default">
+               <arguments>
+                   <argument name="css" xsi:type="string">Splitit_Paymentmethod::css/num_of_installment.css</argument>
+                   <argument name="js" xsi:type="string">Splitit_Paymentmethod::js/num_of_installment.js</argument>
+               </arguments>
+           </block>
+       </referenceBlock>
+   </body>
 </page>

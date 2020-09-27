@@ -6,30 +6,49 @@
 
 namespace Splitit\Paymentmethod\Controller\Installmentplaninit;
 
-class Installmentplaninit extends \Magento\Framework\App\Action\Action {
+use Magento\Framework\App\Action\Action;
+use Magento\Framework\App\Action\Context;
+use Magento\Framework\App\Request\Http;
+use Magento\Framework\Controller\Result\JsonFactory;
+use Magento\Framework\Controller\Result\Json;
+use Magento\Framework\View\Result\PageFactory;
+use Splitit\Paymentmethod\Model\Api;
+use Psr\Log\LoggerInterface;
 
-    protected $request;
-    protected $apiModel;
-    protected $logger;
-    protected $resultPage;
-    protected $resultJsonFactory;
+class Installmentplaninit extends Action
+{
+    /**
+     * @var Http
+     */
+    private $request;
 
     /**
-     * Contructor
-     * @param \Magento\Framework\App\Action\Context $context
-     * @param \Magento\Framework\App\Request\Http $request
-     * @param \Psr\Log\LoggerInterface $logger
-     * @param \Splitit\Paymentmethod\Model\Api $apiModel
-     * @param \Magento\Framework\View\Result\PageFactory $resultPage
-     * @param \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
+     * @var Api
      */
+    private $apiModel;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @var PageFactory
+     */
+    private $resultPage;
+
+    /**
+     * @var JsonFactory
+     */
+    private $resultJsonFactory;
+
     public function __construct(
-        \Magento\Framework\App\Action\Context $context,
-        \Magento\Framework\App\Request\Http $request,
-        \Psr\Log\LoggerInterface $logger,
-        \Splitit\Paymentmethod\Model\Api $apiModel,
-        \Magento\Framework\View\Result\PageFactory $resultPage,
-        \Magento\Framework\Controller\Result\JsonFactory $resultJsonFactory
+        Context $context,
+        Http $request,
+        LoggerInterface $logger,
+        Api $apiModel,
+        PageFactory $resultPage,
+        JsonFactory $resultJsonFactory
     ) {
         $this->request = $request;
         $this->apiModel = $apiModel;
@@ -45,8 +64,8 @@ class Installmentplaninit extends \Magento\Framework\App\Action\Action {
      * guestEmail string
      * @return Json
      */
-    public function execute() {
-
+    public function execute()
+    {
         $request = $this->request->getParams();
         $resultJson = $this->resultJsonFactory->create();
         $response = [
@@ -55,7 +74,7 @@ class Installmentplaninit extends \Magento\Framework\App\Action\Action {
             "successMsg" => "",
             "data" => "",
         ];
-        $selectedInstallment = "";
+
         if (isset($request["selectedInstallment"]) && $request["selectedInstallment"] != "") {
             $selectedInstallment = $request["selectedInstallment"];
         } else {
@@ -73,7 +92,7 @@ class Installmentplaninit extends \Magento\Framework\App\Action\Action {
         }
         /* check if login successfully or not */
         if (!$loginResponse["status"]) {
-            $this->logger->addError("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
+            $this->logger->addError("FILE: " . __FILE__ . "\n LINE: " . __LINE__ . "\n Method: " . __METHOD__);
             $this->logger->addError($loginResponse["errorMsg"]);
             $response["errorMsg"] = 'Error in processing your order. Please try again later.';
             return $resultJson->setData($response);
@@ -84,15 +103,15 @@ class Installmentplaninit extends \Magento\Framework\App\Action\Action {
         if ($installmentPlanInitResponse["status"]) {
             $response["status"] = true;
             $block = $this->resultPage->create()->getLayout()
-                    ->createBlock('Magento\Framework\View\Element\Template')
-                    ->setTemplate('Splitit_Paymentmethod::popup.phtml')
-                    ->setData('data', json_decode($installmentPlanInitResponse["successMsg"],true))
-                    ->toHtml();
+                ->createBlock('Magento\Framework\View\Element\Template')
+                ->setTemplate('Splitit_Paymentmethod::popup.phtml')
+                ->setData('data', json_decode($installmentPlanInitResponse["successMsg"], true))
+                ->toHtml();
 
             $response["successMsg"] = $block;
         } else {
             $response["errorMsg"] = 'Error in processing your order. Please try again later.';
-            $this->logger->addError("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
+            $this->logger->addError("FILE: " . __FILE__ . "\n LINE: " . __LINE__ . "\n Method: " . __METHOD__);
             $this->logger->addError($installmentPlanInitResponse["errorMsg"]);
             if ($installmentPlanInitResponse["errorMsg"]) {
                 $response["errorMsg"] = $installmentPlanInitResponse["errorMsg"];
@@ -102,5 +121,4 @@ class Installmentplaninit extends \Magento\Framework\App\Action\Action {
         $resultJson->setData($response);
         return $resultJson;
     }
-
 }
