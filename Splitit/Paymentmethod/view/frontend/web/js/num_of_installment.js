@@ -1,7 +1,7 @@
-var url = window.location.hostname;
-var http = window.location.protocol;
-
-url = http+"//"+url+"/";
+var url;
+require(['mage/url'], function (urlBuilder) {
+    url = urlBuilder.build('');
+});
 // for local development
 //url = url+"magento2newdeploy/";
 

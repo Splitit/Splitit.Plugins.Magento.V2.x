@@ -1,10 +1,9 @@
 window.onload = function(){
-	
-	var splititAvail = 0;
-	
-	var url = window.location.hostname;
-	var http = window.location.protocol;
-	var baseUrl = http+"//"+url+"/";
+
+    var baseUrl;
+    require(['mage/url'], function (urlBuilder) {
+        baseUrl = urlBuilder.build('');
+    });
 	window.changeIns = true;
 
 	jQuery(document).ready(function(){
