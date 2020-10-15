@@ -1,7 +1,3 @@
-var url;
-require(['mage/url'], function (urlBuilder) {
-    url = urlBuilder.build('');
-});
 // for local development
 //url = url+"magento2newdeploy/";
 
@@ -34,7 +30,7 @@ function runMyScripts(){
 		productId = jQuery('#product_addtocart_form input[name="product"]').val();
 	}
 	jQuery.ajax({
-		url: url + "splititpaymentmethod/showinstallmentprice/getinstallmentprice",
+		url: BASE_URL + "splititpaymentmethod/showinstallmentprice/getinstallmentprice",
 		data : { pid : productId},
 		success: function(result){
 			
@@ -157,7 +153,7 @@ function runMyScripts(){
 
 function runMyScriptForCheckout(){
 	jQuery.ajax({
-		url: url + "splititpaymentmethod/showinstallmentprice/getinstallmentprice", 
+		url: BASE_URL + "splititpaymentmethod/showinstallmentprice/getinstallmentprice",
 		success: function(result){
 			
 			var numOfInstallmentForDisplay = result.numOfInstallmentForDisplay;

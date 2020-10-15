@@ -1,9 +1,5 @@
 window.onload = function(){
 
-    var baseUrl;
-    require(['mage/url'], function (urlBuilder) {
-        baseUrl = urlBuilder.build('');
-    });
 	window.changeIns = true;
 
 	jQuery(document).ready(function(){
@@ -52,7 +48,7 @@ window.onload = function(){
 
 	function getInstallmentOptions(){
 		jQuery.ajax({
-			url: baseUrl + "splititpaymentmethod/installments/getinstallment", 
+			url: BASE_URL + "splititpaymentmethod/installments/getinstallment",
 			showLoader: true,
 			success: function(result){
 			
@@ -118,7 +114,7 @@ window.onload = function(){
 		}
 
 		jQuery.ajax({
-			url: baseUrl + "splititpaymentmethod/installmentplaninit/installmentplaninit", 
+			url: BASE_URL + "splititpaymentmethod/installmentplaninit/installmentplaninit",
 			type : 'POST',
 	        dataType:'json',
 	        data:{"selectedInstallment":((selectedInstallment)?selectedInstallment:3), "guestEmail":guestEmail},
