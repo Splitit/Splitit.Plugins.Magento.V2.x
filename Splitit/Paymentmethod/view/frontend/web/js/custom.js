@@ -1,10 +1,5 @@
 window.onload = function(){
-	
-	var splititAvail = 0;
-	
-	var url = window.location.hostname;
-	var http = window.location.protocol;
-	var baseUrl = http+"//"+url+"/";
+
 	window.changeIns = true;
 
 	jQuery(document).ready(function(){
@@ -52,27 +47,29 @@ window.onload = function(){
         });*/
 
 	function getInstallmentOptions(){
-		jQuery.ajax({
-			url: baseUrl + "splititpaymentmethod/installments/getinstallment", 
-			showLoader: true,
-			success: function(result){
-			
-			// show installments
-			jQuery("#select-num-of-installments").html(result.installmentHtml);
-			// disable place order button
-			jQuery("button#splitit-form").prop("disabled",true);
-			
-			if(result.installmentShow){
-				jQuery("#select-num-of-installments").closest('.num-of-installments').show();
-				jQuery('.apr-tc').show();
-			} else {
-				jQuery('.monthly-img').css('padding-top','1%');
-				jQuery('.apr-tc').remove();
-				jQuery("button#splitit-form").prop("disabled",false);
-			}
-			
-			}
-		});
+		if (document.getElementById('splitit_paymentmethod')!=undefined || document.getElementById('splitit_paymentredirect')!=undefined){
+			jQuery.ajax({
+				url: BASE_URL + "splititpaymentmethod/installments/getinstallment",
+				showLoader: true,
+				success: function(result){
+				
+				// show installments
+				jQuery("#select-num-of-installments").html(result.installmentHtml);
+				// disable place order button
+				jQuery("button#splitit-form").prop("disabled",true);
+				
+				if(result.installmentShow){
+					jQuery("#select-num-of-installments").closest('.num-of-installments').show();
+					jQuery('.apr-tc').show();
+				} else {
+					jQuery('.monthly-img').css('padding-top','1%');
+					jQuery('.apr-tc').remove();
+					jQuery("button#splitit-form").prop("disabled",false);
+				}
+				
+				}
+			});
+		}
 	}
   
 	jQuery(document).on("click", "#splitit-paymentmethod",function(){
@@ -117,41 +114,42 @@ window.onload = function(){
 				return;
 			}
 		}
-
-		jQuery.ajax({
-			url: baseUrl + "splititpaymentmethod/installmentplaninit/installmentplaninit", 
-			type : 'POST',
-	        dataType:'json',
-	        data:{"selectedInstallment":((selectedInstallment)?selectedInstallment:3), "guestEmail":guestEmail},
-	        showLoader: true,
-			success: function(result){
-					if(result.status){
-						
-						jQuery("#approval-popup").remove();
-						jQuery(".approval-popup_ovelay").remove();
-						jQuery('body').append(result.successMsg);
-						if(!validate){
-							var TnC_link = jQuery('div.termAndConditionBtn').find('a').first().attr('href');
-							jQuery('#splitit_paymentmethod_cc_tnc').attr('href',TnC_link);
-
-							var privacy_link = jQuery('div.termAndConditionBtn').find('a').last().attr('href');
-							jQuery('#splitit_paymentmethod_cc_privacy').attr('href',privacy_link);
-
-							/*jQuery("#approval-popup").removeClass("overflowHidden");
-							jQuery('#termAndConditionpopup, ._popup_overlay').hide();*/
-							closeApprovalPopup();
-							controlOrderButton();
-						} else if(isOrder){
-							closeApprovalPopup();
-							controlOrderButton();
+		if (document.getElementById('splitit_paymentmethod')!=undefined || document.getElementById('splitit_paymentredirect')!=undefined){
+			jQuery.ajax({
+				url: BASE_URL + "splititpaymentmethod/installmentplaninit/installmentplaninit",
+				type : 'POST',
+				dataType:'json',
+				data:{"selectedInstallment":((selectedInstallment)?selectedInstallment:3), "guestEmail":guestEmail},
+				showLoader: true,
+				success: function(result){
+						if(result.status){
+							
+							jQuery("#approval-popup").remove();
+							jQuery(".approval-popup_ovelay").remove();
+							jQuery('body').append(result.successMsg);
+							if(!validate){
+								var TnC_link = jQuery('div.termAndConditionBtn').find('a').first().attr('href');
+								jQuery('#splitit_paymentmethod_cc_tnc').attr('href',TnC_link);
+	
+								var privacy_link = jQuery('div.termAndConditionBtn').find('a').last().attr('href');
+								jQuery('#splitit_paymentmethod_cc_privacy').attr('href',privacy_link);
+	
+								/*jQuery("#approval-popup").removeClass("overflowHidden");
+								jQuery('#termAndConditionpopup, ._popup_overlay').hide();*/
+								closeApprovalPopup();
+								controlOrderButton();
+							} else if(isOrder){
+								closeApprovalPopup();
+								controlOrderButton();
+							}
+				
+						} else {
+							jQuery(".loading-mask").hide();
+							alert(result.errorMsg);
 						}
-			
-					} else {
-						jQuery(".loading-mask").hide();
-						alert(result.errorMsg);
-					}
-			
-		}});
+				
+			}});
+		}
 	}
 
 	jQuery(document).on("click", "button#splitit-form",function(){
