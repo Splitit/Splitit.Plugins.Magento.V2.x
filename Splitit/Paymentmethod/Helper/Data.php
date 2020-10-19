@@ -475,8 +475,10 @@ class Data extends AbstractHelper {
 		$getSplititSupportedCultures = $this->SupportedCulturesSource->getSplititSupportedCultures($apiUrl . "api/Infrastructure/SupportedCultures");
 
 		$decodedResult = $this->jsonHelper->jsonDecode($getSplititSupportedCultures);
-		if (isset($decodedResult["ResponseHeader"]["Succeeded"]) && $decodedResult["ResponseHeader"]["Succeeded"] == 1 && count($decodedResult["SupportedCultures"])) {
-			return $decodedResult["SupportedCultures"];
+        if (isset($decodedResult["ResponseHeader"]["Succeeded"]) && $decodedResult["ResponseHeader"]["Succeeded"] == 1 && count($decodedResult["Cultures"])) {
+            return array_map(function($culture) {
+                return $culture['CultureName'];
+            }, $decodedResult["Cultures"]);
 		}
 		return array();
 	}
