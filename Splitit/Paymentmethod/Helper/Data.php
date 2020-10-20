@@ -334,15 +334,15 @@ class Data extends AbstractHelper {
 	 * @return string
 	 */
 	public function getSplititFallbackLanguage() {
-		return $this->getConfig('payment/splitit_paymentmethod/splitit_per_product');
+		return $this->getConfig('payment/splitit_paymentmethod/splitit_fallback_language');
 	}
 
 	/**
-	 * To get the config value of splitit_per_product
+	 * To get the config value of splitit_fallback_language
 	 * @return string
 	 */
 	public function getRedirectSplititFallbackLanguage() {
-		return $this->getConfig('payment/splitit_paymentredirect/splitit_per_product');
+		return $this->getConfig('payment/splitit_paymentredirect/splitit_fallback_language');
 	}
 
 	/**
