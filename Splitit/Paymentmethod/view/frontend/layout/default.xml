@@ -5,5 +5,9 @@
    		<!-- <script src="Splitit_Paymentmethod::js/jquery-1.12.4.js"/> -->
     	<script src="Splitit_Paymentmethod::js/num_of_installment.js"/>
    </head>
-   <body/>
+    <body>
+        <referenceContainer name="after.body.start">
+            <block name="splitit.require.js" class="Magento\Framework\View\Element\Template" template="Splitit_Paymentmethod::base_url.phtml" />
+        </referenceContainer>
+    </body>
 </page>

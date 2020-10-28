@@ -1,20 +1,4 @@
 window.onload = function(){
-
-    var baseUrl;
-    if (typeof(BASE_URL) === 'undefined') {
-        var url = window.location.hostname,
-            http = window.location.protocol;
-
-        baseUrl = http+"//"+url+"/";
-
-        var path = window.location.pathname.split('/');
-        if (path[1].length === 2) {
-            baseUrl += path[1] + "/";
-        }
-    } else {
-        baseUrl = BASE_URL;
-    }
-
 	window.changeIns = true;
 
 	jQuery(document).ready(function(){
@@ -64,7 +48,7 @@ window.onload = function(){
 	function getInstallmentOptions(){
 		if (document.getElementById('splitit_paymentmethod')!=undefined || document.getElementById('splitit_paymentredirect')!=undefined){
 			jQuery.ajax({
-				url: baseUrl + "splititpaymentmethod/installments/getinstallment",
+				url: SPLITIT_BASE_URL + "splititpaymentmethod/installments/getinstallment",
 				showLoader: true,
 				success: function(result){
 				
@@ -131,7 +115,7 @@ window.onload = function(){
 		}
 		if (document.getElementById('splitit_paymentmethod')!=undefined || document.getElementById('splitit_paymentredirect')!=undefined){
 			jQuery.ajax({
-				url: baseUrl + "splititpaymentmethod/installmentplaninit/installmentplaninit",
+				url: SPLITIT_BASE_URL + "splititpaymentmethod/installmentplaninit/installmentplaninit",
 				type : 'POST',
 				dataType:'json',
 				data:{"selectedInstallment":((selectedInstallment)?selectedInstallment:3), "guestEmail":guestEmail},
