@@ -1,5 +1,4 @@
 window.onload = function(){
-
 	window.changeIns = true;
 
 	jQuery(document).ready(function(){
@@ -49,7 +48,7 @@ window.onload = function(){
 	function getInstallmentOptions(){
 		if (document.getElementById('splitit_paymentmethod')!=undefined || document.getElementById('splitit_paymentredirect')!=undefined){
 			jQuery.ajax({
-				url: BASE_URL + "splititpaymentmethod/installments/getinstallment",
+				url: SPLITIT_BASE_URL + "splititpaymentmethod/installments/getinstallment",
 				showLoader: true,
 				success: function(result){
 				
@@ -116,7 +115,7 @@ window.onload = function(){
 		}
 		if (document.getElementById('splitit_paymentmethod')!=undefined || document.getElementById('splitit_paymentredirect')!=undefined){
 			jQuery.ajax({
-				url: BASE_URL + "splititpaymentmethod/installmentplaninit/installmentplaninit",
+				url: SPLITIT_BASE_URL + "splititpaymentmethod/installmentplaninit/installmentplaninit",
 				type : 'POST',
 				dataType:'json',
 				data:{"selectedInstallment":((selectedInstallment)?selectedInstallment:3), "guestEmail":guestEmail},

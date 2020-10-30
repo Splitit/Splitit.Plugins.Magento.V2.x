@@ -1,7 +1,4 @@
-// for local development
-//url = url+"magento2newdeploy/";
-
-var jqueryInterval = setInterval(function(){  
+var jqueryInterval = setInterval(function(){
     
     if(window.jQuery){
       clearInterval(jqueryInterval);      
@@ -31,7 +28,7 @@ function runMyScripts(){
 	}
 	if (document.getElementById('splitit_paymentmethod')!=undefined || document.getElementById('splitit_paymentredirect')!=undefined){
 		jQuery.ajax({
-			url: BASE_URL + "splititpaymentmethod/showinstallmentprice/getinstallmentprice",
+			url: SPLITIT_BASE_URL + "splititpaymentmethod/showinstallmentprice/getinstallmentprice",
 			data : { pid : productId},
 			success: function(result){
 				
@@ -156,7 +153,7 @@ function runMyScripts(){
 function runMyScriptForCheckout(){
 	if (document.getElementById('splitit_paymentmethod')!=undefined || document.getElementById('splitit_paymentredirect')!=undefined){
 		jQuery.ajax({
-			url: BASE_URL + "splititpaymentmethod/showinstallmentprice/getinstallmentprice",
+			url: SPLITIT_BASE_URL + "splititpaymentmethod/showinstallmentprice/getinstallmentprice",
 			success: function(result){
 				
 				var numOfInstallmentForDisplay = result.numOfInstallmentForDisplay;
