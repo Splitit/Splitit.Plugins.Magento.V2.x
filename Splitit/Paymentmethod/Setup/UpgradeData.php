@@ -38,6 +38,9 @@ class UpgradeData implements UpgradeDataInterface
             $this->configResource->saveConfig('payment/splitit_paymentredirect/faq_link_title_url', $helpUrl);
             $this->configResource->saveConfig('payment/splitit_paymentredirect/splitit_logo__bakcground_href', $helpUrl);
         }
+        if (version_compare($context->getVersion(), '2.0.0', '<')) {
+            $this->configResource->saveConfig('payment/splitit_paymentmethod/active', 0);
+        }
 
         $setup->endSetup();
     }
