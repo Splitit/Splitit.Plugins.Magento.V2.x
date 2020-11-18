@@ -13,7 +13,6 @@ class Getinstallmentprice extends \Magento\Framework\App\Action\Action {
 
 	private $helper;
 	private $helperData;
-	private $payment;
 	private $paymentForm;
 	private $cart;
 	private $requestData;
@@ -24,7 +23,6 @@ class Getinstallmentprice extends \Magento\Framework\App\Action\Action {
 	 * @param \Splitit\Paymentmethod\Helper\Data $helperData
 	 * @param \Magento\Checkout\Model\Session $checkoutSession
 	 * @param \Splitit\Paymentmethod\Model\PaymentForm $paymentForm
-	 * @param \Splitit\Paymentmethod\Model\Payment $payment
 	 * @param \Magento\Framework\App\RequestInterface $request
 	 * @param \Magento\Checkout\Model\Cart $cart
      */
@@ -33,13 +31,11 @@ class Getinstallmentprice extends \Magento\Framework\App\Action\Action {
 		\Splitit\Paymentmethod\Helper\Data $helperData,
 		\Magento\Checkout\Model\Session $checkoutSession,
 		\Splitit\Paymentmethod\Model\PaymentForm $paymentForm,
-		\Splitit\Paymentmethod\Model\Payment $payment,
 		\Magento\Framework\App\RequestInterface $request,
 		\Magento\Checkout\Model\Cart $cart
 	) {
 		$this->checkoutSession = $checkoutSession;
 		$this->paymentForm = $paymentForm;
-		$this->payment = $payment;
 		$this->helperData = $helperData;
 		$this->cart = $cart;
 		$this->requestData = $request->getParams();
@@ -55,7 +51,7 @@ class Getinstallmentprice extends \Magento\Framework\App\Action\Action {
 		$this->helper = $this->helperData;
 		$response = [
 			"status" => true,
-			"help" => ['splitit_paymentmethod' => [], 'splitit_paymentredirect' => []],
+			"help" => ['splitit_paymentredirect' => []],
 			"isActive" => "",
 			"pageType" => "",
 			"displayInstallmentPriceOnPage" => "",
@@ -67,7 +63,7 @@ class Getinstallmentprice extends \Magento\Framework\App\Action\Action {
 			"splititLogoBackgroundSrc" => "",
 		];
 
-		$isEnable = $this->helper->getEnableInstallmentPrice();
+		$isEnable = $this->helper->getRedirectEnableInstallmentPrice();
 		if ($isEnable == "") {
 			$isEnable = 0;
 		}
@@ -126,9 +122,9 @@ class Getinstallmentprice extends \Magento\Framework\App\Action\Action {
 		$response["currencySymbol"] = $this->helper->getCurrencyData();
 
 		$resultJson = $this->resultFactory->create(ResultFactory::TYPE_JSON);
-		if ($this->paymentForm->checkProductBasedAvailability() || $this->payment->checkProductBasedAvailability()) {
+		if ($this->paymentForm->checkProductBasedAvailability()) {
 			if(isset($this->requestData['pid']) && $this->requestData['pid']){
-				if($this->paymentForm->isSplititTextVisibleOnProduct($this->requestData['pid']) || $this->payment->isSplititTextVisibleOnProduct($this->requestData['pid'])){
+				if($this->paymentForm->isSplititTextVisibleOnProduct($this->requestData['pid'])){
 					return $resultJson->setData($response);
 				} else {
 					return $resultJson->setData(array('status' => false));
@@ -138,7 +134,7 @@ class Getinstallmentprice extends \Magento\Framework\App\Action\Action {
 		} else {
 			return $resultJson->setData(array('status' => false));
 		}
-		
+
 	}
 
 }

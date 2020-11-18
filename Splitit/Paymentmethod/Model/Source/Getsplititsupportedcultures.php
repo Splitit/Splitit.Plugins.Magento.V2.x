@@ -70,10 +70,10 @@ class Getsplititsupportedcultures {
 	 */
 	public function getApiUrl() {
 
-		if ($this->getConfig("payment/splitit_paymentmethod/sandbox_flag")) {
-			return $this->getConfig("payment/splitit_paymentmethod/api_url_sandbox");
+		if ($this->getConfig("payment/splitit_paymentredirect/sandbox_flag")) {
+			return $this->getConfig("payment/splitit_paymentredirect/api_url_sandbox");
 		}
-		return $this->getConfig("payment/splitit_paymentmethod/api_url");
+		return $this->getConfig("payment/splitit_paymentredirect/api_url");
 	}
 
 	/**

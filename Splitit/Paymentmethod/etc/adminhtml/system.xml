@@ -13,8 +13,8 @@
 <config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
     <system>
         <section id="payment">
-            <group id="splitit_paymentmethod" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Splitit</label>
+            <group id="splitit_paymentredirect" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Splitit Payment Form</label>
                 <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Enabled</label>
                     <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
@@ -38,183 +38,7 @@
 
                 <field id="api_url_sandbox" translate="label" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>API Sandbox Url</label>
-                </field>                
-
-                <field id="sandbox_flag" translate="label" sortOrder="7" type="select" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Sandbox Mode</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
                 </field>
-
-                <field id="debug" translate="label" type="select" sortOrder="8" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Debug</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field>
-
-                <field id="check_setting" translate="label" type="button" sortOrder="9" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Verify API Credentials</label>
-                </field>
-
-                <field id="splitit_fallback_language" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0" >
-                    <label>Splitit Fallback Language</label>
-                    <source_model>Splitit\Paymentmethod\Model\Source\Getsplititsupportedcultures</source_model>
-                </field>
-                
-                <field id="allowspecific" translate="label" type="allowspecific" sortOrder="11" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Accepted Countries for Payment</label>
-                    <source_model>Magento\Payment\Model\Config\Source\Allspecificcountries</source_model>
-                </field>
-
-                <field id="specificcountry" translate="label" type="multiselect" sortOrder="12" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Payment from Specific Countries</label>
-                    <source_model>Magento\Directory\Model\Config\Source\Country</source_model>
-                </field>
-                <!-- <field id="api_key" translate="label" type="obscure" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Api Key</label>
-                    <backend_model>Magento\Config\Model\Config\Backend\Encrypted</backend_model>
-                </field> -->
-
-                <field id="payment_action" translate="label" sortOrder="13" type="select" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Payment Action</label>
-                    <source_model>Splitit\Paymentmethod\Model\Source\PaymentAction</source_model>
-                </field>
-
-                <field id="order_status" translate="label" sortOrder="14" type="select" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>New order status</label>
-                    <source_model>Magento\Sales\Model\Config\Source\Order\Status\Processing</source_model>
-                </field>
-
-                 <field id="select_installment_setup" translate="label" type="select" sortOrder="15" showInDefault="1" showInWebsite="1" showInStore="0" >
-                    <label>Select installment setup</label>
-                    <source_model>Splitit\Paymentmethod\Model\Source\Selectinstallmentsetup</source_model>
-                </field>  
-
-                <field id="fixed_installment" translate="label" type="multiselect" sortOrder="16" showInDefault="1" showInWebsite="1" showInStore="0" >
-                    <label>Set number of installments</label>
-                    <source_model>Splitit\Paymentmethod\Model\Source\Installments</source_model>
-                </field> 
-
-                <field id="depending_on_cart_total" sortOrder="17"  translate="label" showInDefault="1" >
-                    <label>Depending on cart total</label>
-                    <!-- <source_block>Test\Testpayment\Block\Adminhtml\Depandoncart\Edit\Renderer\CustomRenderer\CustomRenderer</source_block> -->
-                    <!-- <frontend_model>Test\Testpayment\Block\System\Config\CustomFrontend</frontend_model> -->
-                    <!-- <source_model>Test\Testpayment\Model\Source\Installments</source_model> -->
-                </field>
-
-                <field id="depanding_on_cart_total_values" translate="label" type="hidden"  sortOrder="18"  showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Depending on cart total values</label>
-                </field>
-
-                <field id="first_payment" translate="label" type="select" sortOrder="19" showInDefault="1" showInWebsite="1" showInStore="0" >
-                    <label>First Payment</label>
-                    <source_model>Splitit\Paymentmethod\Model\Source\Firstpayment</source_model>
-                </field> 
-
-                <field id="percentage_of_order" translate="label" sortOrder="20"  showInDefault="1" showInWebsite="1" showInStore="0" >
-                    <label>Percentage of order %</label>
-                    <depends>
-                        <field id="first_payment">percentage</field>
-                    </depends>
-                </field>
-
-                <field id="splitit_per_product" translate="label" type="select" sortOrder="23" showInDefault="1" showInWebsite="1" showInStore="0" >
-                    <label>Enable Splitit per product</label>
-                    <source_model>Splitit\Paymentmethod\Model\Source\Perproduct</source_model>
-                </field>
-                <field id="splitit_product_skus" translate="label" type="text" sortOrder="24" showInDefault="1" showInWebsite="1" showInStore="0" >
-                    <label>List of product SKUs</label>
-                    <!-- <source_model>Splitit\Paymentmethod\Model\Source\Productskus</source_model> -->
-                </field>
-
-                <field id="enable_installment_price" translate="label" sortOrder="25" type="select" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Show installment option throughout my store</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field>
-
-                <field id="installment_price_on_pages" translate="label" type="multiselect" sortOrder="26" showInDefault="1" showInWebsite="1" showInStore="0" >
-                    <label>Display Installment Price on pages</label>
-                    <source_model>Splitit\Paymentmethod\Model\Source\Frontendpages</source_model>
-                </field>
-
-                <field id="installments_count" translate="label" sortOrder="27" type="select" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Number of installments for display</label>
-                    <source_model>Splitit\Paymentmethod\Model\Source\Installments</source_model>
-                </field>
-
-                <field id="splitit_logo_src" translate="label" sortOrder="28"  showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Splitit logo source</label>
-                </field>
-
-                <field id="title" translate="label" type="hidden" sortOrder="29" showInDefault="1" showInWebsite="1" showInStore="1">
-                    <label>Title</label>
-                </field>
-
-                <field id="faq_link_enabled" translate="label" sortOrder="30" type="select" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Help link enabled</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field>
-
-                <field id="faq_link_title" translate="label" type="hidden" sortOrder="31"  showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Help link title</label>
-                </field>
-
-                <field id="faq_link_title_url" translate="label" sortOrder="32"  showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Help link URL</label>
-                </field>
-
-                 <field id="splitit_logo__bakcground_href" translate="label" sortOrder="33"  showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Splitit Background Link</label>
-                </field>
-
-                <field id="cctypes" translate="label" type="multiselect" sortOrder="34" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Credit Card Types</label>
-                    <source_model>Splitit\Paymentmethod\Model\Source\Cctype</source_model>
-                </field>
-<!-- 
-                <field id="installment_price_text" translate="label" sortOrder="35"  showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Installment price text</label>
-                    <comment>SPLITIT in uppercase will automatically convert to Splitit logo</comment>
-                </field> -->
-
-                <field id="sort_order" translate="label" type="text" sortOrder="36" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Sort Order</label>
-                </field>                
-                
-                <!-- <field id="min_order_total" translate="label" type="text" sortOrder="28" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Minimum Order Total</label>
-                </field>
-                <field id="max_order_total" translate="label" type="text" sortOrder="29" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Maximum Order Total</label>
-                    <comment>Leave empty to disable limit</comment>
-                </field> -->
-                
-            </group>
-            
-            <group id="splitit_paymentredirect" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
-                <label>Splitit Payment Form</label>
-                <field id="active" translate="label" type="select" sortOrder="1" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Enabled</label>
-                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
-                </field>
-
-                <field id="api_terminal_key" translate="label" sortOrder="2" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Terminal API key</label>
-                </field>
-
-                <field id="api_username" translate="label" sortOrder="3" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>API Username</label>
-                </field>
-
-                <field id="api_password" translate="label" sortOrder="4" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>API Password</label>
-                </field>
-
-<!--                <field id="api_url" translate="label" sortOrder="5" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>API Url</label>
-                </field>
-
-                <field id="api_url_sandbox" translate="label" sortOrder="6" showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>API Sandbox Url</label>
-                </field>                -->
 
                 <field id="sandbox_flag" translate="label" sortOrder="7" type="select" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Sandbox Mode</label>
@@ -343,11 +167,6 @@
                     <label>Minimal amount for 3D attempt</label>
                 </field>
                 
-               <!--  <field id="installment_price_text" translate="label" sortOrder="37"  showInDefault="1" showInWebsite="1" showInStore="0">
-                    <label>Installment price text</label>
-                    <comment>SPLITIT in uppercase will automatically convert to Splitit logo</comment>
-                </field> -->
-
                 <field id="sort_order" translate="label" type="text" sortOrder="38" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Sort Order</label>
                 </field>

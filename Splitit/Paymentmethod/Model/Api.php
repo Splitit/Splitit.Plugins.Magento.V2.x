@@ -93,8 +93,8 @@ class Api extends \Magento\Payment\Model\Method\AbstractMethod {
 		$apiUrl = $this->getApiUrl();
 		if (empty($dataForLogin)) {
 			$dataForLogin = array(
-				'UserName' => $this->helper->getApiUsername("splitit_paymentmethod"),
-				'Password' => $this->helper->getApiPassword("splitit_paymentmethod"),
+				'UserName' => $this->helper->getApiUsername("splitit_paymentredirect"),
+				'Password' => $this->helper->getApiPassword("splitit_paymentredirect"),
 				'TouchPoint' => $this->helper->getApiTouchPointVersion(),
 			);
 		}
@@ -185,7 +185,7 @@ class Api extends \Magento\Payment\Model\Method\AbstractMethod {
 
 		$firstInstallmentAmount = $this->getFirstInstallmentAmount($selectedInstallment);
 		$cultureName = $this->helper->getCultureName();
-		
+
 		$customerInfo = $this->customerSession->getCustomer()->getData();
 		if (!isset($customerInfo["firstname"])) {
 			$customerInfo["firstname"] = $this->billingAddress->getFirstname();
@@ -195,23 +195,16 @@ class Api extends \Magento\Payment\Model\Method\AbstractMethod {
 		if ($customerInfo["email"] == "") {
 			$customerInfo["email"] = $this->guestEmail;
 		}
-		$billingStreet1 = "";
-		$billingStreet2 = "";
-		if (isset($this->billingAddress->getStreet()[0])) {
-			$billingStreet1 = $this->billingAddress->getStreet()[0];
-		}
-		if (isset($this->billingAddress->getStreet()[1])) {
-			$billingStreet2 = $this->billingAddress->getStreet()[1];
-		}
+
 		$autoCapture = false;
-		$paymentAction = $this->helper->getPaymentAction();
+		$paymentAction = $this->helper->getRedirectPaymentAction();
 		if ($paymentAction == "authorize_capture") {
 			$autoCapture = true;
 		}
 		$params = [
 			"RequestHeader" => [
 				"SessionId" => $this->getorCreateSplititSessionid(),
-				"ApiKey" => $this->helper->getApiTerminalKey("splitit_paymentmethod"),
+				"ApiKey" => $this->helper->getApiTerminalKey("splitit_paymentredirect"),
 			],
 			"PlanData" => [
 				"Amount" => [
@@ -263,10 +256,10 @@ class Api extends \Magento\Payment\Model\Method\AbstractMethod {
 	public function getApiUrl() {
 
 		$helper = $this->helper;
-		if ($helper->getSandboxFlag("splitit_paymentmethod")) {
-			return $helper->getApiUrlSandbox("splitit_paymentmethod");
+		if ($helper->getSandboxFlag("splitit_paymentredirect")) {
+			return $helper->getApiUrlSandbox("splitit_paymentredirect");
 		}
-		return $helper->getApiUrl("splitit_paymentmethod");
+		return $helper->getApiUrl("splitit_paymentredirect");
 	}
 
 	/**
@@ -360,8 +353,8 @@ class Api extends \Magento\Payment\Model\Method\AbstractMethod {
 	 */
 	public function getFirstInstallmentAmount($selectedInstallment) {
 
-		$firstPayment = $this->helper->getFirstPayment();
-		$percentageOfOrder = $this->helper->getPercentageOfOrder();
+		$firstPayment = $this->helper->getRedirestFirstPayment();
+		$percentageOfOrder = $this->helper->getRedirectPercentageOfOrder();
 
 		$selectedInstallmentAmount = round($this->grandTotal / $selectedInstallment, 2);
 
@@ -489,7 +482,7 @@ class Api extends \Magento\Payment\Model\Method\AbstractMethod {
 
 		} catch (\Exception $e) {
 			$result["errorMsg"] = $this->getServerDownMsg();
-			
+
 			$result = $this->helper->jsonEncode($result);
 		}
 		return $result;

@@ -23,7 +23,7 @@ class RenderHeadLinks extends Template
     public function toHtml()
     {
         $html = '';
-        if ($this->helper->getIsActive() && $this->helper->getEnableInstallmentPrice()) {
+        if ($this->helper->getRedirectIsActive() && $this->helper->getRedirectEnableInstallmentPrice()) {
             if (isset($this->filesToRender['js'])) {
                 $html .= '<script  type="text/javascript"  src="' . $this->getViewFileUrl($this->filesToRender['js']) . '"></script>';
             }
