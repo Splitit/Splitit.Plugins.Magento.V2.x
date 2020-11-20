@@ -11,56 +11,102 @@
 
 namespace Splitit\Paymentmethod\Model;
 
-class PaymentForm extends \Magento\Payment\Model\Method\AbstractMethod
-{
-    const CODE = 'splitit_paymentredirect';
+use Magento\Catalog\Model\ProductRepository;
+use Magento\Checkout\Model\Cart;
+use Magento\Checkout\Model\Session as CheckoutSession;
+use Magento\Customer\Model\Session as CustomerSession;
+use Magento\Framework\UrlInterface;
+use Magento\Quote\Model\Quote;
+use Magento\Quote\Model\QuoteValidator;
+use Magento\Store\Api\Data\StoreInterface;
+use Magento\Store\Model\StoreManagerInterface;
+use Psr\Log\LoggerInterface;
+use Splitit\Paymentmethod\Helper\Data;
+use Splitit\Paymentmethod\Model\Source\Installments;
 
-    protected $_code = self::CODE;
-    protected $_isInitializeNeeded = true;
-    protected $_canUseInternal = true;
-    protected $_canUseForMultishipping = false;
-    protected $_canAuthorize = true;
-    protected $_canCapture = true;
-    protected $_canCapturePartial = false;
-    protected $_canCaptureOnce = false;
-    protected $_canRefund = true;
-    protected $_canRefundInvoicePartial = true;
-    protected $_canVoid = false;
-    protected $_canUseCheckout = true;
-    protected $_canCancel = false;
-    protected $api;
-    protected $helper;
-    protected $checkoutSession;
-    protected $customerSession;
-    protected $quote;
-    protected $quoteValidator;
-    protected $store;
-    protected $logger;
-    protected $orderPlace;
-    protected $productModel;
-    protected $sourceInstallments;
-    protected $storeManager;
-    protected $cart;
-    protected $urlBuilder;
+class PaymentForm
+{
+    /**
+     * @var Api
+     */
+    private $api;
+
+    /**
+     * @var Data
+     */
+    private $helper;
+
+    /**
+     * @var CheckoutSession
+     */
+    private $checkoutSession;
+
+    /**
+     * @var CustomerSession
+     */
+    private $customerSession;
+
+    /**
+     * @var Quote
+     */
+    private $quote;
+
+    /**
+     * @var QuoteValidator
+     */
+    private $quoteValidator;
+
+    /**
+     * @var StoreInterface
+     */
+    private $store;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    /**
+     * @var ProductRepository
+     */
+    private $productModel;
+
+    /**
+     * @var Installments
+     */
+    private $sourceInstallments;
+
+    /**
+     * @var StoreManagerInterface
+     */
+    private $storeManager;
+
+    /**
+     * @var Cart
+     */
+    private $cart;
+
+    /**
+     * @var UrlInterface
+     */
+    private $urlBuilder;
 
     public function __construct(
-        \Psr\Log\LoggerInterface $logger,
+        LoggerInterface $logger,
         Api $api,
-        \Magento\Quote\Model\QuoteValidator $quoteValidator,
-        Helper\OrderPlace $orderPlace,
-        \Magento\Customer\Model\Session $customerSession,
-        \Magento\Store\Api\Data\StoreInterface $store,
-        \Magento\Framework\UrlInterface $urlBuilder,
-        \Magento\Checkout\Model\Session $checkoutSession,
-        \Splitit\Paymentmethod\Helper\Data $helper,
-        \Splitit\Paymentmethod\Model\Source\Installments $sourceInstallments,
-        \Magento\Store\Model\StoreManagerInterface $storeManager,
-        \Magento\Checkout\Model\Cart $cart,
-        \Magento\Catalog\Model\ProductRepository $productModel
+        QuoteValidator $quoteValidator,
+        CustomerSession $customerSession,
+        StoreInterface $store,
+        UrlInterface $urlBuilder,
+        CheckoutSession $checkoutSession,
+        Data $helper,
+        Installments $sourceInstallments,
+        StoreManagerInterface $storeManager,
+        Cart $cart,
+        ProductRepository $productModel
     ) {
         $this->api = $api;
         $this->quoteValidator = $quoteValidator;
-        $this->orderPlace = $orderPlace;
         $this->checkoutSession = $checkoutSession;
         $this->customerSession = $customerSession;
         $this->store = $store;
@@ -76,11 +122,12 @@ class PaymentForm extends \Magento\Payment\Model\Method\AbstractMethod
 
     /**
      * Get order redirect url for hosted
+     *
      * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
      */
     public function orderPlaceRedirectUrl()
     {
-
         $this->logger->error("FILE: " . __FILE__ . "\n LINE: " . __LINE__ . "\n Method: " . __METHOD__);
 
         $response = array(
@@ -93,8 +140,7 @@ class PaymentForm extends \Magento\Payment\Model\Method\AbstractMethod
         );
 
         /*check for address*/
-        $quote = $this->quote;
-        $billAddress = $quote->getBillingAddress();
+        $billAddress = $this->quote->getBillingAddress();
         $customerInfo = $this->customerSession->getCustomer()->getData();
         if (!isset($customerInfo["firstname"])) {
             $customerInfo["firstname"] = $billAddress->getFirstname();
@@ -120,8 +166,7 @@ class PaymentForm extends \Magento\Payment\Model\Method\AbstractMethod
         if (isset($initResponse["checkoutUrl"]) && $initResponse["checkoutUrl"] != "") {
             $response["checkoutUrl"] = $initResponse["checkoutUrl"];
 
-            $quote = $this->quote;
-            $billAddress = $quote->getBillingAddress();
+            $billAddress = $this->quote->getBillingAddress();
             $customerInfo = $this->customerSession->getCustomer()->getData();
             if (!isset($customerInfo["firstname"])) {
                 $customerInfo["firstname"] = $billAddress->getFirstname();
@@ -131,10 +176,9 @@ class PaymentForm extends \Magento\Payment\Model\Method\AbstractMethod
             $bags = $billAddress->getStreet();
 
             if (!($bags[0] == "" || $billAddress->getCity() == "" || $billAddress->getPostcode() == "" || $customerInfo["firstname"] == "" || $customerInfo["lastname"] == "" || $customerInfo["email"] == "" || $billAddress->getTelephone() == "")) {
-                if ($this->quoteValidator->validateBeforeSubmit($quote)) {
-                }
+                $this->quoteValidator->validateBeforeSubmit($this->quote);
             }
-            $this->checkoutSession->setSplititQuoteId($quote->getId());
+            $this->checkoutSession->setSplititQuoteId($this->quote->getId());
             $this->checkoutSession->setSplititCheckoutUrl($response["checkoutUrl"]);
             $this->checkoutSession->setSplititInstallmentPlanNumber($initResponse["installmentPlanNumber"]);
 
@@ -149,11 +193,12 @@ class PaymentForm extends \Magento\Payment\Model\Method\AbstractMethod
 
     /**
      * Validation for billing fields
-     * @param billingAddress object
-     * @param customerInfo object
+     *
+     * @param $billingAddress
+     * @param $customerInfo
      * @return array
      */
-    public function checkForBillingFieldsEmpty($billingAddress, $customerInfo)
+    private function checkForBillingFieldsEmpty($billingAddress, $customerInfo)
     {
 
         $response = ["errorMsg" => "", "successMsg" => "", "status" => false];
@@ -184,99 +229,10 @@ class PaymentForm extends \Magento\Payment\Model\Method\AbstractMethod
     }
 
     /**
-     * get checkout redirect url
-     * @return array
-     */
-    public function getCheckoutRedirectUrl()
-    {
-        $data = $this->orderPlaceRedirectUrl();
-        return $data['checkoutUrl'];
-    }
-
-    /**
-     * Validate payment method information object
-     *
-     * @return $this
-     */
-    public function validate()
-    {
-        return $this;
-    }
-
-    /**
-     * create the installment plan
-     * @param api object
-     * @param payment object
-     * @param amount float
-     * @return array
-     */
-    protected function createInstallmentPlan($api, $payment, $amount)
-    {
-        $cultureName = $this->helper->getCultureName(true);
-        $dataForLogin = array(
-            'UserName' => $this->helper->getApiUsername("splitit_paymentredirect"),
-            'Password' => $this->helper->getApiPassword("splitit_paymentredirect"),
-            'TouchPoint' => $this->helper->getApiTouchPointVersion(),
-        );
-        $params = array(
-            "RequestHeader" => array(
-                "SessionId" => $this->api->getorCreateSplititSessionid($dataForLogin),
-                "ApiKey" => $this->helper->getApiTerminalKey('splitit_paymentredirect'),
-                "CultureName" => $cultureName,
-            ),
-            "InstallmentPlanNumber" => $this->customerSession->getInstallmentPlanNumber(),
-            "CreditCardDetails" => array(
-                "CardCvv" => $payment->getCcCid(),
-                "CardNumber" => $payment->getCcNumber(),
-                "CardExpYear" => $payment->getCcExpYear(),
-                "CardExpMonth" => $payment->getCcExpMonth(),
-            ),
-            "PlanApprovalEvidence" => array(
-                "AreTermsAndConditionsApproved" => "True",
-            ),
-        );
-        $result = $api->createInstallmentPlan($this->api->getApiUrl(), $params);
-        if (isset($result["ResponseHeader"]) && isset($result["ResponseHeader"]["Errors"]) && !empty($result["ResponseHeader"]["Errors"])) {
-            $e = $api->getError();
-            throw new \Magento\Framework\Validator\Exception($e['code'] . ' ' . $e['message']);
-        }
-        return $result;
-    }
-
-    /**
-     * @param $storeId int
-     *
-     * @return PayItSimple_Payment_Model_Api
-     * @throws Mage_Payment_Exception
-     */
-    public function _initApi()
-    {
-        $dataForLogin = array(
-            'UserName' => $this->helper->getApiUsername("splitit_paymentredirect"),
-            'Password' => $this->helper->getApiPassword("splitit_paymentredirect"),
-            'TouchPoint' => $this->helper->getApiTouchPointVersion(),
-        );
-        $result = $this->api->apiLogin($dataForLogin);
-        if (isset($result["serverError"])) {
-            throw new \Magento\Framework\Validator\Exception(__($result["serverError"]));
-        }
-        return $result;
-    }
-
-    /**
-     * get number of installments
-     * @param api object
-     * @return int
-     */
-    public function getValidNumberOfInstallments($api)
-    {
-        return $result = $api->getValidNumberOfInstallments();
-    }
-
-    /**
      * Update order in magento
-     * @param api object
-     * @param order int
+     *
+     * @param $api
+     * @param $order
      * @return array
      */
     public function updateRefOrderNumber($api, $order)
@@ -331,18 +287,18 @@ class PaymentForm extends \Magento\Payment\Model\Method\AbstractMethod
 
     /**
      * initialization of plam
+     *
      * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function installmentplaninitForHostedSolution()
+    private function installmentplaninitForHostedSolution()
     {
         $this->logger->error("FILE: " . __FILE__ . "\n LINE: " . __LINE__ . "\n Method: " . __METHOD__);
         $this->logger->addDebug("FILE: " . __FILE__ . "\n LINE: " . __LINE__ . "\n Method: " . __METHOD__);
-        $session = $this->checkoutSession;
-        $quote_id = $session->getQuoteId();
         $firstInstallmentAmount = $this->getFirstInstallmentAmountHosted();
         $checkout = $this->checkoutSession->getQuote();
         $billAddress = $checkout->getBillingAddress();
-        $BillingAddressArr = $billAddress->getData();
         $customerInfo = $this->customerSession->getCustomer()->getData();
         $numOfInstallments = $this->checkoutSession->getInstallmentsInDropdownForPaymentForm();
 
@@ -382,12 +338,6 @@ class PaymentForm extends \Magento\Payment\Model\Method\AbstractMethod
 
                 $this->logger->addDebug('======= installmentplaninit : response from splitit =======InstallmentPlanNumber : ' . $installmentPlan);
                 $this->logger->addDebug(print_r($decodedResult, TRUE));
-                /*store information in splitit_hosted_solution for successExit and Async*/
-                $customerId = 0;
-                if ($this->customerSession->isLoggedIn()) {
-                    $customerData = $this->customerSession->getCustomer();
-                    $customerId = $customerData->getId();
-                }
             } else if (isset($decodedResult["ResponseHeader"]) && count($decodedResult["ResponseHeader"]["Errors"])) {
                 $errorMsg = "";
                 $i = 1;
@@ -412,15 +362,18 @@ class PaymentForm extends \Magento\Payment\Model\Method\AbstractMethod
 
     /**
      * initialization of plan params
-     * @param billAddress object
-     * @param customerInfo object
-     * @param firstInstallmentAmount int
-     * @param cultureName string
-     * @param numOfInstallments int
-     * @param selectedInstallment int
+     *
+     * @param $firstInstallmentAmount
+     * @param $billAddress
+     * @param $customerInfo
+     * @param $cultureName
+     * @param null $numOfInstallments
+     * @param $selectedInstallment
      * @return array
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function installmentplaninitParams($firstInstallmentAmount, $billAddress, $customerInfo, $cultureName, $numOfInstallments = null, $selectedInstallment)
+    private function installmentplaninitParams($firstInstallmentAmount, $billAddress, $customerInfo, $cultureName, $numOfInstallments = null, $selectedInstallment)
     {
         $paymentAction = $this->helper->getRedirectPaymentAction();
         $autoCapture = false;
@@ -526,10 +479,13 @@ class PaymentForm extends \Magento\Payment\Model\Method\AbstractMethod
     }
 
     /**
-     * Get first insatallment amount for hosted
+     * Get first installment amount for hosted
+     *
      * @return float
+     * @throws \Magento\Framework\Exception\LocalizedException
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
-    public function getFirstInstallmentAmountHosted()
+    private function getFirstInstallmentAmountHosted()
     {
         $firstPayment = $this->helper->getRedirestFirstPayment();
         $percentageOfOrder = $this->helper->getRedirectPercentageOfOrder();
@@ -553,7 +509,8 @@ class PaymentForm extends \Magento\Payment\Model\Method\AbstractMethod
 
     /**
      * Get installment details from Splitit
-     * @param api object
+     *
+     * @param $api
      * @return array
      */
     public function getInstallmentPlanDetails($api)
@@ -604,8 +561,9 @@ class PaymentForm extends \Magento\Payment\Model\Method\AbstractMethod
 
     /**
      * Cancel installment details from Splitit
-     * @param api object
-     * @param installmentPlanNumber string
+     *
+     * @param $api
+     * @param $installmentPlanNumber
      * @return array
      */
     public function cancelInstallmentPlan($api, $installmentPlanNumber)
@@ -646,29 +604,12 @@ class PaymentForm extends \Magento\Payment\Model\Method\AbstractMethod
     }
 
     /**
+     * $depandOnCart = 1;
      * Determine method availability based on quote amount and config data
      *
      * @param \Magento\Quote\Api\Data\CartInterface|null $quote
      * @return bool
-     */
-    public function isAvailable(\Magento\Quote\Api\Data\CartInterface $quote = null)
-    {
-        if (!$quote) {
-            $quote = $this->quote;
-        }
-
-        if ($this->checkAvailableInstallments($quote) && $this->checkProductBasedAvailability()) {
-            return parent::isAvailable($quote);
-        } else {
-            return false;
-        }
-    }
-
-    /**            $depandOnCart = 1;
-     * Determine method availability based on quote amount and config data
-     *
-     * @param \Magento\Quote\Api\Data\CartInterface|null $quote
-     * @return bool
+     * @throws \Magento\Framework\Exception\NoSuchEntityException
      */
     public function checkAvailableInstallments($quote)
     {

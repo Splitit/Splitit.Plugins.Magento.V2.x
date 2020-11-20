@@ -83,15 +83,11 @@ class Success extends \Magento\Framework\App\Action\Action {
 		if (!$this->checkoutSession->getSplititInstallmentPlanNumber()) {
 			$this->checkoutSession->setSplititInstallmentPlanNumber($params['InstallmentPlanNumber']);
 		}
-		$api = $this->paymentForm->_initApi();
 		$planDetails = $this->paymentForm->getInstallmentPlanDetails($this->api);
 
 		$this->logger->addDebug("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 		$this->logger->addDebug('======= get installmentplan details :  ======= ');
 		$this->logger->addDebug(print_r($planDetails, TRUE));
-
-		$orderId = 0;
-		$orderIncrementId = 0;
 
 		$grandTotal = number_format((float) $quote->getGrandTotal(), 2, '.', '');
 		$planDetails["grandTotal"] = number_format((float) $planDetails["grandTotal"], 2, '.', '');
@@ -130,7 +126,7 @@ class Success extends \Magento\Framework\App\Action\Action {
 			}
 			$this->orderSender->send($order);
 			$order->save();
-			$curlRes = $this->paymentForm->updateRefOrderNumber($this->api, $order);
+			$this->paymentForm->updateRefOrderNumber($this->api, $order);
 
 			$this->logger->addDebug("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 			$this->logger->addDebug('====== Order Id =====:' . $orderId . '==== Order Increment Id ======:' . $orderIncrementId);
