@@ -63,7 +63,7 @@ class Getinstallment extends \Magento\Framework\App\Action\Action {
 
 		$totalAmount = $this->cart->getQuote()->getGrandTotal();
 
-		$selectInstallmentSetup = $this->helper->getSelectInstallmentSetup();
+		$selectInstallmentSetup = $this->helper->getRedirectSelectInstallmentSetup();
 		$options = $this->splititSource->toOptionArray();
 		$currentCurrencyCode = $this->storeManager->getStore()->getCurrentCurrencyCode();
 		$currencySymbol = $this->currency->load($currentCurrencyCode)->getCurrencySymbol();
@@ -71,7 +71,7 @@ class Getinstallment extends \Magento\Framework\App\Action\Action {
 		$installmentHtml = '<option value="">--' . __('No Installment available') . '--</option>';
 		$countInstallments = $installmentValue = 0;
 		if ($selectInstallmentSetup == "" || $selectInstallmentSetup == "fixed") {
-			$installments = $this->helper->getFixedInstallment();
+			$installments = $this->helper->getRedirectFixedInstallment();
 
 			if ($installments) {
 				$installmentHtml = '<option value="">--' . __('Please Select') . '--</option>';
@@ -84,7 +84,7 @@ class Getinstallment extends \Magento\Framework\App\Action\Action {
 			}
 		} else {
 			$installmentHtml = '<option value="">--' . __('Please Select') . '--</option>';
-			$depandingOnCartInstallments = $this->helper->getDepandingOnCartTotalValues();
+			$depandingOnCartInstallments = $this->helper->getRedirectDepandingOnCartTotalValues();
 			$depandingOnCartInstallmentsArr = $this->jsonHelper->jsonDecode($depandingOnCartInstallments);
 			$dataAsPerCurrency = [];
 			foreach ($depandingOnCartInstallmentsArr as $data) {

@@ -11,7 +11,7 @@ use Magento\Checkout\Model\ConfigProviderInterface;
  * Class ConfigProvider
  */
 final class ConfigProvider implements ConfigProviderInterface {
-	const CODE = 'splitit_paymentmethod';
+	const CODE = 'splitit_paymentredirect';
 
 	/**
 	 * Payment ConfigProvider constructor.

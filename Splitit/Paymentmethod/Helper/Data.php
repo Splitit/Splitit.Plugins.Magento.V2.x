@@ -77,56 +77,50 @@ class Data extends AbstractHelper {
 
 	/**
 	 * To get the config value of Api UserName
-	 * @param method string
 	 * @return string
 	 */
-	public function getApiUsername($method) {
-		return $this->getConfig("payment/" . $method . "/api_username");
+	public function getApiUsername() {
+		return $this->getConfig("payment/splitit_paymentredirect/api_username");
 	}
 
 	/**
 	 * To get the config value of Api password
-	 * @param method string
 	 * @return string
 	 */
-	public function getApiPassword($method) {
-		return $this->getConfig("payment/" . $method . "/api_password");
+	public function getApiPassword() {
+		return $this->getConfig("payment/splitit_paymentredirect/api_password");
 	}
 
 	/**
 	 * To get the config value of api_terminal_key
-	 * @param method string
 	 * @return string
 	 */
-	public function getApiTerminalKey($method) {
-		return $this->getConfig("payment/" . $method . "/api_terminal_key");
+	public function getApiTerminalKey() {
+		return $this->getConfig("payment/splitit_paymentredirect/api_terminal_key");
 	}
 
 	/**
 	 * To get the config value of sandbox_flag
-	 * @param method string
 	 * @return string
 	 */
-	public function getSandboxFlag($method) {
-		return $this->getConfig("payment/" . $method . "/sandbox_flag");
+	public function getSandboxFlag() {
+		return $this->getConfig("payment/splitit_paymentredirect/sandbox_flag");
 	}
 
 	/**
 	 * To get the config value of api_url_sandbox
-	 * @param method string
 	 * @return string
 	 */
-	public function getApiUrlSandbox($method) {
-		return $this->getConfig("payment/" . $method . "/api_url_sandbox");
+	public function getApiUrlSandbox() {
+		return $this->getConfig("payment/splitit_paymentredirect/api_url_sandbox");
 	}
 
 	/**
 	 * To get the config value of api_url
-	 * @param method string
 	 * @return string
 	 */
-	public function getApiUrl($method) {
-		return $this->getConfig("payment/" . $method . "/api_url");
+	public function getApiUrl() {
+		return $this->getConfig("payment/splitit_paymentredirect/api_url");
 	}
 
 	/**
@@ -141,14 +135,6 @@ class Data extends AbstractHelper {
 	 * To get the config value of select_installment_setup
 	 * @return string
 	 */
-	public function getSelectInstallmentSetup() {
-		return $this->getConfig('payment/splitit_paymentmethod/select_installment_setup');
-	}
-
-	/**
-	 * To get the config value of select_installment_setup
-	 * @return string
-	 */
 	public function getRedirectSelectInstallmentSetup() {
 		return $this->getConfig('payment/splitit_paymentredirect/select_installment_setup');
 	}
@@ -157,24 +143,8 @@ class Data extends AbstractHelper {
 	 * To get the config value of fixed_installment
 	 * @return string
 	 */
-	public function getFixedInstallment() {
-		return $this->getConfig('payment/splitit_paymentmethod/fixed_installment');
-	}
-
-	/**
-	 * To get the config value of fixed_installment
-	 * @return string
-	 */
 	public function getRedirectFixedInstallment() {
 		return $this->getConfig('payment/splitit_paymentredirect/fixed_installment');
-	}
-
-	/**
-	 * To get the config value of depanding_on_cart_total_values
-	 * @return string
-	 */
-	public function getDepandingOnCartTotalValues() {
-		return $this->getConfig('payment/splitit_paymentmethod/depanding_on_cart_total_values');
 	}
 
 	/**
@@ -190,7 +160,7 @@ class Data extends AbstractHelper {
 	 * @return string
 	 */
 	public function getFaqLinkEnabled() {
-		return $this->getConfig('payment/splitit_paymentmethod/faq_link_enabled');
+		return $this->getConfig('payment/splitit_paymentredirect/faq_link_enabled');
 	}
 
 	/**
@@ -198,22 +168,14 @@ class Data extends AbstractHelper {
 	 * @return string
 	 */
 	public function getFaqLinkTitle() {
-		return $this->getConfig('payment/splitit_paymentmethod/faq_link_title');
-	}
-
-	/**
-	 * To get the config value of faq_link_title_url
-	 * @return string
-	 */
-	public function getFaqLinkTitleUrl() {
-		return $this->getConfig('payment/splitit_paymentmethod/faq_link_title_url');
+		return $this->getConfig('payment/splitit_paymentredirect/faq_link_title');
 	}
 
 	/**
 	 * To get the config value of payment_action
 	 * @return string
 	 */
-	public function getRedirectFaqLinkTitleUrl() {
+	public function getFaqLinkTitleUrl() {
 		return $this->getConfig('payment/splitit_paymentredirect/faq_link_title_url');
 	}
 
@@ -223,22 +185,6 @@ class Data extends AbstractHelper {
 	 */
 	public function getRedirectPaymentAction() {
 		return $this->getConfig('payment/splitit_paymentredirect/payment_action');
-	}
-
-	/**
-	 * To get the config value of payment_action
-	 * @return string
-	 */
-	public function getPaymentAction() {
-		return $this->getConfig('payment/splitit_paymentmethod/payment_action');
-	}
-
-	/**
-	 * To get the config value of enable_installment_price
-	 * @return string
-	 */
-	public function getEnableInstallmentPrice() {
-		return $this->getConfig('payment/splitit_paymentmethod/enable_installment_price');
 	}
 
 	/**
@@ -253,24 +199,8 @@ class Data extends AbstractHelper {
 	 * To get the config value of first_payment
 	 * @return string
 	 */
-	public function getFirstPayment() {
-		return $this->getConfig('payment/splitit_paymentmethod/first_payment');
-	}
-
-	/**
-	 * To get the config value of first_payment
-	 * @return string
-	 */
 	public function getRedirestFirstPayment() {
 		return $this->getConfig('payment/splitit_paymentredirect/first_payment');
-	}
-
-	/**
-	 * To get the config value of percentage_of_order
-	 * @return string
-	 */
-	public function getPercentageOfOrder() {
-		return $this->getConfig('payment/splitit_paymentmethod/percentage_of_order');
 	}
 
 	/**
@@ -314,43 +244,11 @@ class Data extends AbstractHelper {
 	}
 
 	/**
-	 * To get the config value of splitit_product_skus
-	 * @return string
-	 */
-	public function getSplititProductSkus() {
-		return $this->getConfig('payment/splitit_paymentmethod/splitit_product_skus');
-	}
-
-	/**
-	 * To get the config value of splitit_per_product
-	 * @return string
-	 */
-	public function getSplititPerProduct() {
-		return $this->getConfig('payment/splitit_paymentmethod/splitit_per_product');
-	}
-
-	/**
-	 * To get the config value of splitit_fallback_language
-	 * @return string
-	 */
-	public function getSplititFallbackLanguage() {
-		return $this->getConfig('payment/splitit_paymentmethod/splitit_per_product');
-	}
-
-	/**
 	 * To get the config value of splitit_per_product
 	 * @return string
 	 */
 	public function getRedirectSplititFallbackLanguage() {
 		return $this->getConfig('payment/splitit_paymentredirect/splitit_per_product');
-	}
-
-	/**
-	 * To get the config value of active
-	 * @return string
-	 */
-	public function getIsActive() {
-		return $this->getConfig('payment/splitit_paymentmethod/active');
 	}
 
 	/**
@@ -365,24 +263,8 @@ class Data extends AbstractHelper {
 	 * To get the config value of splitit_logo_src
 	 * @return string
 	 */
-	public function getSplititLogoSrc() {
-		return $this->getConfig('payment/splitit_paymentmethod/splitit_logo_src');
-	}
-
-	/**
-	 * To get the config value of splitit_logo_src
-	 * @return string
-	 */
 	public function getRedirectSplititLogoSrc() {
 		return $this->getConfig('payment/splitit_paymentredirect/splitit_logo_src');
-	}
-
-	/**
-	 * To get the config value of splitit_logo__bakcground_href
-	 * @return string
-	 */
-	public function getSplititLogoHref() {
-		return $this->getConfig('payment/splitit_paymentmethod/splitit_logo__bakcground_href');
 	}
 
 	/**
@@ -397,24 +279,8 @@ class Data extends AbstractHelper {
 	 * To get the config value of installments_count
 	 * @return string
 	 */
-	public function getInstallmentsCount() {
-		return $this->getConfig('payment/splitit_paymentmethod/installments_count');
-	}
-
-	/**
-	 * To get the config value of installments_count
-	 * @return string
-	 */
 	public function getRedirectInstallmentsCoun() {
 		return $this->getConfig('payment/splitit_paymentredirect/installments_count');
-	}
-
-	/**
-	 * To get the config value of installment_price_on_pages
-	 * @return string
-	 */
-	public function getInstallmentsPriceOnPage() {
-		return $this->getConfig('payment/splitit_paymentmethod/installment_price_on_pages');
 	}
 
 	/**
@@ -441,7 +307,6 @@ class Data extends AbstractHelper {
 	 */
 	public function getCurrencyData() {
 		$currencyCode = $this->storeManager->getStore()->getCurrentCurrencyCode();
-		$currencyRate = $this->storeManager->getStore()->getCurrentCurrencyRate();
 
 		$currency = $this->currency->load($currencyCode);
 		return $currencySymbol = $currency->getCurrencySymbol();
@@ -451,17 +316,13 @@ class Data extends AbstractHelper {
 	 * To get Splitit culture names
 	 * @return string
 	 */
-	public function getCultureName($paymentForm = false) {
+	public function getCultureName() {
 		$storelang = $this->storeLocale->getLocale();
 		$splititSupportedCultures = $this->getSplititSupportedCultures();
 
 		if (count($splititSupportedCultures) && in_array(str_replace('_', '-', $storelang), $splititSupportedCultures)) {
 			return str_replace('_', '-', $storelang);
 		} else {
-			if ($paymentForm) {
-				return $this->getSplititFallbackLanguage();
-			}
-
 			return $this->getRedirectSplititFallbackLanguage();
 		}
 	}
@@ -503,16 +364,6 @@ class Data extends AbstractHelper {
 			$text['bakcground_href'] = $this->getRedirectSplititLogoHref();
 			$text['installments_count'] = $this->getRedirectInstallmentsCoun();
 			$text['installment_price_on_pages'] = $this->getRedirectInstallmentsPriceOnPage();
-			$text['help_link'] = $this->getRedirectFaqLinkTitleUrl();
-			$text['help_title'] = __('Learn More');
-		}
-
-		if ($this->getIsActive() && $this->getEnableInstallmentPrice()) {
-			$text['price_text'] = 'or {NOI} interest-free payments of {AMOUNT} with SPLITIT';
-			$text['logo_src'] = $this->getSplititLogoSrc();
-			$text['bakcground_href'] = $this->getSplititLogoHref();
-			$text['installments_count'] = $this->getInstallmentsCount();
-			$text['installment_price_on_pages'] = $this->getInstallmentsPriceOnPage();
 			$text['help_link'] = $this->getFaqLinkTitleUrl();
 			$text['help_title'] = __('Learn More');
 		}
