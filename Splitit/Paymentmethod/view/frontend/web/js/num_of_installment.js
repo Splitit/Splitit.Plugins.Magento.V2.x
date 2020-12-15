@@ -26,7 +26,6 @@ function runMyScripts(){
 	if(jQuery('#product_addtocart_form').length && jQuery('#product_addtocart_form input[name="product"]').length){
 		productId = jQuery('#product_addtocart_form input[name="product"]').val();
 	}
-	if (document.getElementById('splitit_paymentmethod')!=undefined || document.getElementById('splitit_paymentredirect')!=undefined){
 	jQuery.ajax({
 			url: SPLITIT_BASE_URL + "splititpaymentmethod/showinstallmentprice/getinstallmentprice",
 		data : { pid : productId},
@@ -134,7 +133,6 @@ function runMyScripts(){
 
 		}
 	});
-	}
 
 	// regular checkout page
 
