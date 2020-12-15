@@ -10,12 +10,13 @@ define([
                 var prices = this._getNewPrices();
                 var newPrice = {detail: prices.finalPrice.amount};
                 var oldPrice = window.splitit_product_price;
-                if (oldPrice != undefined && oldPrice != newPrice.detail) {
+                if (oldPrice != undefined) {
                     var installments = (newPrice.detail/parseFloat(window.splitit_installments)).toFixed(2);
-                    var textBlock = jQuery('.cart-installment').html();
+                    /* var textBlock = jQuery('.cart-installment').html(); */
                     var newValue = window.splitit_currency + installments;
-                    textBlock = textBlock.replace(/\$([0-9]+\.?[0-9]+)/, newValue);
-                    jQuery('.cart-installment').html(textBlock);
+                    /* textBlock = textBlock.replace(/\$([0-9]+\.?[0-9]+)/, newValue);
+                    jQuery('.cart-installment').html(textBlock); */
+                    jQuery('.cart-installment .after-ins-price').html(newValue);
                 }
                 return this._super();
             }

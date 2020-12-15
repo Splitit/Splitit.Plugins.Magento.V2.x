@@ -67,7 +67,7 @@ function runMyScripts(){
 						productprice = Number(productprice.replace(/[^0-9\.]+/g,""));
 						productprice = jQuery(this).find('[data-price-type="finalPrice"]').attr('data-price-amount');
 						installments = (productprice/result.numOfInstallmentForDisplay).toFixed(2);
-						installmentNewSpan = '<br><span class="cart-installment">'+currencySymbol+installments+' x '+result.numOfInstallmentForDisplay+' '+result.installmetPriceText+'</span>';
+						installmentNewSpan = '<br><span class="cart-installment">'+'<span class="after-ins-price">'+currencySymbol+installments+'</span>'+' x '+result.numOfInstallmentForDisplay+' '+result.installmetPriceText+'</span>';
 						jQuery(priceSpan).after(installmentNewSpan);
 
 					});
@@ -83,7 +83,7 @@ function runMyScripts(){
 					window.splitit_product_price = productprice;
 					window.splitit_installments = result.numOfInstallmentForDisplay;
 					window.splitit_currency = currencySymbol;
-					installmentNewSpan = result.installmetPriceText.replace('{AMOUNT}',currencySymbol+installments);
+					installmentNewSpan = result.installmetPriceText.replace('{AMOUNT}','<span class="after-ins-price">'+currencySymbol+installments+'</span>');
 					installmentNewSpan = '<br><span class="cart-installment">'+installmentNewSpan+'</span>';
 					jQuery('.product-info-price').after(installmentNewSpan);
 
@@ -98,7 +98,7 @@ function runMyScripts(){
 						currencySymbol = result.currencySymbol;
 						productprice = Number(productprice.replace(/[^0-9\.]+/g,""));
 						installments = (productprice/result.numOfInstallmentForDisplay).toFixed(2);
-						installmentNewSpan = result.installmetPriceText.replace('{AMOUNT}',currencySymbol+installments);
+						installmentNewSpan = result.installmetPriceText.replace('{AMOUNT}','<span class="after-ins-price">'+currencySymbol+installments+'</span>');
 					installmentNewSpan = '<br><span class="cart-installment">'+installmentNewSpan+'</span>';
 						jQuery('table.totals tr:last').after('<tr><td>'+installmentNewSpan+'</td></tr>');
 		    		}else{
@@ -120,7 +120,7 @@ function runMyScripts(){
 							currencySymbol = result.currencySymbol;
 							productprice = Number(productprice.replace(/[^0-9\.]+/g,""));
 							installments = (productprice/result.numOfInstallmentForDisplay).toFixed(2);
-							installmentNewSpan = result.installmetPriceText.replace('{AMOUNT}',currencySymbol+installments);
+							installmentNewSpan = result.installmetPriceText.replace('{AMOUNT}','<span class="after-ins-price">'+currencySymbol+installments+'</span>');
 							installmentNewSpan = '<br><span class="cart-installment">'+installmentNewSpan+'</span>';
 							jQuery('div.iwd-grand-total-item').after(installmentNewSpan);
 						}
@@ -191,7 +191,7 @@ function runMyScriptForCheckout(){
 					currencySymbol = result.currencySymbol;
 					productprice = Number(productprice.replace(/[^0-9\.]+/g,""));
 					installments = (productprice/result.numOfInstallmentForDisplay).toFixed(2);
-					installmentNewSpan = result.installmetPriceText.replace('{AMOUNT}',currencySymbol+installments);
+					installmentNewSpan = result.installmetPriceText.replace('{AMOUNT}','<span class="after-ins-price">'+currencySymbol+installments+'</span>');
 					installmentNewSpan = '<br><span class="cart-installment">'+installmentNewSpan+'</span>';
 					jQuery('.cart-installment').closest('tr').remove();
 					jQuery('table.table-totals').find('.cart-installment-onepage').closest('tr').remove();
