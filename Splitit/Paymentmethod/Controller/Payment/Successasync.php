@@ -94,14 +94,10 @@ class Successasync extends \Magento\Framework\App\Action\Action {
 		$this->logger->addDebug('======= successAsyncAction :  =======InstallmentPlanNumber coming from splitit in url: ' . $params["InstallmentPlanNumber"]);
 		$this->logger->addDebug('======= quote Id from Splitit :  ======= '.$params['RefOrderNumber']);
 		$quote = $this->quoteRepository->get($params['RefOrderNumber']);
-		$api = $this->paymentForm->_initApi();
 		$planDetails = $this->paymentForm->getInstallmentPlanDetails($this->api);
 
 		$this->logger->addDebug('======= get installmentplan details :  ======= ');
 		$this->logger->addDebug(print_r($planDetails, TRUE));
-
-		$orderId = 0;
-		$orderIncrementId = 0;
 
 		$grandTotal = number_format((float) $quote->getGrandTotal(), 2, '.', '');
 		$planDetails["grandTotal"] = number_format((float) $planDetails["grandTotal"], 2, '.', '');
