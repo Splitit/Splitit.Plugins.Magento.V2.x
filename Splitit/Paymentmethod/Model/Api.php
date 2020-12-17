@@ -83,6 +83,23 @@ class Api extends \Magento\Payment\Model\Method\AbstractMethod {
 
 	}
 
+    /**
+     * Verify that payment was done correctly on Splitit side
+     *
+     * @param $ipn
+     * @return array
+     */
+    public function verifyPayment($ipn)
+    {
+        $apiUrl = $this->getApiUrl();
+        $params = [
+            'RequestHeader' => ['SessionId' => $this->getorCreateSplititSessionid()],
+            'InstallmentPlanNumber' => $ipn
+        ];
+        $result = $this->makePhpCurlRequest($apiUrl, 'InstallmentPlan/Get/VerifyPayment', $params);
+        return $this->helper->jsonDecode($result);
+    }
+
 	/**
 	 * Responsible for login to Splitit and generate session id
 	 *

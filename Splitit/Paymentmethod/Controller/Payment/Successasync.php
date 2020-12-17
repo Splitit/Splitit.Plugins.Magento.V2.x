@@ -103,7 +103,11 @@ class Successasync extends \Magento\Framework\App\Action\Action {
 		$planDetails["grandTotal"] = number_format((float) $planDetails["grandTotal"], 2, '.', '');
 		$this->logger->addDebug('======= grandTotal(orderObj):' . $grandTotal . ', grandTotal(planDetails):' . $planDetails["grandTotal"] . '   ======= ');
 
-		if ($grandTotal == $planDetails["grandTotal"] && ($planDetails["planStatus"] == "PendingMerchantShipmentNotice" || $planDetails["planStatus"] == "InProgress")) {
+        $verifyResult = $this->api->verifyPayment($params['InstallmentPlanNumber']);
+        $this->logger->addDebug('======= verify details :  ======= ');
+        $this->logger->addDebug(print_r($verifyResult, TRUE));
+
+		if ($verifyResult['IsPaid'] && $verifyResult['OriginalAmountPaid'] == $grandTotal && $grandTotal == $planDetails["grandTotal"] && ($planDetails["planStatus"] == "PendingMerchantShipmentNotice" || $planDetails["planStatus"] == "InProgress")) {
 			$orderId = $this->orderPlace->execute($quote, array());
 			$this->logger->addDebug('======= order Id :  ======= '.$orderId);
 
