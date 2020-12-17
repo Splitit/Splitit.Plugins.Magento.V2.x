@@ -91,13 +91,45 @@ class Api extends \Magento\Payment\Model\Method\AbstractMethod {
      */
     public function verifyPayment($ipn)
     {
-        $apiUrl = $this->getApiUrl();
-        $params = [
-            'RequestHeader' => ['SessionId' => $this->getorCreateSplititSessionid()],
-            'InstallmentPlanNumber' => $ipn
-        ];
-        $result = $this->makePhpCurlRequest($apiUrl, 'InstallmentPlan/Get/VerifyPayment', $params);
-        return $this->helper->jsonDecode($result);
+		try{
+			$apiUrl = $this->getApiUrl();
+			$params = [
+				'RequestHeader' => ['SessionId' => $this->getorCreateSplititSessionid()],
+				'InstallmentPlanNumber' => $ipn
+			];
+			$result = $this->makePhpCurlRequest($apiUrl, 'InstallmentPlan/Get/VerifyPayment', $params);
+			$decodedResult = $this->helper->jsonDecode($result);
+			/*check for curl error*/
+			if (isset($decodedResult["errorMsg"])) {
+				throw new \Magento\Framework\Validator\Exception(__($decodedResult["errorMsg"]));
+			}
+			if (isset($decodedResult["ResponseHeader"]) && isset($decodedResult["ResponseHeader"]["Errors"]) && !empty($decodedResult["ResponseHeader"]["Errors"])) {
+				$errorMsg = "";
+
+				$errorCode = 503;
+				$isErrorCode503Found = 0;
+				foreach ($decodedResult["ResponseHeader"]["Errors"] as $key => $value) {
+					$errorMsg .= $value["ErrorCode"] . " : " . $value["Message"];
+					if ($value["ErrorCode"] == $errorCode) {
+						$isErrorCode503Found = 1;
+						break;
+					}
+				}
+
+				if ($isErrorCode503Found == 0) {
+					throw new \Magento\Framework\Validator\Exception(__($errorMsg));
+				}
+
+			} elseif (isset($decodedResult["serverError"])) {
+				$errorMsg = $decodedResult["serverError"];
+				throw new \Magento\Framework\Validator\Exception(__($errorMsg));
+			}
+		} catch (\Exception $e) {
+			$this->logger->error($e->getMessage());
+			$decodedResult["errorMsg"] = $e->getMessage();
+		}
+
+		return $decodedResult;
     }
 
 	/**
