@@ -109,26 +109,22 @@ class Successasync extends \Magento\Framework\App\Action\Action {
 		$this->logger->addDebug(print_r($verifyResult, TRUE));
 		
 		if(isset($verifyResult['errorMsg'])){
-			$this->logger->addDebug('======= verify API error :  ======= ');
+			$this->logger->addDebug('======= ASYNC verify API error :  ======= ');
 			$this->logger->addDebug($verifyResult['errorMsg']);
 			$this->logger->addDebug(__('Sorry, the payment was denied by the gateway! So order was not placed. If any amount was deducted, it will be credited back. Please try to order again.'));
-			
-			$this->messageManager->addError(__('Sorry, the payment was denied by the gateway! So order was not placed. If any amount was deducted, it will be credited back. Please try to order again.'));
-			$this->_redirect("checkout/cart")->sendResponse();
+			return json_encode(['error'=>true]);
 		}
 		if(!$verifyResult['IsPaid']){
-			$this->logger->addDebug('======= verify API error :  ======= ');
+			$this->logger->addDebug('======= ASYNC verify API error :  ======= ');
 			$this->logger->addDebug(__('Sorry, there was no actual payment received to create the order! So order was not placed. Please try to order again.'));
 			
-			$this->messageManager->addError(__('Sorry, there was no actual payment received to create the order! So order was not placed. Please try to order again.'));
-			$this->_redirect("checkout/cart")->sendResponse();
+			return json_encode(['error'=>true]);
 		}
 		if($verifyResult['OriginalAmountPaid'] != $grandTotal){
-			$this->logger->addDebug('======= verify API error :  ======= ');
+			$this->logger->addDebug('======= ASYNC verify API error :  ======= ');
 			$this->logger->addDebug(__('Sorry, there\'s an amount mismatch between cart amount and paid amount! So order was not placed. If any amount was deducted, it will be credited back. Please try to order again.'));
 			
-			$this->messageManager->addError(__('Sorry, there\'s an amount mismatch between cart amount and paid amount! So order was not placed. If any amount was deducted, it will be credited back. Please try to order again.'));
-			$this->_redirect("checkout/cart")->sendResponse();
+			return json_encode(['error'=>true]);
 		}
 		/* END verify payment from splitit */
 
