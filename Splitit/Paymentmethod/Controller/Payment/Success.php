@@ -93,6 +93,36 @@ class Success extends \Magento\Framework\App\Action\Action {
 		$planDetails["grandTotal"] = number_format((float) $planDetails["grandTotal"], 2, '.', '');
 		$this->logger->addDebug("FILE: ".__FILE__."\n LINE: ". __LINE__."\n Method: ". __METHOD__);
 		$this->logger->addDebug('======= grandTotal(quote):' . $grandTotal . ', grandTotal(planDetails):' . $planDetails["grandTotal"] . '   ======= ');
+
+		/* verify payment from splitit */
+        $verifyResult = $this->api->verifyPayment($this->checkoutSession->getSplititInstallmentPlanNumber());
+        $this->logger->addDebug('======= verify details :  ======= ');
+		$this->logger->addDebug(print_r($verifyResult, TRUE));
+		
+		if(isset($verifyResult['errorMsg'])){
+			$this->logger->addDebug('======= verify API error :  ======= ');
+			$this->logger->addDebug($verifyResult['errorMsg']);
+			$this->logger->addDebug(__('Sorry, the payment was denied by the gateway! So order was not placed. If any amount was deducted, it will be credited back. Please try to order again.'));
+			
+			$this->messageManager->addError(__('Sorry, the payment was denied by the gateway! So order was not placed. If any amount was deducted, it will be credited back. Please try to order again.'));
+			$this->_redirect("checkout/cart")->sendResponse();
+		}
+		if(!$verifyResult['IsPaid']){
+			$this->logger->addDebug('======= verify API error :  ======= ');
+			$this->logger->addDebug(__('Sorry, there was no actual payment received to create the order! So order was not placed. Please try to order again.'));
+			
+			$this->messageManager->addError(__('Sorry, there was no actual payment received to create the order! So order was not placed. Please try to order again.'));
+			$this->_redirect("checkout/cart")->sendResponse();
+		}
+		if($verifyResult['OriginalAmountPaid'] != $grandTotal){
+			$this->logger->addDebug('======= verify API error :  ======= ');
+			$this->logger->addDebug(__('Sorry, there\'s an amount mismatch between cart amount and paid amount! So order was not placed. If any amount was deducted, it will be credited back. Please try to order again.'));
+			
+			$this->messageManager->addError(__('Sorry, there\'s an amount mismatch between cart amount and paid amount! So order was not placed. If any amount was deducted, it will be credited back. Please try to order again.'));
+			$this->_redirect("checkout/cart")->sendResponse();
+		}
+		/* END verify payment from splitit */
+
 		if ($grandTotal == $planDetails["grandTotal"] && ($planDetails["planStatus"] == "PendingMerchantShipmentNotice" || $planDetails["planStatus"] == "InProgress")) {
 			$this->orderPlace->execute($quote, array());
 			$order = $this->checkoutSession->getLastRealOrder();
