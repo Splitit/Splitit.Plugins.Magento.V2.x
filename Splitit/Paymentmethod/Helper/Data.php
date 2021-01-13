@@ -244,11 +244,11 @@ class Data extends AbstractHelper {
 	}
 
 	/**
-	 * To get the config value of splitit_per_product
+	 * To get the config value of splitit_fallback_language
 	 * @return string
 	 */
 	public function getRedirectSplititFallbackLanguage() {
-		return $this->getConfig('payment/splitit_paymentredirect/splitit_per_product');
+		return $this->getConfig('payment/splitit_paymentredirect/splitit_fallback_language');
 	}
 
 	/**
@@ -336,8 +336,10 @@ class Data extends AbstractHelper {
 		$getSplititSupportedCultures = $this->SupportedCulturesSource->getSplititSupportedCultures($apiUrl . "api/Infrastructure/SupportedCultures");
 
 		$decodedResult = $this->jsonHelper->jsonDecode($getSplititSupportedCultures);
-		if (isset($decodedResult["ResponseHeader"]["Succeeded"]) && $decodedResult["ResponseHeader"]["Succeeded"] == 1 && count($decodedResult["SupportedCultures"])) {
-			return $decodedResult["SupportedCultures"];
+        if (isset($decodedResult["ResponseHeader"]["Succeeded"]) && $decodedResult["ResponseHeader"]["Succeeded"] == 1 && count($decodedResult["Cultures"])) {
+            return array_map(function($culture) {
+                return $culture['CultureName'];
+            }, $decodedResult["Cultures"]);
 		}
 		return array();
 	}

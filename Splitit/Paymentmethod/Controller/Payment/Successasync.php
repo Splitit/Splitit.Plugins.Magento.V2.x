@@ -94,18 +94,39 @@ class Successasync extends \Magento\Framework\App\Action\Action {
 		$this->logger->addDebug('======= successAsyncAction :  =======InstallmentPlanNumber coming from splitit in url: ' . $params["InstallmentPlanNumber"]);
 		$this->logger->addDebug('======= quote Id from Splitit :  ======= '.$params['RefOrderNumber']);
 		$quote = $this->quoteRepository->get($params['RefOrderNumber']);
-		$api = $this->paymentForm->_initApi();
 		$planDetails = $this->paymentForm->getInstallmentPlanDetails($this->api);
 
 		$this->logger->addDebug('======= get installmentplan details :  ======= ');
 		$this->logger->addDebug(print_r($planDetails, TRUE));
 
-		$orderId = 0;
-		$orderIncrementId = 0;
-
 		$grandTotal = number_format((float) $quote->getGrandTotal(), 2, '.', '');
 		$planDetails["grandTotal"] = number_format((float) $planDetails["grandTotal"], 2, '.', '');
 		$this->logger->addDebug('======= grandTotal(orderObj):' . $grandTotal . ', grandTotal(planDetails):' . $planDetails["grandTotal"] . '   ======= ');
+
+		/* verify payment from splitit */
+        $verifyResult = $this->api->verifyPayment($params['InstallmentPlanNumber']);
+        $this->logger->addDebug('======= verify details :  ======= ');
+		$this->logger->addDebug(print_r($verifyResult, TRUE));
+		
+		if(isset($verifyResult['errorMsg'])){
+			$this->logger->addDebug('======= ASYNC verify API error :  ======= ');
+			$this->logger->addDebug($verifyResult['errorMsg']);
+			$this->logger->addDebug(__('Sorry, the payment was denied by the gateway! So order was not placed. If any amount was deducted, it will be credited back. Please try to order again.'));
+			return json_encode(['error'=>true]);
+		}
+		if(!$verifyResult['IsPaid']){
+			$this->logger->addDebug('======= ASYNC verify API error :  ======= ');
+			$this->logger->addDebug(__('Sorry, there was no actual payment received to create the order! So order was not placed. Please try to order again.'));
+			
+			return json_encode(['error'=>true]);
+		}
+		if($verifyResult['OriginalAmountPaid'] != $grandTotal){
+			$this->logger->addDebug('======= ASYNC verify API error :  ======= ');
+			$this->logger->addDebug(__('Sorry, there\'s an amount mismatch between cart amount and paid amount! So order was not placed. If any amount was deducted, it will be credited back. Please try to order again.'));
+			
+			return json_encode(['error'=>true]);
+		}
+		/* END verify payment from splitit */
 
 		if ($grandTotal == $planDetails["grandTotal"] && ($planDetails["planStatus"] == "PendingMerchantShipmentNotice" || $planDetails["planStatus"] == "InProgress")) {
 			$orderId = $this->orderPlace->execute($quote, array());

@@ -19,7 +19,8 @@
         <label data-bind="attr: {'for': getCode()}" class="label">
             <!-- Splitit Logo -->
             <img data-bind="attr: {src: getPaymentAcceptanceMarkSrc(), alt: $t('Splitit')}"
-                 class="payment-icon-splitit"/>
+                 class="payment-icon-splitit"
+                 style="height: 19px !important;"/>
             <!-- Splitit Logo -->
             <span data-bind="i18n: getTitle()"></span>
             <a data-bind="attr: {href: getPaymentAcceptanceMarkHref()}, click: showAcceptanceWindow" class="action action-help">
